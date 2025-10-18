@@ -28,5 +28,10 @@ public class UserCompany : BaseEntity
     /// Kullanıcı bu şirkete erişim hakkı var mı?
     /// </summary>
     public bool IsActive { get; set; } = true;
+    
+    /// <summary>
+    /// Kullanıcının şirkete katılma tarihi
+    /// </summary>
+    public DateTime JoinedAt { get; set; }
 }
 

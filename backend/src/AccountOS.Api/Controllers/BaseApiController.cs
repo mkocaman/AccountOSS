@@ -26,7 +26,7 @@ public abstract class BaseApiController : ControllerBase
     {
         if (result.Success)
         {
-            return Ok(new { success = true, data = result.Value });
+            return Ok(new { success = true, data = result.Data });
         }
 
         return BadRequest(new { success = false, message = result.Error });

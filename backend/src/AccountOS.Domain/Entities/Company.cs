@@ -50,9 +50,9 @@ public class Company : BaseEntity
     public string Country { get; set; } = "TR";
     
     /// <summary>
-    /// Para birimi (ISO 4217: TRY, USD, EUR, UZS, vb.)
+    /// Temel para birimi (ISO 4217: TRY, USD, EUR, UZS, vb.)
     /// </summary>
-    public string Currency { get; set; } = "TRY";
+    public string BaseCurrency { get; set; } = "TRY";
     
     /// <summary>
     /// Zaman dilimi (IANA: Europe/Istanbul, Asia/Tashkent, vb.)
@@ -60,9 +60,9 @@ public class Company : BaseEntity
     public string TimeZone { get; set; } = "Europe/Istanbul";
     
     /// <summary>
-    /// Dil kodu (ISO 639-1: tr, en, uz, ru, vb.)
+    /// Varsayılan dil kodu (ISO 639-1: TR, EN, UZ, RU, vb. - büyük harf)
     /// </summary>
-    public string Language { get; set; } = "tr";
+    public string DefaultLanguage { get; set; } = "TR";
     
     /// <summary>
     /// Şirket aktif mi?
@@ -70,9 +70,14 @@ public class Company : BaseEntity
     public bool IsActive { get; set; } = true;
     
     /// <summary>
-    /// Logo dosya yolu
+    /// Logo URL/yolu
     /// </summary>
-    public string? LogoPath { get; set; }
+    public string? LogoUrl { get; set; }
+    
+    /// <summary>
+    /// Birincil renk (white-label için, hex format: #FF5733)
+    /// </summary>
+    public string? PrimaryColor { get; set; }
     
     /// <summary>
     /// Abonelik bitiş tarihi

@@ -32,22 +32,23 @@ public class Result
 /// </summary>
 public class Result<T> : Result
 {
-    private readonly T? _value;
+    private readonly T? _data;
 
-    protected Result(T? value, bool success, string error) 
+    protected Result(T? data, bool success, string error) 
         : base(success, error)
     {
-        _value = value;
+        _data = data;
     }
 
-    public T Value => Success
-        ? _value!
-        : throw new InvalidOperationException("Başarısız bir sonuçtan değer okunamaz");
+    /// <summary>
+    /// İşlem sonucu verisi (başarılıysa)
+    /// </summary>
+    public T? Data => _data;
 
     /// <summary>
     /// Başarılı sonuç döndürür (veri ile)
     /// </summary>
-    public static Result<T> Ok(T value) => new(value, true, string.Empty);
+    public static Result<T> Ok(T data) => new(data, true, string.Empty);
 
     /// <summary>
     /// Başarısız sonuç döndürür

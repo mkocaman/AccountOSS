@@ -153,7 +153,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsRequired()
                 .HasMaxLength(2);
                 
-            entity.Property(e => e.Currency)
+            entity.Property(e => e.BaseCurrency)
                 .IsRequired()
                 .HasMaxLength(3);
                 
@@ -161,12 +161,15 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
                 .IsRequired()
                 .HasMaxLength(100);
                 
-            entity.Property(e => e.Language)
+            entity.Property(e => e.DefaultLanguage)
                 .IsRequired()
                 .HasMaxLength(2);
                 
-            entity.Property(e => e.LogoPath)
+            entity.Property(e => e.LogoUrl)
                 .HasMaxLength(500);
+                
+            entity.Property(e => e.PrimaryColor)
+                .HasMaxLength(20);
                 
             // Indexes
             entity.HasIndex(e => e.TaxNumber);

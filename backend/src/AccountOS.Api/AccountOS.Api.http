@@ -62,6 +62,41 @@ Content-Type: application/json
 GET {{baseUrl}}/sample/{{sampleId}}
 
 ### ===============================
+### COMPANIES (JWT REQUIRED)
+### ===============================
+
+### 1. Create Company
+# @name createCompany
+POST {{baseUrl}}/companies
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Yeni Şirket A.Ş.",
+  "taxNumber": "1234567890",
+  "taxOffice": "Ankara Vergi Dairesi",
+  "phone": "+90 312 555 1234",
+  "email": "info@yenisirket.com",
+  "address": "Ankara Caddesi No:123",
+  "city": "Ankara",
+  "country": "TR",
+  "baseCurrency": "TRY",
+  "defaultLanguage": "TR",
+  "timeZone": "Europe/Istanbul"
+}
+
+### 2. Get My Companies
+GET {{baseUrl}}/companies
+Authorization: Bearer {{accessToken}}
+
+### 3. Extract Company ID from Create Response
+@companyId = {{createCompany.response.body.data.id}}
+
+### 4. Get Company By ID
+GET {{baseUrl}}/companies/{{companyId}}
+Authorization: Bearer {{accessToken}}
+
+### ===============================
 ### PROTECTED ENDPOINTS (JWT Required)
 ### ===============================
 
