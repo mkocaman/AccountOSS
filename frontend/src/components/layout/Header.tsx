@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Button, Dropdown, Badge, Avatar, Select, Space } from 'antd';
 import {
   MenuFoldOutlined,
@@ -7,9 +8,12 @@ import {
   SettingOutlined,
   LogoutOutlined,
   GlobalOutlined,
+  PlusOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/authStore';
+import { useCompanyStore } from '@/store/companyStore';
+import { companiesApi } from '@/api/companies';
 
 interface HeaderProps {
   collapsed: boolean;
@@ -20,6 +24,34 @@ interface HeaderProps {
 export const Header = ({ collapsed, onToggle }: HeaderProps) => {
   const navigate = useNavigate();
   const { user, clearAuth } = useAuthStore();
+  const { companies, currentCompany, setCompanies, setCurrentCompany } =
+    useCompanyStore();
+
+  // Şirket listesini yükle
+  useEffect(() => {
+    loadCompanies();
+  }, []);
+
+  const loadCompanies = async () => {
+    try {
+      const response = await companiesApi.getUserCompanies();
+      if (response.success) {
+        setCompanies(response.data);
+      }
+    } catch (error) {
+      console.error('Şirketler yüklenemedi:', error);
+    }
+  };
+
+  // Şirket değiştir
+  const handleCompanyChange = (companyId: string) => {
+    const company = companies.find((c) => c.id === companyId);
+    if (company) {
+      setCurrentCompany(company);
+      // Sayfayı yenile (yeni şirket context'i için)
+      window.location.reload();
+    }
+  };
 
   // Çıkış yap
   const handleLogout = () => {
@@ -78,16 +110,48 @@ export const Header = ({ collapsed, onToggle }: HeaderProps) => {
 
       {/* Sağ Taraf: Actions */}
       <Space size="middle">
-        {/* Şirket Seçici (TODO: Gerçek şirket listesi) */}
+        {/* Şirket Seçici - GERÇEK VERİ */}
         <Select
-          defaultValue="company1"
-          style={{ width: 200 }}
-          options={[
-            { value: 'company1', label: 'Test Company' },
-            { value: 'company2', label: 'Demo Company' },
-          ]}
+          value={currentCompany?.id}
+          onChange={handleCompanyChange}
+          style={{ width: 220 }}
+          loading={companies.length === 0}
           placeholder="Şirket seçin"
-        />
+          dropdownRender={(menu) => (
+            <>
+              {menu}
+              <div className="p-2 border-t">
+                <Button
+                  type="text"
+                  icon={<PlusOutlined />}
+                  onClick={() => navigate('/companies/create')}
+                  block
+                >
+                  Yeni Şirket Ekle
+                </Button>
+              </div>
+            </>
+          )}
+        >
+          {companies.map((company) => (
+            <Select.Option key={company.id} value={company.id}>
+              <div className="flex items-center gap-2">
+                {company.logoUrl ? (
+                  <img
+                    src={company.logoUrl}
+                    alt={company.name}
+                    className="w-5 h-5 rounded"
+                  />
+                ) : (
+                  <div className="w-5 h-5 bg-primary rounded text-white text-xs flex items-center justify-center">
+                    {company.name.charAt(0)}
+                  </div>
+                )}
+                <span>{company.name}</span>
+              </div>
+            </Select.Option>
+          ))}
+        </Select>
 
         {/* Dil Seçici */}
         <Dropdown

@@ -2,6 +2,8 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { Login } from '@/features/auth/Login';
 import { Dashboard } from '@/features/dashboard/Dashboard';
 import { MainLayout } from '@/components/layout/MainLayout';
+import { CompanyList } from '@/features/companies/CompanyList';
+import { CompanyForm } from '@/features/companies/CompanyForm';
 import { useAuthStore } from '@/store/authStore';
 
 // Protected Route komponenti
@@ -43,6 +45,23 @@ export const router = createBrowserRouter([
       {
         path: 'dashboard',
         element: <Dashboard />,
+      },
+      {
+        path: 'companies',
+        children: [
+          {
+            index: true,
+            element: <CompanyList />,
+          },
+          {
+            path: 'create',
+            element: <CompanyForm />,
+          },
+          {
+            path: 'edit/:id',
+            element: <CompanyForm />,
+          },
+        ],
       },
       {
         path: 'invoices',

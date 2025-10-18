@@ -35,7 +35,18 @@ export interface User {
 export interface Company {
   id: string;
   name: string;
+  taxNumber: string;
+  taxOffice?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
   logoUrl?: string;
   primaryColor?: string;
+  baseCurrency: string;
+  defaultLanguage?: string;
+  timeZone?: string;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
