@@ -36,6 +36,9 @@ public static class DependencyInjection
         services.AddScoped<IJwtService, JwtService>();
         services.AddScoped<IPasswordHasher, PasswordHasher>();
         
+        // Encryption Service (for sensitive data)
+        services.AddSingleton<EncryptionService>();
+        
         // Email Service
         services.AddScoped<IEmailService, EmailService>();
         
@@ -46,8 +49,14 @@ public static class DependencyInjection
         services.AddMemoryCache();
         services.AddScoped<ICacheService, MemoryCacheService>();
         
-        // File Storage Service
+        // File Storage Service (legacy - simple)
         services.AddScoped<IFileStorageService, LocalFileStorageService>();
+        
+        // File Storage Providers (multi-provider)
+        services.AddScoped<Services.FileStorage.LocalDiskStorageProvider>();
+        services.AddScoped<Services.FileStorage.CustomCdnStorageProvider>();
+        services.AddScoped<Services.FileStorage.FileStorageService>();
+        services.AddHttpClient(); // For CustomCdnStorageProvider
         
         // Stock Service (FIFO)
         services.AddScoped<IStockService, StockService>();
@@ -64,6 +73,13 @@ public static class DependencyInjection
         // Security Services
         services.AddScoped<IRateLimitService, RateLimitService>();
         services.AddScoped<ITwoFactorAuthService, TwoFactorAuthService>();
+        
+        // Tax & Accounting Services
+        services.AddScoped<ITaxService, TaxService>();
+        services.AddScoped<IJournalEntryService, JournalEntryService>();
+        
+        // Search Service
+        services.AddScoped<ISearchService, SearchService>();
         
         // NOT: HttpContextAccessor API katmanında (Program.cs) eklenir
         // services.AddHttpContextAccessor(); 

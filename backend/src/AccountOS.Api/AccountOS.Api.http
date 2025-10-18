@@ -733,1250 +733,547 @@ GET {{baseUrl}}/products/{{productId}}
 Authorization: Bearer {{accessToken}}
 
 ### ===============================
-### INVOICES (FATURALAR)
+### USER PREFERENCES & SETTINGS
 ### ===============================
 
-### 37. Create Sales Invoice (Draft) - Satış Faturası Oluştur
-# @name createSalesInvoice
-POST {{baseUrl}}/invoices
+### 37. Get User Preferences
+GET {{baseUrl}}/preferences/user
+Authorization: Bearer {{accessToken}}
+
+### 38. Update User Theme
+PUT {{baseUrl}}/preferences/user
 Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
-  "type": 0,
-  "customerId": "{{customerId}}",
-  "invoiceDate": "2025-10-18",
-  "dueDate": "2025-11-18",
-  "currency": "TRY",
-  "notes": "Test satış faturası",
-  "items": [
+  "theme": "dark"
+}
+
+### 39. Update Language & Regional Settings
+PUT {{baseUrl}}/preferences/user
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "language": "en-US",
+  "timezone": "America/New_York",
+  "dateFormat": "MM/dd/yyyy",
+  "timeFormat": "12",
+  "numberFormat": "en-US",
+  "defaultCurrency": "USD"
+}
+
+### 40. Update Dashboard Preferences
+PUT {{baseUrl}}/preferences/user
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "itemsPerPage": 50,
+  "compactMode": true,
+  "sidebarCollapsed": false,
+  "defaultPage": "/dashboard"
+}
+
+### 41. Update Email Preferences
+PUT {{baseUrl}}/preferences/user
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "emailNotificationsEnabled": true,
+  "dailyDigestEmail": true,
+  "weeklyReportEmail": true
+}
+
+### 42. Update Default Values
+PUT {{baseUrl}}/preferences/user
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "defaultInvoiceDueDays": 45,
+  "defaultPaymentMethod": 0,
+  "defaultVatRate": 18,
+  "invoiceNotesTemplate": "Payment due within {days} days. Thank you for your business."
+}
+
+### 43. Get Company Settings
+GET {{baseUrl}}/preferences/company
+Authorization: Bearer {{accessToken}}
+
+### 44. Update Company Info
+PUT {{baseUrl}}/preferences/company
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "companyName": "Acme Corp",
+  "website": "https://acme.com",
+  "phone": "+90 212 123 4567",
+  "email": "info@acme.com",
+  "address": "Levent Mahallesi, Istanbul, Turkey",
+  "taxNumber": "1234567890",
+  "taxOffice": "Istanbul Vergi Dairesi"
+}
+
+### 45. Update Invoice Settings
+PUT {{baseUrl}}/preferences/company
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "invoicePrefix": "FA-",
+  "invoiceStartNumber": 1000,
+  "invoiceNumberFormat": "{PREFIX}{YEAR}-{NUMBER:0000}",
+  "invoiceFooter": "Thank you for your business!",
+  "defaultInvoiceNotes": "Payment due within 30 days.",
+  "defaultInvoiceTerms": "Net 30. Late payment subject to 2% monthly interest."
+}
+
+### 46. Update Feature Flags
+PUT {{baseUrl}}/preferences/company
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "multiCurrencyEnabled": true,
+  "inventoryEnabled": true,
+  "expenseManagementEnabled": true,
+  "requireTwoFactor": false,
+  "requireEmailVerification": true
+}
+
+### 47. Get Dashboard Widgets
+GET {{baseUrl}}/preferences/dashboard/widgets
+Authorization: Bearer {{accessToken}}
+
+### 48. Create Revenue Chart Widget
+POST {{baseUrl}}/preferences/dashboard/widgets
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "widgetType": "revenue-chart",
+  "title": "Revenue Overview",
+  "settings": "{\"period\":\"monthly\",\"chartType\":\"line\"}",
+  "positionX": 0,
+  "positionY": 0,
+  "width": 8,
+  "height": 4,
+  "isVisible": true,
+  "order": 1
+}
+
+### 49. Create Invoice List Widget
+POST {{baseUrl}}/preferences/dashboard/widgets
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "widgetType": "invoice-list",
+  "title": "Recent Invoices",
+  "settings": "{\"limit\":10,\"status\":\"all\"}",
+  "positionX": 8,
+  "positionY": 0,
+  "width": 4,
+  "height": 4,
+  "isVisible": true,
+  "order": 2
+}
+
+### 50. Update Widget Position
+POST {{baseUrl}}/preferences/dashboard/widgets
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "id": "{{widgetId}}",
+  "widgetType": "revenue-chart",
+  "title": "Revenue Overview",
+  "settings": "{\"period\":\"monthly\",\"chartType\":\"line\"}",
+  "positionX": 0,
+  "positionY": 6,
+  "width": 8,
+  "height": 4,
+  "isVisible": true,
+  "order": 1
+}
+
+### 51. Delete Widget
+DELETE {{baseUrl}}/preferences/dashboard/widgets/{{widgetId}}
+Authorization: Bearer {{accessToken}}
+
+### ===============================
+### TAX & ACCOUNTING
+### ===============================
+
+### 52. Initialize Chart of Accounts (Standard Turkish COA)
+POST {{baseUrl}}/accounting/chart-of-accounts/initialize
+Authorization: Bearer {{accessToken}}
+
+### 53. Get All Chart of Accounts
+GET {{baseUrl}}/accounting/chart-of-accounts
+Authorization: Bearer {{accessToken}}
+
+### 54. Get Asset Accounts
+GET {{baseUrl}}/accounting/chart-of-accounts?accountType=0
+Authorization: Bearer {{accessToken}}
+
+### 55. Get Liability Accounts
+GET {{baseUrl}}/accounting/chart-of-accounts?accountType=1
+Authorization: Bearer {{accessToken}}
+
+### 56. Get Revenue Accounts
+GET {{baseUrl}}/accounting/chart-of-accounts?accountType=3
+Authorization: Bearer {{accessToken}}
+
+### 57. Create Manual Journal Entry - Cash to Bank Transfer
+POST {{baseUrl}}/accounting/journal-entries
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "entryDate": "2025-10-18",
+  "description": "Kasa'dan Banka'ya para transferi",
+  "lines": [
     {
-      "productId": "{{productId}}",
-      "description": "Test ürün 1",
-      "quantity": 2,
-      "unitPrice": 1000,
-      "discountPercentage": 10
+      "accountId": "{{bankAccountId}}",
+      "debitAmount": 10000,
+      "creditAmount": 0,
+      "description": "Banka'ya transfer"
+    },
+    {
+      "accountId": "{{cashAccountId}}",
+      "debitAmount": 0,
+      "creditAmount": 10000,
+      "description": "Kasa'dan çıkış"
     }
   ]
 }
 
-### 38. Extract Invoice ID
-@invoiceId = {{createSalesInvoice.response.body.data.id}}
-
-### 39. Create Purchase Invoice (Draft) - Alış Faturası Oluştur
-POST {{baseUrl}}/invoices
+### 58. Create Journal Entry - Opening Capital
+POST {{baseUrl}}/accounting/journal-entries
 Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
-  "type": 1,
-  "customerId": "{{customerId}}",
-  "invoiceDate": "2025-10-18",
-  "currency": "TRY",
-  "notes": "Test alış faturası",
-  "items": [
+  "entryDate": "2025-01-01",
+  "description": "Açılış kaydı - İlk sermaye",
+  "lines": [
     {
-      "productId": "{{productId}}",
-      "quantity": 100,
-      "unitPrice": 800,
-      "discountPercentage": 5
+      "accountId": "{{bankAccountId}}",
+      "debitAmount": 100000,
+      "creditAmount": 0,
+      "description": "Banka'ya sermaye girişi"
+    },
+    {
+      "accountId": "{{capitalAccountId}}",
+      "debitAmount": 0,
+      "creditAmount": 100000,
+      "description": "Sermaye"
     }
   ]
 }
 
-### 40. Get All Invoices - Tüm Faturaları Listele
-GET {{baseUrl}}/invoices
-Authorization: Bearer {{accessToken}}
-
-### 41. Get Sales Invoices Only - Sadece Satış Faturaları
-GET {{baseUrl}}/invoices?type=0
-Authorization: Bearer {{accessToken}}
-
-### 42. Get Purchase Invoices Only - Sadece Alış Faturaları
-GET {{baseUrl}}/invoices?type=1
-Authorization: Bearer {{accessToken}}
-
-### 43. Get Issued Invoices - Kesilmiş Faturalar
-GET {{baseUrl}}/invoices?status=1
-Authorization: Bearer {{accessToken}}
-
-### 44. Get Invoices by Customer - Cariye Göre Faturalar
-GET {{baseUrl}}/invoices?customerId={{customerId}}
-Authorization: Bearer {{accessToken}}
-
-### 45. Get Invoices by Date Range - Tarih Aralığına Göre
-GET {{baseUrl}}/invoices?startDate=2025-10-01&endDate=2025-10-31
-Authorization: Bearer {{accessToken}}
-
-### 46. Search Invoices - Fatura Ara
-GET {{baseUrl}}/invoices?searchTerm=INV-2025
-Authorization: Bearer {{accessToken}}
-
-### 47. Get Invoice By ID - ID'ye Göre Fatura Detayı
-GET {{baseUrl}}/invoices/{{invoiceId}}
-Authorization: Bearer {{accessToken}}
-
-### 48. Issue Invoice - Fatura Kes (Draft → Issued + Stok Hareketi)
-POST {{baseUrl}}/invoices/{{invoiceId}}/issue
-Authorization: Bearer {{accessToken}}
-# Expected: 
-# - Status changes to Issued
-# - Stock movements applied (Sales: decrease, Purchase: increase)
-# - FIFO cost calculated for sales
-
-### 49. Cancel Invoice - Faturayı İptal Et
-POST {{baseUrl}}/invoices/{{invoiceId}}/cancel
-Authorization: Bearer {{accessToken}}
-# Expected: Status changes to Cancelled
-
-### 50. Try to Issue Already Issued Invoice (Should Fail)
-POST {{baseUrl}}/invoices/{{invoiceId}}/issue
-Authorization: Bearer {{accessToken}}
-# Expected: 400 Bad Request
-# "Sadece taslak faturalar kesilebilir"
-
-### 51. Create Multi-Currency Invoice - Çok Para Birimli Fatura
-POST {{baseUrl}}/invoices
+### 59. Create Journal Entry - Invoice Sale (Manual Example)
+POST {{baseUrl}}/accounting/journal-entries
 Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
-  "type": 0,
+  "entryDate": "2025-10-18",
+  "description": "Fatura satışı - Müşteri A",
+  "lines": [
+    {
+      "accountId": "{{receivablesAccountId}}",
+      "debitAmount": 12000,
+      "creditAmount": 0,
+      "description": "Müşteri A alacağı"
+    },
+    {
+      "accountId": "{{salesRevenueAccountId}}",
+      "debitAmount": 0,
+      "creditAmount": 10000,
+      "description": "Satış geliri"
+    },
+    {
+      "accountId": "{{vatPayableAccountId}}",
+      "debitAmount": 0,
+      "creditAmount": 2000,
+      "description": "KDV %20"
+    }
+  ]
+}
+
+### 60. Get Trial Balance - Current Month
+GET {{baseUrl}}/accounting/trial-balance?startDate=2025-10-01&endDate=2025-10-31
+Authorization: Bearer {{accessToken}}
+
+### 61. Get Trial Balance - Year to Date
+GET {{baseUrl}}/accounting/trial-balance?startDate=2025-01-01&endDate=2025-10-18
+Authorization: Bearer {{accessToken}}
+
+### ===============================
+### TAX RATE MANAGEMENT (CRUD)
+### ===============================
+
+### 62. Get All Tax Rates
+GET {{baseUrl}}/accounting/tax-rates
+Authorization: Bearer {{accessToken}}
+
+### 63. Get VAT Tax Rates Only
+GET {{baseUrl}}/accounting/tax-rates?taxType=0
+Authorization: Bearer {{accessToken}}
+
+### 64. Get Active Tax Rates Only
+GET {{baseUrl}}/accounting/tax-rates?isActive=true
+Authorization: Bearer {{accessToken}}
+
+### 65. Get Tax Rate By ID
+GET {{baseUrl}}/accounting/tax-rates/{{taxRateId}}
+Authorization: Bearer {{accessToken}}
+
+### 66. Create New VAT Rate (18%)
+POST {{baseUrl}}/accounting/tax-rates
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "taxType": 0,
+  "name": "KDV %18",
+  "code": "KDV18",
+  "rate": 18,
+  "effectiveFrom": "2026-01-01",
+  "countryCode": "TR",
+  "isDefault": false,
+  "description": "2026 yılı için yeni KDV oranı"
+}
+
+### 67. Create Withholding Tax Rate
+POST {{baseUrl}}/accounting/tax-rates
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "taxType": 1,
+  "name": "Gelir Vergisi Stopajı %25",
+  "code": "GVS25",
+  "rate": 25,
+  "effectiveFrom": "2025-01-01",
+  "countryCode": "TR",
+  "isDefault": false,
+  "description": "Belirli gelirler için %25 stopaj"
+}
+
+### 68. Update Tax Rate - Change Rate
+PUT {{baseUrl}}/accounting/tax-rates/{{taxRateId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "id": "{{taxRateId}}",
+  "rate": 19,
+  "description": "Oran %18'den %19'a güncellendi"
+}
+
+### 69. Update Tax Rate - Deactivate
+PUT {{baseUrl}}/accounting/tax-rates/{{taxRateId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "id": "{{taxRateId}}",
+  "isActive": false,
+  "description": "Oran pasif yapıldı"
+}
+
+### 70. Update Tax Rate - Set as Default
+PUT {{baseUrl}}/accounting/tax-rates/{{taxRateId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "id": "{{taxRateId}}",
+  "isDefault": true,
+  "description": "Varsayılan oran olarak belirlendi"
+}
+
+### 71. Delete Tax Rate (Unused)
+DELETE {{baseUrl}}/accounting/tax-rates/{{taxRateId}}
+Authorization: Bearer {{accessToken}}
+
+### ===============================
+### ADVANCED SEARCH
+### ===============================
+
+### 72. Global Search - Simple
+GET {{baseUrl}}/search/global?q=test&limit=10
+Authorization: Bearer {{accessToken}}
+
+### 73. Global Search - Invoice Number
+GET {{baseUrl}}/search/global?q=INV-2025&limit=10
+Authorization: Bearer {{accessToken}}
+
+### 74. Global Search - Customer Name
+GET {{baseUrl}}/search/global?q=Acme&limit=10
+Authorization: Bearer {{accessToken}}
+
+### 75. Advanced Invoice Search - All Invoices
+POST {{baseUrl}}/search/invoices
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "searchText": "",
+  "pageNumber": 1,
+  "pageSize": 50,
+  "sortBy": "date",
+  "sortDescending": true
+}
+
+### 76. Advanced Invoice Search - By Customer
+POST {{baseUrl}}/search/invoices
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
   "customerId": "{{customerId}}",
-  "invoiceDate": "2025-10-18",
+  "pageNumber": 1,
+  "pageSize": 50
+}
+
+### 77. Advanced Invoice Search - Date Range
+POST {{baseUrl}}/search/invoices
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "startDate": "2025-01-01",
+  "endDate": "2025-12-31",
+  "sortBy": "date",
+  "sortDescending": true
+}
+
+### 78. Advanced Invoice Search - By Status & Currency
+POST {{baseUrl}}/search/invoices
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "status": 2,
   "currency": "USD",
-  "notes": "Dolar cinsinden fatura",
-  "items": [
-    {
-      "productId": "{{productId}}",
-      "quantity": 1,
-      "unitPrice": 100,
-      "discountPercentage": 0
-    }
-  ]
+  "pageNumber": 1,
+  "pageSize": 50
 }
 
-### 52. Test Insufficient Stock (Should Fail) - Yetersiz Stok Testi
-POST {{baseUrl}}/invoices
+### 79. Advanced Invoice Search - Amount Range
+POST {{baseUrl}}/search/invoices
 Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
-  "type": 0,
-  "customerId": "{{customerId}}",
-  "invoiceDate": "2025-10-18",
+  "minAmount": 1000,
+  "maxAmount": 10000,
+  "sortBy": "amount",
+  "sortDescending": true
+}
+
+### 80. Advanced Invoice Search - Complex Filters
+POST {{baseUrl}}/search/invoices
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "searchText": "ABC",
+  "startDate": "2025-10-01",
+  "endDate": "2025-10-31",
+  "status": 2,
   "currency": "TRY",
-  "items": [
-    {
-      "productId": "{{productId}}",
-      "quantity": 10000,
-      "unitPrice": 1000,
-      "discountPercentage": 0
-    }
-  ]
+  "minAmount": 500,
+  "maxAmount": 5000,
+  "sortBy": "date",
+  "sortDescending": true,
+  "pageNumber": 1,
+  "pageSize": 20
 }
-# Expected: 400 Bad Request
-# "Yetersiz stok! Ürün: ..., Mevcut: ..., İstenen: 10000"
 
-### ===============================
-### PAYMENTS (ÖDEMELER)
-### ===============================
-
-### 53. Record Payment (Receipt - Müşteriden Tahsilat)
-# @name createPayment
-POST {{baseUrl}}/payments
+### 81. Advanced Customer Search - All Customers
+POST {{baseUrl}}/search/customers
 Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
-  "type": 0,
-  "customerId": "{{customerId}}",
-  "invoiceId": "{{invoiceId}}",
-  "paymentDate": "2025-10-18",
-  "method": 1,
-  "amount": 1000,
-  "currency": "TRY",
-  "bankAccount": "Kuveyt Türk - 97191958-1",
-  "referenceNumber": "DEKONT-123456",
-  "description": "Fatura kısmi ödemesi"
+  "pageNumber": 1,
+  "pageSize": 50,
+  "sortBy": "name",
+  "sortDescending": false
 }
 
-### 54. Extract Payment ID
-@paymentId = {{createPayment.response.body.data.id}}
-
-### 55. Record Payment (Payment - Tedarikçiye Ödeme)
-POST {{baseUrl}}/payments
+### 82. Advanced Customer Search - By Name
+POST {{baseUrl}}/search/customers
 Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
-  "type": 1,
-  "customerId": "{{customerId}}",
-  "paymentDate": "2025-10-18",
-  "method": 1,
-  "amount": 500,
-  "currency": "TRY",
-  "bankAccount": "Vakıf Katılım - 887512-1",
-  "referenceNumber": "EFT-789012",
-  "description": "Alış faturası ödemesi"
-}
-
-### 56. Record Check Payment
-POST {{baseUrl}}/payments
-Authorization: Bearer {{accessToken}}
-Content-Type: application/json
-
-{
-  "type": 0,
-  "customerId": "{{customerId}}",
-  "paymentDate": "2025-10-18",
-  "method": 3,
-  "amount": 3000,
-  "currency": "TRY",
-  "referenceNumber": "0159636",
-  "description": "Alınan Çek - Kuveyt Türk"
-}
-
-### 57. Record Multi-Currency Payment (USD)
-POST {{baseUrl}}/payments
-Authorization: Bearer {{accessToken}}
-Content-Type: application/json
-
-{
-  "type": 0,
-  "customerId": "{{customerId}}",
-  "paymentDate": "2025-10-18",
-  "method": 1,
-  "amount": 100,
-  "currency": "USD",
-  "bankAccount": "Kuveyt Türk USD - 97191958-101",
-  "description": "USD fatura ödemesi"
-}
-
-### 58. Get All Payments
-GET {{baseUrl}}/payments
-Authorization: Bearer {{accessToken}}
-
-### 59. Get Receipts Only (Tahsilatlar)
-GET {{baseUrl}}/payments?type=0
-Authorization: Bearer {{accessToken}}
-
-### 60. Get Payments Only (Ödemeler)
-GET {{baseUrl}}/payments?type=1
-Authorization: Bearer {{accessToken}}
-
-### 61. Get Payments by Customer
-GET {{baseUrl}}/payments?customerId={{customerId}}
-Authorization: Bearer {{accessToken}}
-
-### 62. Get Payments by Invoice
-GET {{baseUrl}}/payments?invoiceId={{invoiceId}}
-Authorization: Bearer {{accessToken}}
-
-### 63. Get Payments by Method (Bank Transfer)
-GET {{baseUrl}}/payments?method=1
-Authorization: Bearer {{accessToken}}
-
-### 64. Get Payments by Date Range
-GET {{baseUrl}}/payments?startDate=2025-10-01&endDate=2025-10-31
-Authorization: Bearer {{accessToken}}
-
-### 65. Search Payments
-GET {{baseUrl}}/payments?searchTerm=DEKONT
-Authorization: Bearer {{accessToken}}
-
-### 66. Get Payment By ID
-GET {{baseUrl}}/payments/{{paymentId}}
-Authorization: Bearer {{accessToken}}
-
-### ===============================
-### CUSTOMER STATEMENT (CARİ HESAP EKSTRESİ)
-### ===============================
-
-### 67. Get Customer Statement (Basic - TRY Only)
-GET {{baseUrl}}/customers/{{customerId}}/statement?startDate=2025-07-23&endDate=2025-10-18
-Authorization: Bearer {{accessToken}}
-
-### 68. Get Customer Statement (Multi-Currency)
-GET {{baseUrl}}/customers/{{customerId}}/statement?startDate=2025-07-23&endDate=2025-10-18&currencies=TRY,USD,EUR
-Authorization: Bearer {{accessToken}}
-
-### 69. Get Customer Statement (Full Details with Items)
-GET {{baseUrl}}/customers/{{customerId}}/statement?startDate=2025-07-23&endDate=2025-10-18&showInvoiceNames=true&showItems=true&showBankAccounts=true
-Authorization: Bearer {{accessToken}}
-
-### 70. Get Customer Statement (All Transactions)
-GET {{baseUrl}}/customers/{{customerId}}/statement?startDate=2021-01-01&endDate=2025-12-31
-Authorization: Bearer {{accessToken}}
-
-### ===============================
-### DOCUMENT NUMBERING TEMPLATES
-### ===============================
-
-### 71. Get All Templates
-GET {{baseUrl}}/document-numbering
-Authorization: Bearer {{accessToken}}
-
-### 72. Get Templates by Document Type
-GET {{baseUrl}}/document-numbering?documentType=Invoice
-Authorization: Bearer {{accessToken}}
-
-### 73. Create Invoice Template (Logo İşbaşı Style)
-# @name createTemplate
-POST {{baseUrl}}/document-numbering
-Authorization: Bearer {{accessToken}}
-Content-Type: application/json
-
-{
-  "documentType": "Invoice",
-  "subType": "Sales",
-  "template": "{PREFIX}{YEAR}{SEQUENCE}",
-  "prefix": "VME",
-  "includeYear": true,
-  "yearFormat": "YYYY",
-  "includeMonth": false,
-  "sequenceLength": 9,
-  "startingNumber": 1,
-  "resetFrequency": 1
-}
-
-### 74. Extract Template ID
-@templateId = {{createTemplate.response.body.data.id}}
-
-### 75. Create Payment Template (AccountOS Style)
-POST {{baseUrl}}/document-numbering
-Authorization: Bearer {{accessToken}}
-Content-Type: application/json
-
-{
-  "documentType": "Payment",
-  "template": "{PREFIX}-{YEAR}-{SEQUENCE}",
-  "prefix": "PAY",
-  "includeYear": true,
-  "yearFormat": "YYYY",
-  "includeMonth": false,
-  "sequenceLength": 4,
-  "startingNumber": 1,
-  "resetFrequency": 1
-}
-
-### 76. Create Purchase Invoice Template
-POST {{baseUrl}}/document-numbering
-Authorization: Bearer {{accessToken}}
-Content-Type: application/json
-
-{
-  "documentType": "Invoice",
-  "subType": "Purchase",
-  "template": "{PREFIX}-{YEAR}-{SEQUENCE}",
-  "prefix": "PUR",
-  "includeYear": true,
-  "yearFormat": "YYYY",
-  "includeMonth": false,
-  "sequenceLength": 4,
-  "startingNumber": 1,
-  "resetFrequency": 1
-}
-
-### 77. Create Monthly Reset Template
-POST {{baseUrl}}/document-numbering
-Authorization: Bearer {{accessToken}}
-Content-Type: application/json
-
-{
-  "documentType": "Quote",
-  "template": "{PREFIX}{YEAR}{MONTH}{SEQUENCE}",
-  "prefix": "QT",
-  "includeYear": true,
-  "yearFormat": "YYYY",
-  "includeMonth": true,
-  "monthFormat": "MM",
-  "sequenceLength": 4,
-  "startingNumber": 1,
-  "resetFrequency": 2
-}
-
-### 78. Update Template
-PUT {{baseUrl}}/document-numbering/{{templateId}}
-Authorization: Bearer {{accessToken}}
-Content-Type: application/json
-
-{
-  "id": "{{templateId}}",
-  "template": "{PREFIX}-{YEAR}-{SEQUENCE}",
-  "prefix": "INV",
-  "includeYear": true,
-  "yearFormat": "YYYY",
-  "includeMonth": false,
-  "sequenceLength": 5,
-  "resetFrequency": 1,
+  "searchText": "Corp",
   "isActive": true
 }
 
-### ===============================
-### PDF GENERATION
-### ===============================
-
-### 79. Download Invoice PDF
-GET {{baseUrl}}/invoices/{{invoiceId}}/pdf
-Authorization: Bearer {{accessToken}}
-
-### 80. Download Customer Statement PDF (Basic)
-GET {{baseUrl}}/customers/{{customerId}}/statement/pdf?startDate=2025-07-23&endDate=2025-10-18
-Authorization: Bearer {{accessToken}}
-
-### 81. Download Customer Statement PDF (Multi-Currency)
-GET {{baseUrl}}/customers/{{customerId}}/statement/pdf?startDate=2025-07-23&endDate=2025-10-18&currencies=TRY,USD,EUR&showBankAccounts=true
-Authorization: Bearer {{accessToken}}
-
-### 82. Download Statement with Invoice Items
-GET {{baseUrl}}/customers/{{customerId}}/statement/pdf?startDate=2025-07-23&endDate=2025-10-18&showItems=true
-Authorization: Bearer {{accessToken}}
-
-### ===============================
-### REPORTS & ANALYTICS
-### ===============================
-
-### 83. Get Dashboard Statistics
-GET {{baseUrl}}/reports/dashboard?currency=TRY
-Authorization: Bearer {{accessToken}}
-
-### 84. Get Dashboard Statistics (USD)
-GET {{baseUrl}}/reports/dashboard?currency=USD
-Authorization: Bearer {{accessToken}}
-
-### 85. Get Sales Report (This Month)
-GET {{baseUrl}}/reports/sales?startDate=2025-10-01&endDate=2025-10-31&currency=TRY
-Authorization: Bearer {{accessToken}}
-
-### 86. Get Sales Report (Last 3 Months with Comparison)
-GET {{baseUrl}}/reports/sales?startDate=2025-07-01&endDate=2025-10-31&currency=TRY&includeComparison=true
-Authorization: Bearer {{accessToken}}
-
-### 87. Get Sales Report by Customer
-GET {{baseUrl}}/reports/sales?startDate=2025-01-01&endDate=2025-12-31&customerId={{customerId}}&currency=TRY
-Authorization: Bearer {{accessToken}}
-
-### 88. Get Sales Report by Product
-GET {{baseUrl}}/reports/sales?startDate=2025-01-01&endDate=2025-12-31&productId={{productId}}&currency=TRY
-Authorization: Bearer {{accessToken}}
-
-### 89. Get Purchase Report (This Month)
-GET {{baseUrl}}/reports/purchases?startDate=2025-10-01&endDate=2025-10-31&currency=TRY
-Authorization: Bearer {{accessToken}}
-
-### 90. Get Purchase Report by Supplier
-GET {{baseUrl}}/reports/purchases?startDate=2025-01-01&endDate=2025-12-31&supplierId={{customerId}}&currency=TRY
-Authorization: Bearer {{accessToken}}
-
-### 91. Get Profit/Loss Report (This Year)
-GET {{baseUrl}}/reports/profit-loss?startDate=2025-01-01&endDate=2025-12-31&currency=TRY
-Authorization: Bearer {{accessToken}}
-
-### 92. Get Profit/Loss Report (This Month)
-GET {{baseUrl}}/reports/profit-loss?startDate=2025-10-01&endDate=2025-10-31&currency=TRY
-Authorization: Bearer {{accessToken}}
-
-### 93. Get Stock Report (All Products)
-GET {{baseUrl}}/reports/stock?currency=TRY
-Authorization: Bearer {{accessToken}}
-
-### 94. Get Stock Report (Low Stock Only)
-GET {{baseUrl}}/reports/stock?currency=TRY&includeLowStockOnly=true
-Authorization: Bearer {{accessToken}}
-
-### 95. Get Customer Balance Report (with Aging)
-GET {{baseUrl}}/reports/customer-balances?currency=TRY&includeAging=true
-Authorization: Bearer {{accessToken}}
-
-# ========================================
-# EMAIL INTEGRATION MODULE
-# ========================================
-
-### ===== EMAIL CONFIGURATION =====
-
-### 96. Get Email Configuration
-GET {{baseUrl}}/email-configuration
-Authorization: Bearer {{accessToken}}
-
-### 97. Save Email Configuration (Gmail Example)
-POST {{baseUrl}}/email-configuration
+### 83. Advanced Customer Search - By Tax Number
+POST {{baseUrl}}/search/customers
 Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
-  "smtpHost": "smtp.gmail.com",
-  "smtpPort": 587,
-  "useSsl": true,
-  "username": "your-email@gmail.com",
-  "password": "your-app-password",
-  "senderName": "BEYCE İÇ VE DIŞ TİCARET",
-  "senderEmail": "your-email@gmail.com"
+  "taxNumber": "1234567890"
 }
 
-### 98. Test Email Configuration
-POST {{baseUrl}}/email-configuration/test
+### 84. Advanced Product Search - All Products
+POST {{baseUrl}}/search/products
 Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
-  "testEmail": "test@example.com"
+  "pageNumber": 1,
+  "pageSize": 50,
+  "sortBy": "name",
+  "sortDescending": false
 }
 
-### ===== SEND EMAILS =====
-
-### 99. Send Invoice Email
-POST {{baseUrl}}/email/send-invoice
+### 85. Advanced Product Search - By Name/Code
+POST {{baseUrl}}/search/products
 Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
-  "invoiceId": "{{invoiceId}}",
-  "additionalMessage": "Lütfen faturayı inceleyiniz. Sorularınız için bizimle iletişime geçebilirsiniz."
+  "searchText": "laptop",
+  "isActive": true
 }
 
-### 100. Send Payment Reminder
-POST {{baseUrl}}/email/send-payment-reminder
+### 86. Advanced Product Search - Price Range
+POST {{baseUrl}}/search/products
 Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
-  "invoiceId": "{{invoiceId}}"
+  "minPrice": 100,
+  "maxPrice": 1000,
+  "inStock": true,
+  "sortBy": "price",
+  "sortDescending": false
 }
 
-### ===== EMAIL LOGS =====
-
-### 101. Get All Email Logs
-GET {{baseUrl}}/email/logs
-Authorization: Bearer {{accessToken}}
-
-### 102. Get Email Logs by Status (Sent)
-GET {{baseUrl}}/email/logs?status=2
-Authorization: Bearer {{accessToken}}
-
-### 103. Get Email Logs by Status (Failed)
-GET {{baseUrl}}/email/logs?status=3
-Authorization: Bearer {{accessToken}}
-
-### 104. Get Email Logs with Date Range
-GET {{baseUrl}}/email/logs?startDate=2025-10-01&endDate=2025-10-31
-Authorization: Bearer {{accessToken}}
-
-### 105. Search Email Logs
-GET {{baseUrl}}/email/logs?searchTerm=sarisoy
-Authorization: Bearer {{accessToken}}
-
-# ========================================
-# AUDIT TRAIL & LOGGING MODULE
-# ========================================
-
-### ===== AUDIT LOGS =====
-
-### 106. Get All Audit Logs
-GET {{baseUrl}}/audit-logs
-Authorization: Bearer {{accessToken}}
-
-### 107. Get Audit Logs by Action (Create)
-GET {{baseUrl}}/audit-logs?action=0
-Authorization: Bearer {{accessToken}}
-
-### 108. Get Audit Logs by Action (Update)
-GET {{baseUrl}}/audit-logs?action=1
-Authorization: Bearer {{accessToken}}
-
-### 109. Get Audit Logs by Action (Delete)
-GET {{baseUrl}}/audit-logs?action=2
-Authorization: Bearer {{accessToken}}
-
-### 110. Get Audit Logs by Action (Login)
-GET {{baseUrl}}/audit-logs?action=10
-Authorization: Bearer {{accessToken}}
-
-### 111. Get Audit Logs by Entity Type (Invoice)
-GET {{baseUrl}}/audit-logs?entityType=Invoice
-Authorization: Bearer {{accessToken}}
-
-### 112. Get Audit Logs by Entity Type (Customer)
-GET {{baseUrl}}/audit-logs?entityType=Customer
-Authorization: Bearer {{accessToken}}
-
-### 113. Get Audit Logs by Date Range
-GET {{baseUrl}}/audit-logs?startDate=2025-10-01&endDate=2025-10-31
-Authorization: Bearer {{accessToken}}
-
-### 114. Get Audit Logs by User
-GET {{baseUrl}}/audit-logs?userId={{userId}}
-Authorization: Bearer {{accessToken}}
-
-### 115. Search Audit Logs
-GET {{baseUrl}}/audit-logs?searchTerm=invoice
-Authorization: Bearer {{accessToken}}
-
-### 116. Get Audit Logs with Pagination
-GET {{baseUrl}}/audit-logs?pageNumber=1&pageSize=20
-Authorization: Bearer {{accessToken}}
-
-### ===== ENTITY HISTORY =====
-
-### 117. Get Invoice History
-GET {{baseUrl}}/audit-logs/entity-history?entityType=Invoice&entityId={{invoiceId}}
-Authorization: Bearer {{accessToken}}
-
-### 118. Get Customer History
-GET {{baseUrl}}/audit-logs/entity-history?entityType=Customer&entityId={{customerId}}
-Authorization: Bearer {{accessToken}}
-
-### 119. Get Payment History
-GET {{baseUrl}}/audit-logs/entity-history?entityType=Payment&entityId={{paymentId}}
-Authorization: Bearer {{accessToken}}
-
-### ===== USER ACTIVITY =====
-
-### 120. Get Current User Activity
-GET {{baseUrl}}/audit-logs/user-activity
-Authorization: Bearer {{accessToken}}
-
-### 121. Get Specific User Activity
-GET {{baseUrl}}/audit-logs/user-activity?userId={{userId}}
-Authorization: Bearer {{accessToken}}
-
-### 122. Get User Activity by Date Range
-GET {{baseUrl}}/audit-logs/user-activity?startDate=2025-10-01&endDate=2025-10-31
-Authorization: Bearer {{accessToken}}
-
-### ===== AUDIT TRAIL USE CASES =====
-
-### 123. Security Audit - Failed Login Attempts
-GET {{baseUrl}}/audit-logs?action=12
-Authorization: Bearer {{accessToken}}
-
-### 124. Compliance Report - All Changes in Date Range
-GET {{baseUrl}}/audit-logs?startDate=2025-10-01&endDate=2025-10-31&pageSize=100
-Authorization: Bearer {{accessToken}}
-
-### 125. Critical Actions Report (Deletes)
-GET {{baseUrl}}/audit-logs?action=2
-Authorization: Bearer {{accessToken}}
-
-# ========================================
-# EXPENSE MANAGEMENT MODULE
-# ========================================
-
-### ===== EXPENSE CATEGORIES =====
-
-### 126. Get All Expense Categories
-GET {{baseUrl}}/expense-categories
-Authorization: Bearer {{accessToken}}
-
-### 127. Get Active Expense Categories
-GET {{baseUrl}}/expense-categories?isActive=true
-Authorization: Bearer {{accessToken}}
-
-### 128. Get Expense Category by ID
-GET {{baseUrl}}/expense-categories/{{expenseCategoryId}}
-Authorization: Bearer {{accessToken}}
-
-### 129. Create Expense Category - Office Supplies
-POST {{baseUrl}}/expense-categories
+### 87. Advanced Product Search - Out of Stock
+POST {{baseUrl}}/search/products
 Authorization: Bearer {{accessToken}}
 Content-Type: application/json
 
 {
-  "code": "OFFICE",
-  "name": "Ofis Malzemeleri",
-  "description": "Kırtasiye, yazıcı, bilgisayar vb.",
-  "monthlyBudget": 5000,
-  "currency": "TRY",
-  "colorCode": "#3498db",
-  "displayOrder": 1
-}
-
-### 130. Create Expense Category - Rent
-POST {{baseUrl}}/expense-categories
-Authorization: Bearer {{accessToken}}
-Content-Type: application/json
-
-{
-  "code": "RENT",
-  "name": "Kira",
-  "description": "Ofis kirası",
-  "monthlyBudget": 50000,
-  "currency": "TRY",
-  "colorCode": "#e74c3c",
-  "displayOrder": 2
-}
-
-### 131. Create Expense Category - Utilities
-POST {{baseUrl}}/expense-categories
-Authorization: Bearer {{accessToken}}
-Content-Type: application/json
-
-{
-  "code": "UTIL",
-  "name": "Faturalar",
-  "description": "Elektrik, su, internet, telefon",
-  "monthlyBudget": 10000,
-  "currency": "TRY",
-  "colorCode": "#f39c12",
-  "displayOrder": 3
-}
-
-### 132. Update Expense Category
-PUT {{baseUrl}}/expense-categories/{{expenseCategoryId}}
-Authorization: Bearer {{accessToken}}
-Content-Type: application/json
-
-{
-  "id": "{{expenseCategoryId}}",
-  "code": "OFFICE",
-  "name": "Ofis Malzemeleri (Updated)",
-  "description": "Updated description",
-  "monthlyBudget": 6000,
-  "currency": "TRY",
-  "colorCode": "#3498db",
+  "inStock": false,
   "isActive": true,
-  "displayOrder": 1
+  "sortBy": "stock",
+  "sortDescending": false
 }
-
-### 133. Delete Expense Category
-DELETE {{baseUrl}}/expense-categories/{{expenseCategoryId}}
-Authorization: Bearer {{accessToken}}
-
-### ===== EXPENSES =====
-
-### 134. Get All Expenses
-GET {{baseUrl}}/expenses
-Authorization: Bearer {{accessToken}}
-
-### 135. Get Expense by ID
-GET {{baseUrl}}/expenses/{{expenseId}}
-Authorization: Bearer {{accessToken}}
-
-### 136. Create Expense - Office Supplies (Draft)
-POST {{baseUrl}}/expenses
-Authorization: Bearer {{accessToken}}
-Content-Type: application/json
-
-{
-  "categoryId": "{{expenseCategoryId}}",
-  "expenseDate": "2025-10-18",
-  "title": "Kırtasiye Malzemeleri",
-  "description": "Yazıcı kağıdı, kalem, dosya",
-  "amount": 1500,
-  "currency": "TRY",
-  "vatRate": 20,
-  "paymentMethod": 0,
-  "notes": "Migros'tan alındı",
-  "tags": ["office", "supplies"]
-}
-
-### 137. Create Expense - Rent (with Supplier)
-POST {{baseUrl}}/expenses
-Authorization: Bearer {{accessToken}}
-Content-Type: application/json
-
-{
-  "categoryId": "{{expenseCategoryId}}",
-  "supplierId": "{{customerId}}",
-  "expenseDate": "2025-10-01",
-  "title": "Ekim Ayı Ofis Kirası",
-  "amount": 50000,
-  "currency": "TRY",
-  "vatRate": 0,
-  "paymentMethod": 1,
-  "invoiceNumber": "RENT-2025-10"
-}
-
-### 138. Create Expense - Paid Immediately
-POST {{baseUrl}}/expenses
-Authorization: Bearer {{accessToken}}
-Content-Type: application/json
-
-{
-  "categoryId": "{{expenseCategoryId}}",
-  "expenseDate": "2025-10-18",
-  "paymentDate": "2025-10-18",
-  "title": "Elektrik Faturası",
-  "description": "Ekim 2025 elektrik",
-  "amount": 2500,
-  "currency": "TRY",
-  "vatRate": 20,
-  "paymentMethod": 1,
-  "invoiceNumber": "ELEC-OCT-2025"
-}
-
-### 139. Create Recurring Expense (Monthly Rent)
-POST {{baseUrl}}/expenses
-Authorization: Bearer {{accessToken}}
-Content-Type: application/json
-
-{
-  "categoryId": "{{expenseCategoryId}}",
-  "expenseDate": "2025-10-01",
-  "title": "Monthly Office Rent",
-  "amount": 15000,
-  "currency": "TRY",
-  "vatRate": 0,
-  "paymentMethod": 1,
-  "isRecurring": true,
-  "recurringFrequency": 2,
-  "recurringEndDate": "2026-10-01",
-  "tags": ["rent", "recurring"]
-}
-
-### 140. Create Multi-Currency Expense (USD)
-POST {{baseUrl}}/expenses
-Authorization: Bearer {{accessToken}}
-Content-Type: application/json
-
-{
-  "categoryId": "{{expenseCategoryId}}",
-  "expenseDate": "2025-10-18",
-  "title": "Software License - Adobe",
-  "description": "Annual subscription",
-  "amount": 500,
-  "currency": "USD",
-  "vatRate": 0,
-  "paymentMethod": 2,
-  "referenceNumber": "LIC-2025-001",
-  "tags": ["software", "license", "usd"]
-}
-
-### 141. Update Expense
-PUT {{baseUrl}}/expenses/{{expenseId}}
-Authorization: Bearer {{accessToken}}
-Content-Type: application/json
-
-{
-  "id": "{{expenseId}}",
-  "categoryId": "{{expenseCategoryId}}",
-  "expenseDate": "2025-10-18",
-  "title": "Kırtasiye Malzemeleri (Updated)",
-  "description": "Updated description",
-  "amount": 1800,
-  "currency": "TRY",
-  "vatRate": 20,
-  "paymentMethod": 0
-}
-
-### 142. Approve Expense
-POST {{baseUrl}}/expenses/{{expenseId}}/approve
-Authorization: Bearer {{accessToken}}
-
-### 143. Reject Expense
-POST {{baseUrl}}/expenses/{{expenseId}}/reject
-Authorization: Bearer {{accessToken}}
-Content-Type: application/json
-
-{
-  "expenseId": "{{expenseId}}",
-  "rejectionReason": "Missing invoice attachment"
-}
-
-### 144. Mark Expense as Paid
-POST {{baseUrl}}/expenses/{{expenseId}}/mark-as-paid
-Authorization: Bearer {{accessToken}}
-Content-Type: application/json
-
-{
-  "expenseId": "{{expenseId}}",
-  "paymentDate": "2025-10-18"
-}
-
-### 145. Delete Expense
-DELETE {{baseUrl}}/expenses/{{expenseId}}
-Authorization: Bearer {{accessToken}}
-
-### ===== EXPENSE FILTERS =====
-
-### 146. Get Expenses by Category
-GET {{baseUrl}}/expenses?categoryId={{expenseCategoryId}}
-Authorization: Bearer {{accessToken}}
-
-### 147. Get Expenses by Supplier
-GET {{baseUrl}}/expenses?supplierId={{customerId}}
-Authorization: Bearer {{accessToken}}
-
-### 148. Get Expenses by Status (Draft)
-GET {{baseUrl}}/expenses?status=0
-Authorization: Bearer {{accessToken}}
-
-### 149. Get Expenses by Status (Paid)
-GET {{baseUrl}}/expenses?status=3
-Authorization: Bearer {{accessToken}}
-
-### 150. Get Expenses by Approval Status (Pending)
-GET {{baseUrl}}/expenses?approvalStatus=1
-Authorization: Bearer {{accessToken}}
-
-### 151. Get Expenses by Date Range
-GET {{baseUrl}}/expenses?startDate=2025-10-01&endDate=2025-10-31
-Authorization: Bearer {{accessToken}}
-
-### 152. Search Expenses
-GET {{baseUrl}}/expenses?searchTerm=kira
-Authorization: Bearer {{accessToken}}
-
-### 153. Get Expenses with Pagination
-GET {{baseUrl}}/expenses?pageNumber=1&pageSize=20
-Authorization: Bearer {{accessToken}}
-
-# ========================================
-# FILE & DOCUMENT MANAGEMENT MODULE
-# ========================================
-
-### ===== FILE STORAGE CONFIGURATION =====
-
-### 154. Configure Local Disk Storage (Default)
-# NOTE: File management infrastructure hazır
-# Full implementation (upload/download/attach) Prompt 1.23 EXTENDED'da tamamlanacak
-# Database structure ready: file_storage_configurations, files, file_attachments
-
-### 155. File Management - Database Structure Ready
-# Tables created:
-# - file_storage_configurations (storage provider configs)
-# - files (file metadata with versioning)
-# - file_attachments (polymorphic relationships)
-#
-# Storage Providers Supported:
-# - LocalDisk (default, free)
-# - Azure Blob Storage (enterprise)
-# - AWS S3 (enterprise)
-# - Custom CDN (flexible)
-#
-# Features Ready:
-# - Multi-provider architecture
-# - Storage quota management
-# - File versioning (parent_file_id)
-# - Polymorphic attachments (Invoice, Expense, Customer, etc.)
-# - MD5 hash duplicate detection
-# - Download tracking
-# - Soft delete
-#
-# TODO: Full implementation in Prompt 1.23 EXTENDED
-
-###
-
-### ===============================
-### NOTIFICATIONS (v0.1.24)
-### ===============================
-
-### 1. Get All Notifications
-GET {{baseUrl}}/notifications
-Authorization: Bearer {{accessToken}}
-
-### 2. Get Unread Notifications
-GET {{baseUrl}}/notifications?isRead=false
-Authorization: Bearer {{accessToken}}
-
-### 3. Get Unread Notification Count
-GET {{baseUrl}}/notifications/unread-count
-Authorization: Bearer {{accessToken}}
-
-### 4. Mark Notification as Read
-POST {{baseUrl}}/notifications/{{notificationId}}/mark-as-read
-Authorization: Bearer {{accessToken}}
-
-### 5. Mark All Notifications as Read
-POST {{baseUrl}}/notifications/mark-all-as-read
-Authorization: Bearer {{accessToken}}
-
-### 6. Delete Notification
-DELETE {{baseUrl}}/notifications/{{notificationId}}
-Authorization: Bearer {{accessToken}}
-
-### 7. Get Notification Preferences
-GET {{baseUrl}}/notifications/preferences
-Authorization: Bearer {{accessToken}}
-
-### 8. Save Notification Preference - Low Stock Alerts
-POST {{baseUrl}}/notifications/preferences
-Authorization: Bearer {{accessToken}}
-Content-Type: application/json
-
-{
-  "notificationType": 20,
-  "inAppEnabled": true,
-  "emailEnabled": true,
-  "minimumPriority": 1
-}
-
-### 9. Save Notification Preference - Expense Notifications
-POST {{baseUrl}}/notifications/preferences
-Authorization: Bearer {{accessToken}}
-Content-Type: application/json
-
-{
-  "notificationType": 12,
-  "inAppEnabled": true,
-  "emailEnabled": false,
-  "minimumPriority": 0
-}
-
-### 10. Get High Priority Notifications
-GET {{baseUrl}}/notifications?priority=2
-Authorization: Bearer {{accessToken}}
-
-###
-
-### ===============================
-### API SECURITY (v0.1.25 - Infrastructure)
-### ===============================
-
-### 1. Test Security Headers
-GET {{baseUrl}}/health
-Authorization: Bearer {{accessToken}}
-
-### Expected Response Headers:
-# X-Content-Type-Options: nosniff
-# X-Frame-Options: DENY
-# X-XSS-Protection: 1; mode=block
-# Referrer-Policy: strict-origin-when-cross-origin
-# Content-Security-Policy: default-src 'self'; ...
-# Strict-Transport-Security: max-age=31536000; includeSubDomains (HTTPS only)
-# Permissions-Policy: geolocation=(), microphone=(), camera=()
-
-### 2. Security Headers on Any Endpoint
-GET {{baseUrl}}/companies
-Authorization: Bearer {{accessToken}}
-
-### 3. Security Headers on POST
-POST {{baseUrl}}/customers
-Authorization: Bearer {{accessToken}}
-Content-Type: application/json
-
-{
-  "name": "Security Test Customer",
-  "email": "security@test.com",
-  "customerType": 0
-}
-
-### TODO: Rate Limiting Tests (Future)
-### TODO: 2FA Setup & Verification Tests (Future)
-### TODO: API Key Creation & Usage Tests (Future)
-### TODO: IP Blacklist Tests (Future)
-
-###
-
-### ===============================
-### API SECURITY - FULL (v0.1.25)
-### ===============================
-
-### ===== TWO-FACTOR AUTHENTICATION (2FA) =====
-
-### 1. Enable 2FA
-POST {{baseUrl}}/security/2fa/enable
-Authorization: Bearer {{accessToken}}
-
-### Response includes:
-# - qrCodeDataUrl: Base64 PNG image (scan with Google Authenticator / Authy)
-# - manualEntryKey: Manual entry for authenticator app
-# - backupCodes: [10 codes] - SAVE THESE SECURELY!
-
-### 2. Verify 2FA Code (TOTP)
-POST {{baseUrl}}/security/2fa/verify
-Authorization: Bearer {{accessToken}}
-Content-Type: application/json
-
-{
-  "code": "123456",
-  "isBackupCode": false
-}
-
-### 3. Verify 2FA Code (Backup Code)
-POST {{baseUrl}}/security/2fa/verify
-Authorization: Bearer {{accessToken}}
-Content-Type: application/json
-
-{
-  "code": "ABCD1234",
-  "isBackupCode": true
-}
-
-### 4. Generate New Backup Codes
-POST {{baseUrl}}/security/2fa/backup-codes
-Authorization: Bearer {{accessToken}}
-
-### 5. Disable 2FA
-POST {{baseUrl}}/security/2fa/disable
-Authorization: Bearer {{accessToken}}
-
-### ===== API KEY MANAGEMENT =====
-
-### 6. Create API Key (Full Permissions)
-POST {{baseUrl}}/security/api-keys
-Authorization: Bearer {{accessToken}}
-Content-Type: application/json
-
-{
-  "name": "Production Integration",
-  "description": "API key for production server integration",
-  "rateLimitPerMinute": 120,
-  "expiresAt": "2026-12-31T23:59:59Z",
-  "permissions": [
-    "/api/v1/invoices/*",
-    "/api/v1/customers/*",
-    "/api/v1/products/*"
-  ],
-  "allowedIps": [
-    "203.0.113.0",
-    "198.51.100.0"
-  ]
-}
-
-### Response will include the actual API key - SAVE IT!
-### Format: acc_os_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
-### 7. Create API Key (Read-Only)
-POST {{baseUrl}}/security/api-keys
-Authorization: Bearer {{accessToken}}
-Content-Type: application/json
-
-{
-  "name": "Read-Only Reporting",
-  "description": "Read-only access for external reporting",
-  "rateLimitPerMinute": 60,
-  "permissions": [
-    "GET /api/v1/invoices",
-    "GET /api/v1/reports/*"
-  ]
-}
-
-### 8. Revoke API Key
-POST {{baseUrl}}/security/api-keys/{{apiKeyId}}/revoke
-Authorization: Bearer {{accessToken}}
-
-### ===== RATE LIMITING TESTS =====
-
-### 9. Test Normal Request (Within Limit)
-GET {{baseUrl}}/invoices
-Authorization: Bearer {{accessToken}}
-
-### Check response headers:
-# X-RateLimit-Remaining: Shows remaining requests
-
-### 10. Test Rate Limit (Make Multiple Requests)
-# Make 1001 requests in 1 minute to trigger global rate limit
-# Or make 6 login attempts in 5 minutes to trigger login rate limit
-
-### ===== SECURITY HEADERS VERIFICATION =====
-
-### 11. Verify Security Headers
-GET {{baseUrl}}/companies
-Authorization: Bearer {{accessToken}}
-
-### Expected Response Headers:
-# X-Content-Type-Options: nosniff
-# X-Frame-Options: DENY
-# X-XSS-Protection: 1; mode=block
-# Referrer-Policy: strict-origin-when-cross-origin
-# Content-Security-Policy: default-src 'self'; ...
-# Strict-Transport-Security: max-age=31536000; includeSubDomains (HTTPS only)
-# Permissions-Policy: geolocation=(), microphone=(), camera=()
-
-### ===== 2FA WORKFLOW =====
-
-### 12. Complete 2FA Setup Workflow
-
-# Step 1: Enable 2FA
-POST {{baseUrl}}/security/2fa/enable
-Authorization: Bearer {{accessToken}}
-
-# Step 2: Scan QR code with Google Authenticator
-# Or manually enter the key shown in response
-
-# Step 3: Verify with first TOTP code
-POST {{baseUrl}}/security/2fa/verify
-Authorization: Bearer {{accessToken}}
-Content-Type: application/json
-
-{
-  "code": "123456",
-  "isBackupCode": false
-}
-
-# Step 4: Save backup codes securely!
-
-### 13. Use Backup Code (One-Time)
-POST {{baseUrl}}/security/2fa/verify
-Authorization: Bearer {{accessToken}}
-Content-Type: application/json
-
-{
-  "code": "ABCD1234",
-  "isBackupCode": true
-}
-
-### 14. Regenerate Backup Codes
-POST {{baseUrl}}/security/2fa/backup-codes
-Authorization: Bearer {{accessToken}}
-
-### ===== API KEY USAGE =====
-
-### 15. Use API Key for Request
-GET {{baseUrl}}/invoices
-X-API-Key: acc_os_your_api_key_here
-
-### 16. API Key with Rate Limiting
-# API key has its own rate limit (rateLimitPerMinute)
-# Make requests exceeding the limit
-
-GET {{baseUrl}}/invoices
-X-API-Key: acc_os_your_api_key_here
-
-### ===== BRUTE FORCE PROTECTION =====
-
-### 17. Test Failed Login Protection
-# Make 5 failed login attempts from same IP
-
-POST {{baseUrl}}/auth/login
-Content-Type: application/json
-
-{
-  "email": "test@example.com",
-  "password": "wrong_password_1"
-}
-
-# After 5th attempt, IP will be auto-blacklisted for 30 minutes
-# Status: 429 Too Many Requests
-
-### ===== PERFORMANCE TESTS =====
-
-### 18. Rate Limiting Performance
-# Verify rate limiting doesn't impact response time significantly
-
-GET {{baseUrl}}/invoices
-Authorization: Bearer {{accessToken}}
-
-### 19. Security Headers Performance
-# Verify security headers don't impact performance
-
-GET {{baseUrl}}/products
-Authorization: Bearer {{accessToken}}
-
-### ===== SECURITY BEST PRACTICES =====
-
-### 20. 2FA Best Practices
-# 1. Enable 2FA for all admin users
-# 2. Save backup codes in password manager
-# 3. Regenerate backup codes every 90 days
-# 4. Use authenticator app (Google Authenticator, Authy, etc.)
-# 5. Don't share backup codes
-
-### 21. API Key Best Practices
-# 1. Create separate keys for each integration
-# 2. Use IP whitelist when possible
-# 3. Set expiration dates (rotate every 90 days)
-# 4. Use minimal permissions (least privilege)
-# 5. Monitor usage and detect anomalies
-# 6. Revoke unused keys immediately
-
-### 22. Rate Limiting Best Practices
-# 1. Start with generous limits
-# 2. Monitor actual usage patterns
-# 3. Adjust limits based on data
-# 4. Different limits for different endpoints
-# 5. Whitelist trusted IPs if needed
-# 6. Strict limits on sensitive endpoints (login, register)
 
 ###

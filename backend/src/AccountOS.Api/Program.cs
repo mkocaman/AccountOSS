@@ -80,14 +80,21 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// CORS
+// CORS - Frontend bağlantısı için
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
+        policy.WithOrigins(
+                "http://localhost:3000",      // Vite dev server
+                "http://localhost:3001",      // Alternative port
+                "https://accountos.com",      // Production (future)
+                "https://www.accountos.com"   // Production www
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials()  // Cookie ve auth için gerekli
+            .SetIsOriginAllowedToAllowWildcardSubdomains();
     });
 });
 
@@ -148,13 +155,14 @@ if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 
 app.UseHttpsRedirection();
 
+// CORS - ÖNEMLİ: Diğer middleware'lerden ÖNCE!
+app.UseCors("AllowFrontend");
+
 // Security Headers (OWASP recommended)
 app.UseMiddleware<SecurityHeadersMiddleware>();
 
 // Rate Limiting (before authentication)
 app.UseMiddleware<RateLimitingMiddleware>();
-
-app.UseCors("AllowAll");
 
 // Global Exception Handler Middleware
 app.UseMiddleware<ExceptionHandlerMiddleware>();

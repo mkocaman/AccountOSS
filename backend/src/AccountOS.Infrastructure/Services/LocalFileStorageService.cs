@@ -29,9 +29,11 @@ public class LocalFileStorageService : IFileStorageService
     public async Task<string> UploadFileAsync(
         Stream fileStream, 
         string fileName, 
-        string folder = "uploads", 
+        string contentType,
+        Dictionary<string, string>? metadata = null,
         CancellationToken cancellationToken = default)
     {
+        var folder = metadata?.GetValueOrDefault("folder") ?? "uploads";
         var folderPath = Path.Combine(_basePath, folder);
         
         if (!Directory.Exists(folderPath))
@@ -66,7 +68,7 @@ public class LocalFileStorageService : IFileStorageService
         return Task.FromResult(stream);
     }
 
-    public Task DeleteFileAsync(string filePath, CancellationToken cancellationToken = default)
+    public Task<bool> DeleteFileAsync(string filePath, CancellationToken cancellationToken = default)
     {
         var fullPath = Path.Combine(_basePath, filePath);
         
@@ -74,9 +76,22 @@ public class LocalFileStorageService : IFileStorageService
         {
             File.Delete(fullPath);
             _logger.LogInformation("Dosya silindi: {FilePath}", filePath);
+            return Task.FromResult(true);
         }
         
-        return Task.CompletedTask;
+        return Task.FromResult(false);
+    }
+
+    public Task<string?> GetPublicUrlAsync(string filePath, TimeSpan? expiresIn = null, CancellationToken cancellationToken = default)
+    {
+        // Local storage doesn't support public URLs
+        return Task.FromResult<string?>(null);
+    }
+
+    public Task<bool> TestConnectionAsync(string configuration, CancellationToken cancellationToken = default)
+    {
+        // Test if base path is writable
+        return Task.FromResult(Directory.Exists(_basePath));
     }
 
     public Task<bool> FileExistsAsync(string filePath, CancellationToken cancellationToken = default)

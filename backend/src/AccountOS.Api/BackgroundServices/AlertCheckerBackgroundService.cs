@@ -34,8 +34,8 @@ public class AlertCheckerBackgroundService : BackgroundService
                 var context = scope.ServiceProvider.GetRequiredService<IApplicationDbContext>();
                 var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
-                // 1. Düşük stok kontrolü - TODO: Product entity'de CurrentStock/MinimumStock field'ları yok (StockLayer ile yapılıyor)
-                // await CheckLowStockAsync(context, notificationService, stoppingToken);
+                // 1. Düşük stok kontrolü (StockLayer-based)
+                await CheckLowStockAsync(context, notificationService, stoppingToken);
 
                 // 2. Vadesi geçmiş fatura kontrolü
                 await CheckOverdueInvoicesAsync(context, notificationService, stoppingToken);
@@ -59,17 +59,68 @@ public class AlertCheckerBackgroundService : BackgroundService
         _logger.LogInformation("Alert Checker Background Service stopped");
     }
 
-    // TODO: CheckLowStockAsync - Product entity'de CurrentStock/MinimumStock yok (StockLayer ile yapılıyor)
-    // Gelecekte StockLayer bazlı low stock alert eklenebilir
-    /*
     private async Task CheckLowStockAsync(
         IApplicationDbContext context,
         INotificationService notificationService,
         CancellationToken cancellationToken)
     {
-        // Implementation removed - needs StockLayer integration
+        try
+        {
+            // Her ürün için toplam remaining stock hesapla
+            var productStocks = await context.StockLayers
+                .Where(sl => sl.RemainingQuantity > 0)
+                .GroupBy(sl => new { sl.ProductId, sl.CompanyId })
+                .Select(g => new
+                {
+                    g.Key.ProductId,
+                    g.Key.CompanyId,
+                    TotalStock = g.Sum(sl => sl.RemainingQuantity)
+                })
+                .ToListAsync(cancellationToken);
+
+            foreach (var stock in productStocks)
+            {
+                // TODO: MinimumStock Product entity'de yok - şimdilik sabit değer (10) kullanıyoruz
+                var minimumStock = 10m;
+
+                if (stock.TotalStock <= minimumStock)
+                {
+                    // Ürün bilgisini al
+                    var product = await context.Products
+                        .Where(p => p.Id == stock.ProductId)
+                        .Select(p => new { p.Id, p.Name, p.CompanyId })
+                        .FirstOrDefaultAsync(cancellationToken);
+
+                    if (product == null)
+                        continue;
+
+                    // Son 24 saatte alert gönderilmiş mi?
+                    var recentAlert = await context.Notifications
+                        .Where(n => n.Type == NotificationType.LowStock
+                                 && n.EntityType == "Product"
+                                 && n.EntityId == product.Id
+                                 && n.CreatedAt > DateTime.UtcNow.AddHours(-24))
+                        .AnyAsync(cancellationToken);
+
+                    if (!recentAlert)
+                    {
+                        await notificationService.SendLowStockAlertAsync(
+                            product.Id,
+                            product.Name,
+                            stock.TotalStock,
+                            minimumStock,
+                            cancellationToken);
+
+                        _logger.LogInformation("Low stock alert sent for product {ProductName}", product.Name);
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error checking low stock");
+        }
     }
-    */
 
     private async Task CheckOverdueInvoicesAsync(
         IApplicationDbContext context,

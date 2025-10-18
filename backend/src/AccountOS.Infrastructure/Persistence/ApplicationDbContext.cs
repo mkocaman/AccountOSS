@@ -61,6 +61,15 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<IpBlacklist> IpBlacklist => Set<IpBlacklist>();
     public DbSet<ApiKey> ApiKeys => Set<ApiKey>();
     public DbSet<TwoFactorAuth> TwoFactorAuths => Set<TwoFactorAuth>();
+    public DbSet<UserPreference> UserPreferences => Set<UserPreference>();
+    public DbSet<CompanySettings> CompanySettings => Set<CompanySettings>();
+    public DbSet<DashboardWidget> DashboardWidgets => Set<DashboardWidget>();
+    public DbSet<TaxRate> TaxRates => Set<TaxRate>();
+    public DbSet<TaxCalculation> TaxCalculations => Set<TaxCalculation>();
+    public DbSet<ChartOfAccount> ChartOfAccounts => Set<ChartOfAccount>();
+    public DbSet<JournalEntry> JournalEntries => Set<JournalEntry>();
+    public DbSet<JournalEntryLine> JournalEntryLines => Set<JournalEntryLine>();
+    public DbSet<AccountingPeriod> AccountingPeriods => Set<AccountingPeriod>();
     
     /// <summary>
     /// Model yapılandırması (entity configuration, indexes, relationships)

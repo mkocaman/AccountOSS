@@ -44,6 +44,15 @@ public interface IApplicationDbContext
     DbSet<IpBlacklist> IpBlacklist { get; }
     DbSet<ApiKey> ApiKeys { get; }
     DbSet<TwoFactorAuth> TwoFactorAuths { get; }
+    DbSet<UserPreference> UserPreferences { get; }
+    DbSet<CompanySettings> CompanySettings { get; }
+    DbSet<DashboardWidget> DashboardWidgets { get; }
+    DbSet<TaxRate> TaxRates { get; }
+    DbSet<TaxCalculation> TaxCalculations { get; }
+    DbSet<ChartOfAccount> ChartOfAccounts { get; }
+    DbSet<JournalEntry> JournalEntries { get; }
+    DbSet<JournalEntryLine> JournalEntryLines { get; }
+    DbSet<AccountingPeriod> AccountingPeriods { get; }
     
     /// <summary>
     /// Değişiklikleri veritabanına kaydet
