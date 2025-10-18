@@ -96,6 +96,46 @@ Authorization: Bearer {{accessToken}}
 GET {{baseUrl}}/companies/{{companyId}}
 Authorization: Bearer {{accessToken}}
 
+### 5. Update Company (Owner/Admin only)
+PUT {{baseUrl}}/companies/{{companyId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "id": "{{companyId}}",
+  "name": "Güncellenmiş Şirket A.Ş.",
+  "taxNumber": "9876543210",
+  "taxOffice": "İstanbul Vergi Dairesi",
+  "phone": "+90 212 555 9999",
+  "email": "info@updated-company.com",
+  "address": "Yeni Adres No:456",
+  "city": "İstanbul",
+  "country": "TR",
+  "baseCurrency": "USD",
+  "defaultLanguage": "EN",
+  "timeZone": "Europe/Istanbul",
+  "primaryColor": "#FF5733"
+}
+
+### 6. Set Default Company
+POST {{baseUrl}}/companies/{{companyId}}/set-default
+Authorization: Bearer {{accessToken}}
+
+### 7. Invite User to Company (Owner/Admin only)
+POST {{baseUrl}}/companies/{{companyId}}/invite
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "companyId": "{{companyId}}",
+  "email": "newuser@example.com",
+  "role": "Manager"
+}
+
+### 8. Delete Company (Soft Delete - Owner only)
+DELETE {{baseUrl}}/companies/{{companyId}}
+Authorization: Bearer {{accessToken}}
+
 ### ===============================
 ### PROTECTED ENDPOINTS (JWT Required)
 ### ===============================

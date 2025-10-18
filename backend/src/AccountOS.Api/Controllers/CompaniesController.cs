@@ -1,4 +1,8 @@
 using AccountOS.Application.Companies.Commands.CreateCompany;
+using AccountOS.Application.Companies.Commands.DeleteCompany;
+using AccountOS.Application.Companies.Commands.InviteUser;
+using AccountOS.Application.Companies.Commands.SetDefaultCompany;
+using AccountOS.Application.Companies.Commands.UpdateCompany;
 using AccountOS.Application.Companies.Queries.GetCompanies;
 using AccountOS.Application.Companies.Queries.GetCompanyById;
 using Microsoft.AspNetCore.Authorization;
@@ -62,6 +66,92 @@ public class CompaniesController : BaseApiController
         
         if (!result.Success)
             return NotFound(new { success = false, message = result.Error });
+        
+        return FromResult(result);
+    }
+
+    /// <summary>
+    /// Şirket bilgilerini güncelle (Owner/Admin yetkisi gerekli)
+    /// </summary>
+    /// <param name="id">Şirket ID</param>
+    /// <param name="command">Güncellenmiş şirket bilgileri</param>
+    /// <returns>Güncellenmiş şirket</returns>
+    [HttpPut("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> UpdateCompany(Guid id, [FromBody] UpdateCompanyCommand command)
+    {
+        if (id != command.Id)
+            return BadRequest(new { success = false, message = "URL'deki ID ile command ID'si eşleşmiyor" });
+
+        var result = await Mediator.Send(command);
+        
+        if (!result.Success)
+            return BadRequest(result);
+        
+        return FromResult(result);
+    }
+
+    /// <summary>
+    /// Şirketi sil (Soft delete - sadece Owner)
+    /// </summary>
+    /// <param name="id">Şirket ID</param>
+    /// <returns>Silme işlemi sonucu</returns>
+    [HttpDelete("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> DeleteCompany(Guid id)
+    {
+        var result = await Mediator.Send(new DeleteCompanyCommand(id));
+        
+        if (!result.Success)
+            return BadRequest(result);
+        
+        return FromResult(result);
+    }
+
+    /// <summary>
+    /// Varsayılan şirketi belirle
+    /// </summary>
+    /// <param name="id">Şirket ID</param>
+    /// <returns>İşlem sonucu</returns>
+    [HttpPost("{id:guid}/set-default")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> SetDefaultCompany(Guid id)
+    {
+        var result = await Mediator.Send(new SetDefaultCompanyCommand(id));
+        
+        if (!result.Success)
+            return BadRequest(result);
+        
+        return FromResult(result);
+    }
+
+    /// <summary>
+    /// Şirkete kullanıcı davet et (Owner/Admin yetkisi gerekli)
+    /// </summary>
+    /// <param name="id">Şirket ID</param>
+    /// <param name="command">Davet bilgileri</param>
+    /// <returns>Davet işlemi sonucu</returns>
+    [HttpPost("{id:guid}/invite")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> InviteUser(Guid id, [FromBody] InviteUserToCompanyCommand command)
+    {
+        if (id != command.CompanyId)
+            return BadRequest(new { success = false, message = "URL'deki ID ile command ID'si eşleşmiyor" });
+
+        var result = await Mediator.Send(command);
+        
+        if (!result.Success)
+            return BadRequest(result);
         
         return FromResult(result);
     }
