@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using AccountOS.Application.Common;
 using AccountOS.Application.Common.Interfaces;
 using AccountOS.Domain.Common;
+using AccountOS.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace AccountOS.Infrastructure.Persistence;
@@ -25,16 +26,153 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
         _currentUserService = currentUserService;
     }
 
-    // DbSet'ler buraya eklenecek
-    // public DbSet<Company> Companies => Set<Company>();
-    // public DbSet<User> Users => Set<User>();
+    // DbSet'ler
+    public DbSet<Company> Companies => Set<Company>();
+    public DbSet<User> Users => Set<User>();
+    public DbSet<UserCompany> UserCompanies => Set<UserCompany>();
+    public DbSet<UserRole> UserRoles => Set<UserRole>();
     
     /// <summary>
     /// Model yapılandırması (entity configuration, indexes, relationships)
     /// </summary>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        // User configuration
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.ToTable("users");
+            
+            entity.Property(e => e.Email)
+                .IsRequired()
+                .HasMaxLength(200);
+            
+            entity.Property(e => e.UserName)
+                .HasMaxLength(100);
+            
+            entity.Property(e => e.FirstName)
+                .IsRequired()
+                .HasMaxLength(100);
+            
+            entity.Property(e => e.LastName)
+                .IsRequired()
+                .HasMaxLength(100);
+            
+            entity.Property(e => e.PasswordHash)
+                .IsRequired()
+                .HasMaxLength(500);
+            
+            entity.Property(e => e.Phone)
+                .HasMaxLength(50);
+            
+            entity.Property(e => e.AvatarPath)
+                .HasMaxLength(500);
+            
+            entity.Property(e => e.EmailConfirmationToken)
+                .HasMaxLength(500);
+            
+            entity.Property(e => e.PasswordResetToken)
+                .HasMaxLength(500);
+            
+            // Indexes
+            entity.HasIndex(e => e.Email).IsUnique();
+            entity.HasIndex(e => e.UserName).IsUnique();
+            entity.HasIndex(e => e.IsActive);
+        });
+
+        // UserCompany configuration
+        modelBuilder.Entity<UserCompany>(entity =>
+        {
+            entity.ToTable("user_companies");
+            
+            entity.HasKey(e => new { e.UserId, e.CompanyId });
+            
+            entity.Property(e => e.Role)
+                .IsRequired()
+                .HasMaxLength(50);
+            
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.UserCompanies)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            entity.HasOne(e => e.Company)
+                .WithMany()
+                .HasForeignKey(e => e.CompanyId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            entity.HasIndex(e => new { e.UserId, e.IsDefault });
+        });
+
+        // UserRole configuration
+        modelBuilder.Entity<UserRole>(entity =>
+        {
+            entity.ToTable("user_roles");
+            
+            entity.Property(e => e.RoleName)
+                .IsRequired()
+                .HasMaxLength(50);
+            
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.UserRoles)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
+            entity.HasIndex(e => new { e.UserId, e.RoleName });
+        });
+        
         base.OnModelCreating(modelBuilder);
+        
+        // Company configuration
+        modelBuilder.Entity<Company>(entity =>
+        {
+            entity.ToTable("companies");
+            
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(200);
+                
+            entity.Property(e => e.TaxNumber)
+                .HasMaxLength(50);
+                
+            entity.Property(e => e.TaxOffice)
+                .HasMaxLength(200);
+                
+            entity.Property(e => e.Email)
+                .HasMaxLength(200);
+                
+            entity.Property(e => e.Phone)
+                .HasMaxLength(50);
+                
+            entity.Property(e => e.Address)
+                .HasMaxLength(500);
+                
+            entity.Property(e => e.City)
+                .HasMaxLength(100);
+                
+            entity.Property(e => e.Country)
+                .IsRequired()
+                .HasMaxLength(2);
+                
+            entity.Property(e => e.Currency)
+                .IsRequired()
+                .HasMaxLength(3);
+                
+            entity.Property(e => e.TimeZone)
+                .IsRequired()
+                .HasMaxLength(100);
+                
+            entity.Property(e => e.Language)
+                .IsRequired()
+                .HasMaxLength(2);
+                
+            entity.Property(e => e.LogoPath)
+                .HasMaxLength(500);
+                
+            // Indexes
+            entity.HasIndex(e => e.TaxNumber);
+            entity.HasIndex(e => e.Email);
+            entity.HasIndex(e => e.IsActive);
+        });
         
         // Assembly'deki tüm IEntityTypeConfiguration implementasyonlarını uygula
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);

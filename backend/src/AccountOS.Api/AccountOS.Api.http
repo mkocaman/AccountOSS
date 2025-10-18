@@ -1,6 +1,72 @@
-@AccountOS.Api_HostAddress = http://localhost:5043
+### AccountOS API Test Endpoints
+### Development: http://localhost:5043 veya https://localhost:7043
 
-GET {{AccountOS.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+@baseUrl = https://localhost:7043/api/v1
+
+### ===============================
+### AUTHENTICATION
+### ===============================
+
+### 1. Register (Kayıt ol)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "test123",
+  "firstName": "Test",
+  "lastName": "User",
+  "phone": "+90 555 123 4567"
+}
+
+### 2. Login (Giriş yap)
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "test123"
+}
+
+### 3. Extract Access Token
+@accessToken = {{login.response.body.data.accessToken}}
+
+### ===============================
+### SAMPLE ENDPOINTS (Protected)
+### ===============================
+
+### Health Check
+GET {{baseUrl}}/sample/health
+
+### Create Sample (Validation Error - name boş)
+POST {{baseUrl}}/sample
+Content-Type: application/json
+
+{
+  "name": "",
+  "description": "test"
+}
+
+### Create Sample (Success)
+POST {{baseUrl}}/sample
+Content-Type: application/json
+
+{
+  "name": "Test Product",
+  "description": "Test Description"
+}
+
+### Get Sample (test için bir guid koy)
+@sampleId = 3fa85f64-5717-4562-b3fc-2c963f66afa6
+GET {{baseUrl}}/sample/{{sampleId}}
+
+### ===============================
+### PROTECTED ENDPOINTS (JWT Required)
+### ===============================
+
+### Test Protected Endpoint
+GET {{baseUrl}}/sample/health
+Authorization: Bearer {{accessToken}}
 
 ###

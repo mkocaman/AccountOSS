@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using AccountOS.Domain.Entities;
 
 namespace AccountOS.Application.Common;
 
@@ -8,8 +9,11 @@ namespace AccountOS.Application.Common;
 /// </summary>
 public interface IApplicationDbContext
 {
-    // DbSet'ler entity'ler oluşturuldukça eklenecek
-    // Örnek: DbSet<Company> Companies { get; }
+    // DbSet'ler
+    DbSet<Company> Companies { get; }
+    DbSet<User> Users { get; }
+    DbSet<UserCompany> UserCompanies { get; }
+    DbSet<UserRole> UserRoles { get; }
     
     /// <summary>
     /// Değişiklikleri veritabanına kaydet

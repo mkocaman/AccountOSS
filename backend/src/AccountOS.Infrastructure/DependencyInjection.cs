@@ -32,6 +32,10 @@ public static class DependencyInjection
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<IDateTimeService, DateTimeService>();
         
+        // Authentication Services
+        services.AddScoped<IJwtService, JwtService>();
+        services.AddScoped<IPasswordHasher, PasswordHasher>();
+        
         // Email Service
         services.AddScoped<IEmailService, EmailService>();
         
