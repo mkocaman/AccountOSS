@@ -1,5 +1,5 @@
-import { Table, TableProps } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
+import { Table } from 'antd';
+import type { TableProps, ColumnsType } from 'antd/es/table';
 
 // Genel amaçlı DataTable bileşeni
 interface DataTableProps<T> extends Omit<TableProps<T>, 'columns'> {

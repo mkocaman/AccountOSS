@@ -18,12 +18,9 @@ import type { ColumnsType } from 'antd/es/table';
 export const CustomerList = () => {
   const navigate = useNavigate();
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [allCustomers, setAllCustomers] = useState<Customer[]>([]); // Backend'den gelen tüm data
   const [loading, setLoading] = useState(false);
-  const [totalCount, setTotalCount] = useState(0);
-  const [params, setParams] = useState<CustomerListParams>({
-    pageNumber: 1,
-    pageSize: 50,
-  });
+  const [params, setParams] = useState<CustomerListParams>({});
   const { modal } = App.useApp();
 
   useEffect(() => {
@@ -36,8 +33,16 @@ export const CustomerList = () => {
     try {
       const response = await customersApi.getAll(params);
       if (response.success) {
-        setCustomers(response.data.items);
-        setTotalCount(response.data.totalCount);
+        const data = response.data;
+        setAllCustomers(data);
+        
+        // Client-side type filter
+        let filtered = data;
+        if (params.type !== undefined) {
+          filtered = filtered.filter((c) => c.type === params.type);
+        }
+        
+        setCustomers(filtered);
       }
     } catch (error) {
       message.error('Müşteriler yüklenemedi');
@@ -48,7 +53,7 @@ export const CustomerList = () => {
 
   // Arama
   const handleSearch = (value: string) => {
-    setParams({ ...params, searchText: value, pageNumber: 1 });
+    setParams({ ...params, searchText: value });
   };
 
   // Müşteri sil
@@ -223,9 +228,7 @@ export const CustomerList = () => {
                 placeholder="Tür"
                 style={{ width: 150 }}
                 allowClear
-                onChange={(value) =>
-                  setParams({ ...params, type: value, pageNumber: 1 })
-                }
+                onChange={(value) => setParams({ ...params, type: value })}
               >
                 <Select.Option value={0}>Bireysel</Select.Option>
                 <Select.Option value={1}>Kurumsal</Select.Option>
@@ -235,9 +238,7 @@ export const CustomerList = () => {
                 placeholder="Durum"
                 style={{ width: 150 }}
                 allowClear
-                onChange={(value) =>
-                  setParams({ ...params, isActive: value, pageNumber: 1 })
-                }
+                onChange={(value) => setParams({ ...params, isActive: value })}
               >
                 <Select.Option value={true}>Aktif</Select.Option>
                 <Select.Option value={false}>Pasif</Select.Option>
@@ -253,13 +254,6 @@ export const CustomerList = () => {
           columns={columns}
           data={customers}
           loading={loading}
-          pagination={{
-            current: params.pageNumber,
-            pageSize: params.pageSize,
-            total: totalCount,
-            onChange: (page, pageSize) =>
-              setParams({ ...params, pageNumber: page, pageSize }),
-          }}
         />
       </Card>
     </div>

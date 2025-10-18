@@ -1,12 +1,19 @@
 import { apiClient } from './client';
 import type { Customer, CreateCustomerRequest, UpdateCustomerRequest } from '@/types/customer';
-import type { ApiResponse, PagedResponse } from '@/types';
+import type { ApiResponse } from '@/types';
 
-// Customer API endpoints
+// Customer API endpoints (Backend: /api/v1/customers)
 export const customersApi = {
-  // Müşteri listesi (pagination + search)
-  getAll: (params?: CustomerListParams) =>
-    apiClient.get<ApiResponse<PagedResponse<Customer>>>('/customers', { params }),
+  // Müşteri listesi (Backend: searchTerm, activeOnly - pagination yok)
+  getAll: async (params?: CustomerListParams): Promise<ApiResponse<Customer[]>> => {
+    const response = await apiClient.get<ApiResponse<Customer[]>>('/customers', {
+      params: {
+        searchTerm: params?.searchText,
+        activeOnly: params?.isActive ?? true,
+      },
+    });
+    return response;
+  },
 
   // Müşteri detayı
   getById: (id: string) =>
@@ -18,26 +25,21 @@ export const customersApi = {
 
   // Müşteri güncelle
   update: (id: string, data: UpdateCustomerRequest) =>
-    apiClient.put<ApiResponse<Customer>>(`/customers/${id}`, data),
+    apiClient.put<ApiResponse<Customer>>(`/customers/${id}`, { ...data, id }),
 
   // Müşteri sil
   delete: (id: string) =>
     apiClient.delete<ApiResponse<void>>(`/customers/${id}`),
 
-  // Müşteri arama (autocomplete için)
+  // Müşteri arama (Backend'de ayrı endpoint yok, getAll kullan)
   search: (query: string) =>
-    apiClient.get<ApiResponse<Customer[]>>('/customers/search', {
-      params: { q: query, limit: 10 },
-    }),
+    customersApi.getAll({ searchText: query }),
 };
 
 // List parametreleri
 export interface CustomerListParams {
-  pageNumber?: number;
-  pageSize?: number;
   searchText?: string;
   type?: number;
   isActive?: boolean;
-  city?: string;
 }
 
