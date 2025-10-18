@@ -1,8 +1,10 @@
+using AccountOS.Application.Common.Interfaces;
 using AccountOS.Application.Customers.Commands.CreateCustomer;
 using AccountOS.Application.Customers.Commands.DeleteCustomer;
 using AccountOS.Application.Customers.Commands.UpdateCustomer;
 using AccountOS.Application.Customers.Queries.GetCustomerById;
 using AccountOS.Application.Customers.Queries.GetCustomers;
+using AccountOS.Application.Customers.Queries.GetCustomerStatement;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -101,6 +103,44 @@ public class CustomersController : BaseApiController
     }
 
     /// <summary>
+    /// Cari hesap ekstresi getir (PDF oluşturmak için)
+    /// </summary>
+    [HttpGet("{id:guid}/statement")]
+    [ProducesResponseType(typeof(Application.Common.Result<Application.Customers.Common.CustomerStatementDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetCustomerStatement(
+        Guid id,
+        [FromQuery] DateTime? startDate = null,
+        [FromQuery] DateTime? endDate = null,
+        [FromQuery] bool showInvoiceNames = true,
+        [FromQuery] bool showItems = false,
+        [FromQuery] bool showBankAccounts = true,
+        [FromQuery] string currencies = "TRY")
+    {
+        var start = startDate ?? DateTime.UtcNow.AddMonths(-1);
+        var end = endDate ?? DateTime.UtcNow;
+        
+        var currencyList = currencies.Split(',').Select(c => c.Trim().ToUpper()).ToList();
+
+        var result = await Mediator.Send(new GetCustomerStatementQuery
+        {
+            CustomerId = id,
+            StartDate = start,
+            EndDate = end,
+            ShowInvoiceNames = showInvoiceNames,
+            ShowItems = showItems,
+            ShowBankAccounts = showBankAccounts,
+            Currencies = currencyList
+        });
+
+        if (!result.Success)
+            return NotFound(result);
+
+        return Ok(result);
+    }
+
+    /// <summary>
     /// Cari hesabı sil (soft delete)
     /// </summary>
     /// <param name="id">Cari hesap ID</param>
@@ -116,6 +156,49 @@ public class CustomersController : BaseApiController
             return BadRequest(result);
         
         return FromResult(result);
+    }
+
+    /// <summary>
+    /// Cari hesap ekstresi PDF'i indir
+    /// </summary>
+    [HttpGet("{id:guid}/statement/pdf")]
+    [ProducesResponseType(typeof(FileResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> DownloadStatementPdf(
+        Guid id,
+        [FromServices] IPdfService pdfService,
+        [FromQuery] DateTime? startDate = null,
+        [FromQuery] DateTime? endDate = null,
+        [FromQuery] bool showInvoiceNames = true,
+        [FromQuery] bool showItems = false,
+        [FromQuery] bool showBankAccounts = true,
+        [FromQuery] string currencies = "TRY")
+    {
+        var start = startDate ?? DateTime.UtcNow.AddMonths(-1);
+        var end = endDate ?? DateTime.UtcNow;
+        
+        var currencyList = currencies.Split(',').Select(c => c.Trim().ToUpper()).ToList();
+
+        var result = await Mediator.Send(new GetCustomerStatementQuery
+        {
+            CustomerId = id,
+            StartDate = start,
+            EndDate = end,
+            ShowInvoiceNames = showInvoiceNames,
+            ShowItems = showItems,
+            ShowBankAccounts = showBankAccounts,
+            Currencies = currencyList
+        });
+
+        if (!result.Success)
+            return NotFound(result);
+
+        var pdfBytes = pdfService.GenerateCustomerStatementPdf(result.Data!);
+
+        var filename = $"Ekstre-{result.Data!.Customer.Code}-{start:yyyyMMdd}-{end:yyyyMMdd}.pdf";
+        
+        return File(pdfBytes, "application/pdf", filename);
     }
 }
 

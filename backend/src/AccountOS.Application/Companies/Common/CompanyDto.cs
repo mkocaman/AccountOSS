@@ -58,5 +58,14 @@ public record CompanyDto
     
     /// <summary>Kullanıcının varsayılan şirketi mi?</summary>
     public bool IsDefaultForUser { get; init; }
+    
+    /// <summary>Maksimum kullanıcı sayısı (plan limiti)</summary>
+    public int MaxUsers { get; init; }
+    
+    /// <summary>Mevcut kullanıcı sayısı</summary>
+    public int CurrentUserCount { get; init; }
+    
+    /// <summary>Kullanıcı limiti doldu mu?</summary>
+    public bool IsUserLimitReached { get; init; }
 }
 

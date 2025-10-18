@@ -39,12 +39,31 @@ public static class DependencyInjection
         // Email Service
         services.AddScoped<IEmailService, EmailService>();
         
+        // Audit Service
+        services.AddScoped<IAuditService, AuditService>();
+        
         // Cache Service
         services.AddMemoryCache();
         services.AddScoped<ICacheService, MemoryCacheService>();
         
         // File Storage Service
         services.AddScoped<IFileStorageService, LocalFileStorageService>();
+        
+        // Stock Service (FIFO)
+        services.AddScoped<IStockService, StockService>();
+        
+        // Document Numbering Service
+        services.AddScoped<IDocumentNumberingService, DocumentNumberingService>();
+        
+        // PDF Service
+        services.AddScoped<IPdfService, PdfService>();
+        
+        // Notification Service
+        services.AddScoped<INotificationService, NotificationService>();
+        
+        // Security Services
+        services.AddScoped<IRateLimitService, RateLimitService>();
+        services.AddScoped<ITwoFactorAuthService, TwoFactorAuthService>();
         
         // NOT: HttpContextAccessor API katmanında (Program.cs) eklenir
         // services.AddHttpContextAccessor(); 

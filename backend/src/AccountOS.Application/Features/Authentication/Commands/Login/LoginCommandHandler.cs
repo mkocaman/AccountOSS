@@ -28,6 +28,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<LoginRes
         // Kullanıcı bul
         var user = await _context.Users
             .Include(u => u.UserRoles)
+            .Include(u => u.UserCompanies)
             .FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
 
         if (user == null)
@@ -47,6 +48,15 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<LoginRes
             return Result<LoginResponse>.Fail("Email veya şifre hatalı");
         }
 
+        // Kullanıcının varsayılan şirketini bul
+        var userCompany = user.UserCompanies
+            .Where(uc => uc.IsActive)
+            .OrderByDescending(uc => uc.IsDefault)
+            .ThenBy(uc => uc.JoinedAt)
+            .FirstOrDefault();
+
+        Guid? companyId = userCompany?.CompanyId;
+
         // Rolleri al
         var roles = user.UserRoles.Select(ur => ur.RoleName).ToList();
         if (!roles.Any())
@@ -54,11 +64,12 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<LoginRes
             roles.Add("User"); // Varsayılan rol
         }
 
-        // JWT token üret
+        // JWT token üret (CompanyId ile)
         var accessToken = _jwtService.GenerateAccessToken(
             user.Id, 
             user.Email, 
-            roles);
+            roles,
+            companyId); // CompanyId eklendi!
         
         var refreshToken = _jwtService.GenerateRefreshToken();
 

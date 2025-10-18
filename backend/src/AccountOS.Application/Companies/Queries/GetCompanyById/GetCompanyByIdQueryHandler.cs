@@ -39,6 +39,10 @@ public class GetCompanyByIdQueryHandler : IRequestHandler<GetCompanyByIdQuery, R
         if (userCompany == null)
             return Result<CompanyDto>.Fail("Şirket bulunamadı veya erişim yetkiniz yok");
 
+        // Kullanıcı sayısını hesapla
+        var userCount = await _context.UserCompanies
+            .CountAsync(uc => uc.CompanyId == request.Id && uc.IsActive, cancellationToken);
+
         // DTO'ya dönüştür
         var dto = new CompanyDto
         {
@@ -59,7 +63,10 @@ public class GetCompanyByIdQueryHandler : IRequestHandler<GetCompanyByIdQuery, R
             IsActive = userCompany.Company.IsActive,
             CreatedAt = userCompany.Company.CreatedAt,
             UserRole = userCompany.Role,
-            IsDefaultForUser = userCompany.IsDefault
+            IsDefaultForUser = userCompany.IsDefault,
+            MaxUsers = userCompany.Company.MaxUsers,
+            CurrentUserCount = userCount,
+            IsUserLimitReached = userCount >= userCompany.Company.MaxUsers
         };
 
         return Result<CompanyDto>.Ok(dto);

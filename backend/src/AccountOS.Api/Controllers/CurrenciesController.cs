@@ -4,6 +4,7 @@ using AccountOS.Application.Currencies.Queries.GetCurrencies;
 using AccountOS.Application.Currencies.Queries.GetCurrentRate;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace AccountOS.Api.Controllers;
 
@@ -94,6 +95,35 @@ public class CurrenciesController : BaseApiController
             return NotFound(result);
         
         return FromResult(result);
+    }
+
+    /// <summary>
+    /// Test endpoint: Currency seed data doğrulaması (Prompt 1.11 Verification)
+    /// </summary>
+    /// <returns>Seed data doğrulama sonucu</returns>
+    [HttpGet("test/seed-verification")]
+    [AllowAnonymous] // Test amaçlı, production'da silinebilir
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> VerifySeedData()
+    {
+        var currencyResult = await Mediator.Send(new GetCurrenciesQuery { ActiveOnly = false });
+        
+        var expectedCurrencies = new[] { "TRY", "USD", "EUR", "GBP", "RUB", "UZS", "AED", "SAR" };
+        var missingCurrencies = expectedCurrencies
+            .Where(code => !currencyResult.Data!.Any(c => c.Code == code))
+            .ToList();
+        
+        return Ok(new
+        {
+            Success = missingCurrencies.Count == 0,
+            TotalCurrencies = currencyResult.Data!.Count,
+            ExpectedCount = 8,
+            MissingCurrencies = missingCurrencies,
+            FoundCurrencies = currencyResult.Data.Select(c => c.Code).ToList(),
+            Message = missingCurrencies.Count == 0 
+                ? "✅ Seed data verification successful! All 8 currencies found."
+                : $"⚠️ Warning: {missingCurrencies.Count} currencies missing: {string.Join(", ", missingCurrencies)}"
+        });
     }
 }
 

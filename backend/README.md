@@ -52,6 +52,77 @@ backend/
   - Serilog.AspNetCore 8.0.3
   - Swashbuckle.AspNetCore 6.8.1
 
+## ✨ Özellikler
+
+### Tamamlanan Modüller
+- ✅ **Authentication & Authorization** (Prompt 1.9, 1.10, 1.12)
+  - JWT tabanlı authentication
+  - Multi-tenant CompanyId claim support
+  - Role-based authorization
+  - Password hashing (BCrypt)
+
+- ✅ **Multi-Tenant Company System** (Prompt 1.8)
+  - Company CRUD operations
+  - User-Company relationship
+  - Default company selection
+  - Tenant isolation (Global Query Filter)
+
+- ✅ **Currency & FxRate System** (Prompt 1.11)
+  - 8 para birimi seed data (TRY, USD, EUR, GBP, RUB, UZS, AED, SAR)
+  - Döviz kuru yönetimi (upsert)
+  - Tarih bazlı kur sorgulama
+  - Seed data verification endpoint
+
+- ✅ **Customer (Cari) Management** (Prompt 1.13)
+  - Customer CRUD operations
+  - Customer types (Müşteri, Tedarikçi, Her İkisi)
+  - Multi-tenant customer isolation
+  - Soft delete support
+
+- ✅ **Product Management** (Prompt 1.13)
+  - Product CRUD operations
+  - Multi-language product names (ProductTranslation)
+  - Product types (Mal, Hizmet, Sabit Kıymet)
+  - Stock tracking
+  - Soft delete support
+
+- ✅ **Language & Translation System** (Prompt 1.14 + 1.15 Enhancement)
+  - 5 dil desteği (TR, EN, RU, UZ, AR)
+  - RTL (Right-to-Left) support
+  - Key-value translation pairs
+  - Category-based filtering
+  - Upsert mechanism
+  - 15 seed translations
+  - **Owner CRUD** - Create/Update/Delete languages & translations 🆕
+  - Protected default language (TR cannot be deleted)
+
+- ✅ **Stock Layers & FIFO System** (Prompt 1.15) 🆕
+  - Layer-based inventory tracking
+  - **FIFO (First-In-First-Out)** cost calculation
+  - Multi-layer consumption support
+  - Exchange rate snapshot per layer
+  - Automatic Product.StockQuantity calculation
+  - Complete audit trail (StockMovement)
+  - Consumption history (StockConsumption)
+  - Multi-currency support
+
+- ✅ **Tenant User Limits** (Prompt 1.15) 🆕
+  - Company.MaxUsers property (default: 5)
+  - CurrentUserCount calculation
+  - Automatic limit validation
+  - Owner can increase/decrease limit
+  - Pricing plan integration ready
+
+### Teknik Özellikler
+- ✅ **Clean Architecture** - Katmanlı mimari
+- ✅ **CQRS Pattern** - MediatR ile komut/sorgu ayrımı
+- ✅ **Validation** - FluentValidation
+- ✅ **Soft Delete** - Global query filter
+- ✅ **Audit Logging** - CreatedBy, UpdatedBy, DeletedBy
+- ✅ **Optimistic Concurrency** - RowVersion
+- ✅ **Result Pattern** - Exception yerine Result<T>
+- ✅ **Global Exception Handler** - Merkezi hata yönetimi
+
 ## 🚀 Başlangıç
 
 ### Gereksinimler

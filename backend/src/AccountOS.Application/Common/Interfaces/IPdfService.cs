@@ -1,22 +1,20 @@
+using AccountOS.Application.Customers.Common;
+using AccountOS.Application.Invoices.Common;
+
 namespace AccountOS.Application.Common.Interfaces;
 
 /// <summary>
 /// PDF oluşturma servisi
-/// Fatura, teklif, sözleşme vb. için PDF üretir
 /// </summary>
 public interface IPdfService
 {
     /// <summary>
-    /// HTML'den PDF oluşturur
+    /// Fatura PDF'i oluştur
     /// </summary>
-    Task<byte[]> GeneratePdfFromHtmlAsync(string html, CancellationToken cancellationToken = default);
-    
-    /// <summary>
-    /// Template'den PDF oluşturur
-    /// </summary>
-    Task<byte[]> GeneratePdfFromTemplateAsync(
-        string templateName, 
-        Dictionary<string, object> data,
-        CancellationToken cancellationToken = default);
-}
+    byte[] GenerateInvoicePdf(InvoiceDto invoice);
 
+    /// <summary>
+    /// Cari hesap ekstresi PDF'i oluştur
+    /// </summary>
+    byte[] GenerateCustomerStatementPdf(CustomerStatementDto statement);
+}

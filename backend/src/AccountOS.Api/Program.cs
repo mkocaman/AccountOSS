@@ -3,6 +3,7 @@ using AccountOS.Infrastructure;
 using AccountOS.Api.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.EntityFrameworkCore;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -101,6 +102,10 @@ var connectionString = configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddInfrastructure(connectionString);
 
+// Background Services
+builder.Services.AddHostedService<AccountOS.Api.BackgroundServices.EmailQueueBackgroundService>();
+builder.Services.AddHostedService<AccountOS.Api.BackgroundServices.AlertCheckerBackgroundService>();
+
 var app = builder.Build();
 
 // Seed database (Development only)
@@ -113,13 +118,13 @@ if (app.Environment.IsDevelopment())
         var context = services.GetRequiredService<AccountOS.Infrastructure.Persistence.ApplicationDbContext>();
         var logger = services.GetRequiredService<ILogger<Program>>();
         
-        // Database'i oluştur (yoksa)
-        await context.Database.EnsureCreatedAsync();
+        // Apply migrations
+        await context.Database.MigrateAsync();
         
         // Seed data ekle
         await AccountOS.Infrastructure.Persistence.ApplicationDbContextSeed.SeedAsync(context, logger);
         
-        logger.LogInformation("Veritabanı hazır");
+        logger.LogInformation("✅ Database migration ve seed data tamamlandı");
     }
     catch (Exception ex)
     {
@@ -143,9 +148,15 @@ if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 
 app.UseHttpsRedirection();
 
+// Security Headers (OWASP recommended)
+app.UseMiddleware<SecurityHeadersMiddleware>();
+
+// Rate Limiting (before authentication)
+app.UseMiddleware<RateLimitingMiddleware>();
+
 app.UseCors("AllowAll");
 
-// Global Exception Handler Middleware - SONRA Exception Handler
+// Global Exception Handler Middleware
 app.UseMiddleware<ExceptionHandlerMiddleware>();
 
 // Authentication & Authorization

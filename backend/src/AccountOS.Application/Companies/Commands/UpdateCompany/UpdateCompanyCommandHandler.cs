@@ -77,10 +77,31 @@ public class UpdateCompanyCommandHandler : IRequestHandler<UpdateCompanyCommand,
         
         company.LogoUrl = request.LogoUrl;
         company.PrimaryColor = request.PrimaryColor;
+        
+        // MaxUsers güncellemesi (sadece Owner)
+        if (request.MaxUsers.HasValue)
+        {
+            // Mevcut kullanıcı sayısını kontrol et
+            var currentUserCount = await _context.UserCompanies
+                .CountAsync(uc => uc.CompanyId == company.Id && uc.IsActive, cancellationToken);
+
+            if (request.MaxUsers.Value < currentUserCount)
+            {
+                return Result<CompanyDto>.Fail(
+                    $"Maksimum kullanıcı sayısı mevcut kullanıcı sayısından ({currentUserCount}) az olamaz");
+            }
+
+            company.MaxUsers = request.MaxUsers.Value;
+        }
+        
         company.UpdatedAt = DateTime.UtcNow;
         company.UpdatedBy = userId;
 
         await _context.SaveChangesAsync(cancellationToken);
+
+        // Kullanıcı sayısını hesapla
+        var userCount = await _context.UserCompanies
+            .CountAsync(uc => uc.CompanyId == company.Id && uc.IsActive, cancellationToken);
 
         // DTO'ya dönüştür
         var dto = new CompanyDto
@@ -102,7 +123,10 @@ public class UpdateCompanyCommandHandler : IRequestHandler<UpdateCompanyCommand,
             IsActive = company.IsActive,
             CreatedAt = company.CreatedAt,
             UserRole = userCompany.Role,
-            IsDefaultForUser = userCompany.IsDefault
+            IsDefaultForUser = userCompany.IsDefault,
+            MaxUsers = company.MaxUsers,
+            CurrentUserCount = userCount,
+            IsUserLimitReached = userCount >= company.MaxUsers
         };
 
         return Result<CompanyDto>.Ok(dto);

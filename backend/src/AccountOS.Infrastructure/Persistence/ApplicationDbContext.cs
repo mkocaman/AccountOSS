@@ -36,6 +36,31 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<Product> Products => Set<Product>();
     public DbSet<ProductTranslation> ProductTranslations => Set<ProductTranslation>();
+    public DbSet<Language> Languages => Set<Language>();
+    public DbSet<Translation> Translations => Set<Translation>();
+    public DbSet<StockLayer> StockLayers => Set<StockLayer>();
+    public DbSet<StockConsumption> StockConsumptions => Set<StockConsumption>();
+    public DbSet<StockMovement> StockMovements => Set<StockMovement>();
+    public DbSet<Invoice> Invoices => Set<Invoice>();
+    public DbSet<InvoiceItem> InvoiceItems => Set<InvoiceItem>();
+    public DbSet<Payment> Payments => Set<Payment>();
+    public DbSet<DocumentNumberingTemplate> DocumentNumberingTemplates => Set<DocumentNumberingTemplate>();
+    public DbSet<EmailConfiguration> EmailConfigurations => Set<EmailConfiguration>();
+    public DbSet<EmailTemplate> EmailTemplates => Set<EmailTemplate>();
+    public DbSet<EmailLog> EmailLogs => Set<EmailLog>();
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<ExpenseCategory> ExpenseCategories => Set<ExpenseCategory>();
+    public DbSet<Expense> Expenses => Set<Expense>();
+    public DbSet<FileStorageConfiguration> FileStorageConfigurations => Set<FileStorageConfiguration>();
+    public DbSet<StoredFile> StoredFiles => Set<StoredFile>();
+    public DbSet<FileAttachment> FileAttachments => Set<FileAttachment>();
+    public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<NotificationPreference> NotificationPreferences => Set<NotificationPreference>();
+    public DbSet<NotificationTemplate> NotificationTemplates => Set<NotificationTemplate>();
+    public DbSet<RateLimitRule> RateLimitRules => Set<RateLimitRule>();
+    public DbSet<IpBlacklist> IpBlacklist => Set<IpBlacklist>();
+    public DbSet<ApiKey> ApiKeys => Set<ApiKey>();
+    public DbSet<TwoFactorAuth> TwoFactorAuths => Set<TwoFactorAuth>();
     
     /// <summary>
     /// Model yapılandırması (entity configuration, indexes, relationships)

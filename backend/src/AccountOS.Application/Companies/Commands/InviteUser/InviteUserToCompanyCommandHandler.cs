@@ -41,6 +41,25 @@ public class InviteUserToCompanyCommandHandler : IRequestHandler<InviteUserToCom
         if (userCompany.Role != "Owner" && userCompany.Role != "Admin")
             return Result<bool>.Fail("Kullanıcı davet etmek için yetkiniz yok");
 
+        // Şirketi getir (user limit kontrolü için)
+        var company = await _context.Companies
+            .Where(c => c.Id == request.CompanyId)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (company == null)
+            return Result<bool>.Fail("Şirket bulunamadı");
+
+        // YENI: Kullanıcı limiti kontrolü
+        var currentUserCount = await _context.UserCompanies
+            .CountAsync(uc => uc.CompanyId == request.CompanyId && uc.IsActive, cancellationToken);
+
+        if (currentUserCount >= company.MaxUsers)
+        {
+            return Result<bool>.Fail(
+                $"Kullanıcı limiti aşıldı! Maksimum: {company.MaxUsers}, Mevcut: {currentUserCount}. " +
+                "Lütfen planınızı yükseltin veya mevcut kullanıcıları silin.");
+        }
+
         // Email'e göre kullanıcıyı bul
         var invitedUser = await _context.Users
             .Where(u => u.Email.ToLower() == request.Email.ToLower())

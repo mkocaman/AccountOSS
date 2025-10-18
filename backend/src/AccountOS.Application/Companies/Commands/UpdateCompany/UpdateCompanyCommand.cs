@@ -50,5 +50,8 @@ public record UpdateCompanyCommand : IRequest<Result<CompanyDto>>
     
     /// <summary>Birincil renk</summary>
     public string? PrimaryColor { get; init; }
+    
+    /// <summary>Maksimum kullanıcı sayısı (Owner only)</summary>
+    public int? MaxUsers { get; init; }
 }
 

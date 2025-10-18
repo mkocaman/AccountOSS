@@ -83,4 +83,9 @@ public class Company : BaseEntity
     /// Abonelik bitiş tarihi
     /// </summary>
     public DateTime? SubscriptionExpiresAt { get; set; }
+    
+    /// <summary>
+    /// Maksimum kullanıcı sayısı (plan limiti)
+    /// </summary>
+    public int MaxUsers { get; set; } = 5; // Default: 5 kullanıcı (Starter plan)
 }

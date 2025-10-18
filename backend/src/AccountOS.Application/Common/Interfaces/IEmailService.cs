@@ -1,32 +1,74 @@
+using AccountOS.Domain.Enums;
+
 namespace AccountOS.Application.Common.Interfaces;
 
 /// <summary>
-/// Email gönderme servisi
-/// SMTP veya SendGrid gibi sağlayıcılar kullanılabilir
+/// Email gönderim servisi
 /// </summary>
 public interface IEmailService
 {
     /// <summary>
-    /// Basit email gönderir
+    /// Email gönder
     /// </summary>
-    Task SendEmailAsync(string to, string subject, string body, CancellationToken cancellationToken = default);
-    
-    /// <summary>
-    /// Template bazlı email gönderir
-    /// </summary>
-    Task SendTemplateEmailAsync(
-        string to, 
-        string templateName, 
-        Dictionary<string, string> parameters,
+    Task<bool> SendEmailAsync(
+        string toEmail,
+        string toName,
+        string subject,
+        string htmlBody,
+        string? plainTextBody = null,
+        List<EmailAttachment>? attachments = null,
+        string? cc = null,
+        string? bcc = null,
         CancellationToken cancellationToken = default);
-    
+
     /// <summary>
-    /// Toplu email gönderir
+    /// Şablon kullanarak email gönder
     /// </summary>
-    Task SendBulkEmailAsync(
-        IEnumerable<string> toList, 
-        string subject, 
-        string body,
+    Task<bool> SendEmailFromTemplateAsync(
+        EmailTemplateType templateType,
+        string toEmail,
+        string toName,
+        Dictionary<string, string> variables,
+        List<EmailAttachment>? attachments = null,
+        Guid? relatedEntityId = null,
+        string? relatedEntityType = null,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Fatura email'i gönder
+    /// </summary>
+    Task<bool> SendInvoiceEmailAsync(
+        Guid invoiceId,
+        string? additionalMessage = null,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Ödeme hatırlatması gönder
+    /// </summary>
+    Task<bool> SendPaymentReminderAsync(
+        Guid invoiceId,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Test email gönder
+    /// </summary>
+    Task<bool> SendTestEmailAsync(
+        string toEmail,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Kuyruktaki email'leri işle
+    /// </summary>
+    Task ProcessEmailQueueAsync(CancellationToken cancellationToken = default);
+}
+
+/// <summary>
+/// Email attachment model
+/// </summary>
+public class EmailAttachment
+{
+    public string FileName { get; set; } = string.Empty;
+    public byte[] Content { get; set; } = Array.Empty<byte>();
+    public string ContentType { get; set; } = "application/octet-stream";
 }
 
