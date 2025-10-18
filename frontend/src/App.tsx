@@ -1,4 +1,4 @@
-import { ConfigProvider } from 'antd';
+import { ConfigProvider, App as AntApp } from 'antd';
 import { RouterProvider } from 'react-router-dom';
 import { router } from './routes';
 import trTR from 'antd/locale/tr_TR';
@@ -14,7 +14,9 @@ function App() {
         },
       }}
     >
-      <RouterProvider router={router} />
+      <AntApp>
+        <RouterProvider router={router} />
+      </AntApp>
     </ConfigProvider>
   );
 }

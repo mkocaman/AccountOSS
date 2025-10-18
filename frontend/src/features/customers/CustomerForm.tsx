@@ -30,6 +30,13 @@ export const CustomerForm = () => {
 
   useEffect(() => {
     if (isEditMode) {
+      // ID kontrolü
+      if (!id || id === 'undefined' || id === 'null') {
+        message.error('Geçersiz müşteri ID\'si');
+        navigate('/customers');
+        return;
+      }
+      
       loadCustomer();
     }
   }, [id]);
@@ -43,8 +50,14 @@ export const CustomerForm = () => {
         form.setFieldsValue(response.data);
         setCustomerType(response.data.type);
       }
-    } catch (error) {
-      message.error('Müşteri bilgileri yüklenemedi');
+    } catch (error: any) {
+      // 404 hatası durumunda özel mesaj
+      if (error.response?.status === 404) {
+        message.error('Müşteri bulunamadı. Bu müşteri silinmiş olabilir.');
+      } else {
+        message.error('Müşteri bilgileri yüklenemedi');
+      }
+      
       navigate('/customers');
     } finally {
       setLoading(false);
@@ -155,7 +168,16 @@ export const CustomerForm = () => {
                     <div className="grid grid-cols-2 gap-4">
                       {customerType === CustomerType.Corporate ? (
                         <>
-                          <Form.Item name="taxNumber" label="Vergi Numarası">
+                          <Form.Item
+                            name="taxNumber"
+                            label="Vergi Numarası"
+                            rules={[
+                              {
+                                required: true,
+                                message: 'Kurumsal müşteriler için vergi numarası zorunludur!',
+                              },
+                            ]}
+                          >
                             <Input placeholder="1234567890" size="large" />
                           </Form.Item>
                           <Form.Item name="taxOffice" label="Vergi Dairesi">
@@ -163,8 +185,29 @@ export const CustomerForm = () => {
                           </Form.Item>
                         </>
                       ) : (
-                        <Form.Item name="identityNumber" label="TC Kimlik No">
-                          <Input placeholder="12345678901" size="large" />
+                        <Form.Item
+                          name="identityNumber"
+                          label="TC Kimlik No"
+                          rules={[
+                            {
+                              required: true,
+                              message: 'Bireysel müşteriler için TC Kimlik No zorunludur!',
+                            },
+                            {
+                              len: 11,
+                              message: 'TC Kimlik No 11 haneli olmalıdır!',
+                            },
+                            {
+                              pattern: /^[0-9]{11}$/,
+                              message: 'TC Kimlik No sadece rakam içermelidir!',
+                            },
+                          ]}
+                        >
+                          <Input
+                            placeholder="12345678901"
+                            size="large"
+                            maxLength={11}
+                          />
                         </Form.Item>
                       )}
                     </div>
@@ -250,7 +293,7 @@ export const CustomerForm = () => {
                           { required: true, message: 'Para birimi gerekli!' },
                         ]}
                       >
-                        <Select size="large">
+                        <Select size="large" placeholder="Para birimi seçin">
                           <Select.Option value="TRY">🇹🇷 TRY</Select.Option>
                           <Select.Option value="USD">🇺🇸 USD</Select.Option>
                           <Select.Option value="EUR">🇪🇺 EUR</Select.Option>

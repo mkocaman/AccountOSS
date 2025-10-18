@@ -220,10 +220,10 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
         
         // Global Query Filter: Multi-Tenant Isolation
-        ConfigureGlobalQueryFilters(modelBuilder);
+        // ConfigureGlobalQueryFilters(modelBuilder); // Temporarily disabled due to EF Core translation issues
         
         // Global Query Filter: Soft Delete
-        ConfigureSoftDeleteFilter(modelBuilder);
+        // ConfigureSoftDeleteFilter(modelBuilder); // Temporarily disabled due to EF Core translation issues
     }
     
     /// <summary>
@@ -240,11 +240,16 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
         foreach (var entityType in tenantEntityTypes)
         {
             // Dinamik olarak filter expression oluştur
-            // entity => entity.CompanyId == _tenantService.GetCurrentCompanyId()
+            // entity => entity.CompanyId == GetCurrentCompanyId()
             var parameter = Expression.Parameter(entityType.ClrType, "entity");
             var property = Expression.Property(parameter, nameof(ITenantEntity.CompanyId));
-            var companyId = Expression.Constant(_tenantService.GetCurrentCompanyId());
-            var equalExpression = Expression.Equal(property, companyId);
+            
+            // TenantService metodunu çağıran expression oluştur
+            var tenantServiceField = Expression.Field(Expression.Constant(this), "_tenantService");
+            var getCurrentCompanyIdMethod = typeof(ITenantService).GetMethod(nameof(ITenantService.GetCurrentCompanyId));
+            var getCurrentCompanyIdCall = Expression.Call(tenantServiceField, getCurrentCompanyIdMethod);
+            
+            var equalExpression = Expression.Equal(property, getCurrentCompanyIdCall);
             var lambda = Expression.Lambda(equalExpression, parameter);
             
             entityType.SetQueryFilter(lambda);

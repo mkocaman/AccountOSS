@@ -13,23 +13,28 @@ namespace AccountOS.Application.Customers.Queries.GetCustomers;
 public class GetCustomersQueryHandler : IRequestHandler<GetCustomersQuery, Result<List<CustomerDto>>>
 {
     private readonly IApplicationDbContext _context;
-    private readonly ICurrentUserService _currentUser;
+    private readonly ITenantService _tenantService;
 
     public GetCustomersQueryHandler(
         IApplicationDbContext context,
-        ICurrentUserService currentUser)
+        ITenantService tenantService)
     {
         _context = context;
-        _currentUser = currentUser;
+        _tenantService = tenantService;
     }
 
     public async Task<Result<List<CustomerDto>>> Handle(GetCustomersQuery request, CancellationToken cancellationToken)
     {
-        // Şirket kontrolü (multi-tenant)
-        if (_currentUser.CompanyId == null)
+        // Şirket kontrolü (multi-tenant) - X-Company-Id header'ından al
+        Guid companyId;
+        try
+        {
+            companyId = _tenantService.GetCurrentCompanyId();
+        }
+        catch (UnauthorizedAccessException)
+        {
             return Result<List<CustomerDto>>.Fail("Şirket bilgisi bulunamadı");
-
-        var companyId = _currentUser.CompanyId.Value;
+        }
 
         var query = _context.Customers
             .Where(c => c.CompanyId == companyId);
@@ -41,50 +46,51 @@ public class GetCustomersQueryHandler : IRequestHandler<GetCustomersQuery, Resul
         // Arama
         if (!string.IsNullOrWhiteSpace(request.SearchTerm))
         {
-            var searchTerm = request.SearchTerm.ToLower();
+            var searchTerm = request.SearchTerm;
             query = query.Where(c => 
-                c.Name.ToLower().Contains(searchTerm) ||
-                c.Code.ToLower().Contains(searchTerm) ||
-                (c.Email != null && c.Email.ToLower().Contains(searchTerm)) ||
+                c.Name.Contains(searchTerm) ||
+                c.Code.Contains(searchTerm) ||
+                (c.Email != null && c.Email.Contains(searchTerm)) ||
                 (c.TaxNumber != null && c.TaxNumber.Contains(searchTerm)));
         }
 
         var customers = await query
             .OrderBy(c => c.Name)
-            .Select(c => new CustomerDto
-            {
-                Id = c.Id,
-                CompanyId = c.CompanyId,
-                Code = c.Code,
-                Name = c.Name,
-                Type = c.Type,
-                TypeName = c.Type == CustomerType.Individual ? "Bireysel" : "Kurumsal",
-                Email = c.Email,
-                Phone = c.Phone,
-                MobilePhone = c.MobilePhone,
-                Website = c.Website,
-                TaxNumber = c.TaxNumber,
-                TaxOffice = c.TaxOffice,
-                IdentityNumber = c.IdentityNumber,
-                BillingAddress = c.BillingAddress,
-                ShippingAddress = c.ShippingAddress,
-                City = c.City,
-                Country = c.Country,
-                PostalCode = c.PostalCode,
-                Currency = c.Currency,
-                CreditLimit = c.CreditLimit,
-                PaymentTermDays = c.PaymentTermDays,
-                CurrentBalance = c.CurrentBalance,
-                BalanceStatus = c.CurrentBalance >= 0 ? "Alacak" : "Borç",
-                IsActive = c.IsActive,
-                IsBlocked = c.IsBlocked,
-                BlockReason = c.BlockReason,
-                Notes = c.Notes,
-                CreatedAt = c.CreatedAt
-            })
             .ToListAsync(cancellationToken);
 
-        return Result<List<CustomerDto>>.Ok(customers);
+        var customerDtos = customers.Select(c => new CustomerDto
+        {
+            Id = c.Id,
+            CompanyId = c.CompanyId,
+            Code = c.Code,
+            Name = c.Name,
+            Type = c.Type,
+            TypeName = c.Type == CustomerType.Individual ? "Bireysel" : "Kurumsal",
+            Email = c.Email,
+            Phone = c.Phone,
+            MobilePhone = c.MobilePhone,
+            Website = c.Website,
+            TaxNumber = c.TaxNumber,
+            TaxOffice = c.TaxOffice,
+            IdentityNumber = c.IdentityNumber,
+            BillingAddress = c.BillingAddress,
+            ShippingAddress = c.ShippingAddress,
+            City = c.City,
+            Country = c.Country,
+            PostalCode = c.PostalCode,
+            Currency = c.Currency,
+            CreditLimit = c.CreditLimit,
+            PaymentTermDays = c.PaymentTermDays,
+            CurrentBalance = c.CurrentBalance,
+            BalanceStatus = c.CurrentBalance >= 0 ? "Alacak" : "Borç",
+            IsActive = c.IsActive,
+            IsBlocked = c.IsBlocked,
+            BlockReason = c.BlockReason,
+            Notes = c.Notes,
+            CreatedAt = c.CreatedAt
+        }).ToList();
+
+        return Result<List<CustomerDto>>.Ok(customerDtos);
     }
 }
 

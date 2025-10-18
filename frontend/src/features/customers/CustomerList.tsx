@@ -34,6 +34,7 @@ export const CustomerList = () => {
       const response = await customersApi.getAll(params);
       if (response.success) {
         const data = response.data;
+        console.log('Loaded customers from API:', data);
         setAllCustomers(data);
         
         // Client-side type filter
@@ -42,6 +43,7 @@ export const CustomerList = () => {
           filtered = filtered.filter((c) => c.type === params.type);
         }
         
+        console.log('Filtered customers:', filtered);
         setCustomers(filtered);
       }
     } catch (error) {
@@ -181,6 +183,8 @@ export const CustomerList = () => {
             icon={<EditOutlined />}
             onClick={(e) => {
               e.stopPropagation();
+              console.log('Edit button clicked for customer ID:', record.id);
+              console.log('Customer record:', record);
               navigate(`/customers/edit/${record.id}`);
             }}
           />

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Form, Input, Button, Card, Select, message, Spin } from 'antd';
+import { Form, Input, Button, Card, Select, message, Spin, Space } from 'antd';
 import { useNavigate, useParams } from 'react-router-dom';
-import { companiesApi, CreateCompanyRequest } from '@/api/companies';
+import { companiesApi, type CreateCompanyRequest } from '@/api/companies';
 
 // Şirket oluştur/düzenle formu
 export const CompanyForm = () => {
@@ -40,7 +40,9 @@ export const CompanyForm = () => {
     setSaving(true);
     try {
       if (isEditMode) {
-        await companiesApi.update(id!, values);
+        // UpdateCompanyRequest tipine uygun hale getir
+        const updateData: UpdateCompanyRequest = { ...values, id: id! };
+        await companiesApi.update(id!, updateData);
         message.success('Şirket güncellendi');
       } else {
         await companiesApi.create(values);
@@ -126,20 +128,37 @@ export const CompanyForm = () => {
             />
           </Form.Item>
 
-          <Form.Item
-            name="baseCurrency"
-            label="Ana Para Birimi"
-            rules={[{ required: true, message: 'Para birimi gerekli!' }]}
-            initialValue="TRY"
-          >
-            <Select size="large" placeholder="Para birimi seçin">
-              <Select.Option value="TRY">🇹🇷 Türk Lirası (TRY)</Select.Option>
-              <Select.Option value="USD">🇺🇸 Amerikan Doları (USD)</Select.Option>
-              <Select.Option value="EUR">🇪🇺 Euro (EUR)</Select.Option>
-              <Select.Option value="GBP">🇬🇧 İngiliz Sterlini (GBP)</Select.Option>
-              <Select.Option value="RUB">🇷🇺 Rus Rublesi (RUB)</Select.Option>
-            </Select>
-          </Form.Item>
+          <div className="grid grid-cols-2 gap-4">
+            <Form.Item
+              name="baseCurrency"
+              label="Ana Para Birimi"
+              rules={[{ required: true, message: 'Para birimi gerekli!' }]}
+              initialValue="TRY"
+            >
+              <Select size="large" placeholder="Para birimi seçin">
+                <Select.Option value="TRY">🇹🇷 Türk Lirası (TRY)</Select.Option>
+                <Select.Option value="USD">🇺🇸 Amerikan Doları (USD)</Select.Option>
+                <Select.Option value="EUR">🇪🇺 Euro (EUR)</Select.Option>
+                <Select.Option value="GBP">🇬🇧 İngiliz Sterlini (GBP)</Select.Option>
+                <Select.Option value="RUB">🇷🇺 Rus Rublesi (RUB)</Select.Option>
+              </Select>
+            </Form.Item>
+
+            <Form.Item
+              name="country"
+              label="Ülke"
+              rules={[{ required: true, message: 'Ülke gerekli!' }]}
+              initialValue="TR"
+            >
+              <Select size="large" placeholder="Ülke seçin">
+                <Select.Option value="TR">🇹🇷 Türkiye</Select.Option>
+                <Select.Option value="US">🇺🇸 Amerika</Select.Option>
+                <Select.Option value="DE">🇩🇪 Almanya</Select.Option>
+                <Select.Option value="GB">🇬🇧 İngiltere</Select.Option>
+                <Select.Option value="RU">🇷🇺 Rusya</Select.Option>
+              </Select>
+            </Form.Item>
+          </div>
 
           {/* Buttons */}
           <Form.Item>

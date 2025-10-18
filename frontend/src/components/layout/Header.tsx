@@ -36,10 +36,20 @@ export const Header = ({ collapsed, onToggle }: HeaderProps) => {
     try {
       const response = await companiesApi.getUserCompanies();
       if (response.success) {
+        console.log('📊 Şirketler yüklendi:', response.data);
         setCompanies(response.data);
+        
+        // Eğer currentCompany yoksa ve şirketler varsa, ilk şirketi otomatik seç
+        if (!currentCompany && response.data.length > 0) {
+          console.log('✅ İlk şirket otomatik seçildi:', response.data[0]);
+          setCurrentCompany(response.data[0]);
+          console.log('📝 localStorage currentCompanyId:', response.data[0].id);
+        } else {
+          console.log('⚠️ currentCompany zaten var:', currentCompany);
+        }
       }
     } catch (error) {
-      console.error('Şirketler yüklenemedi:', error);
+      console.error('❌ Şirketler yüklenemedi:', error);
     }
   };
 
@@ -117,7 +127,7 @@ export const Header = ({ collapsed, onToggle }: HeaderProps) => {
           style={{ width: 220 }}
           loading={companies.length === 0}
           placeholder="Şirket seçin"
-          dropdownRender={(menu) => (
+          popupRender={(menu) => (
             <>
               {menu}
               <div className="p-2 border-t">

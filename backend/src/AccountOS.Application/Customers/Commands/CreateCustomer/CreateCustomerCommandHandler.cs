@@ -14,29 +14,44 @@ namespace AccountOS.Application.Customers.Commands.CreateCustomer;
 public class CreateCustomerCommandHandler : IRequestHandler<CreateCustomerCommand, Result<CustomerDto>>
 {
     private readonly IApplicationDbContext _context;
+    private readonly ITenantService _tenantService;
     private readonly ICurrentUserService _currentUser;
 
     public CreateCustomerCommandHandler(
         IApplicationDbContext context,
+        ITenantService tenantService,
         ICurrentUserService currentUser)
     {
         _context = context;
+        _tenantService = tenantService;
         _currentUser = currentUser;
     }
 
     public async Task<Result<CustomerDto>> Handle(CreateCustomerCommand request, CancellationToken cancellationToken)
     {
-        // Kullanıcı ve şirket kontrolü
-        if (_currentUser.UserId == null || _currentUser.CompanyId == null)
-            return Result<CustomerDto>.Fail("Kullanıcı oturumu veya şirket bilgisi bulunamadı");
+        // Kullanıcı kontrolü
+        if (_currentUser.UserId == null)
+            return Result<CustomerDto>.Fail("Kullanıcı oturumu bulunamadı");
 
         var userId = _currentUser.UserId.Value;
-        var companyId = _currentUser.CompanyId.Value;
+
+        // Şirket kontrolü - X-Company-Id header'ından al
+        Guid companyId;
+        try
+        {
+            companyId = _tenantService.GetCurrentCompanyId();
+        }
+        catch (UnauthorizedAccessException)
+        {
+            return Result<CustomerDto>.Fail("Şirket bilgisi bulunamadı");
+        }
 
         // Aynı isimde cari hesap var mı?
-        var existingCustomer = await _context.Customers
-            .Where(c => c.CompanyId == companyId && c.Name.ToLower() == request.Name.ToLower())
-            .FirstOrDefaultAsync(cancellationToken);
+        var existingCustomers = await _context.Customers
+            .Where(c => c.CompanyId == companyId && c.Name == request.Name)
+            .ToListAsync(cancellationToken);
+        
+        var existingCustomer = existingCustomers.FirstOrDefault();
 
         if (existingCustomer != null)
             return Result<CustomerDto>.Fail($"'{request.Name}' adında bir cari hesap zaten mevcut");

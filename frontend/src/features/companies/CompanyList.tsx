@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Button, Table, Space, Tag, message, Modal, Card } from 'antd';
+import { Button, Table, Space, Tag, message, Modal, Card, App } from 'antd';
 import {
   PlusOutlined,
   EditOutlined,
@@ -8,7 +8,7 @@ import {
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { companiesApi } from '@/api/companies';
-import { Company } from '@/store/companyStore';
+import type { Company } from '@/store/companyStore';
 import type { ColumnsType } from 'antd/es/table';
 
 // Şirket listesi sayfası
@@ -16,6 +16,7 @@ export const CompanyList = () => {
   const navigate = useNavigate();
   const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(false);
+  const { modal } = App.useApp();
 
   useEffect(() => {
     loadCompanies();
@@ -27,7 +28,7 @@ export const CompanyList = () => {
     try {
       const response = await companiesApi.getAll();
       if (response.success) {
-        setCompanies(response.data.items);
+        setCompanies(response.data);
       }
     } catch (error) {
       message.error('Şirketler yüklenemedi');
@@ -38,7 +39,7 @@ export const CompanyList = () => {
 
   // Şirket sil
   const handleDelete = (company: Company) => {
-    Modal.confirm({
+    modal.confirm({
       title: 'Şirketi Sil',
       icon: <ExclamationCircleOutlined />,
       content: `"${company.name}" şirketini silmek istediğinize emin misiniz? Bu işlem geri alınamaz!`,

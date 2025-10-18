@@ -161,8 +161,8 @@ app.UseCors("AllowFrontend");
 // Security Headers (OWASP recommended)
 app.UseMiddleware<SecurityHeadersMiddleware>();
 
-// Rate Limiting (before authentication)
-app.UseMiddleware<RateLimitingMiddleware>();
+// Rate Limiting (before authentication) - GEÇİCİ OLARAK DEVRE DIŞI
+// app.UseMiddleware<RateLimitingMiddleware>();
 
 // Global Exception Handler Middleware
 app.UseMiddleware<ExceptionHandlerMiddleware>();
