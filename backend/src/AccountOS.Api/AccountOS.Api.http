@@ -137,6 +137,73 @@ DELETE {{baseUrl}}/companies/{{companyId}}
 Authorization: Bearer {{accessToken}}
 
 ### ===============================
+### CURRENCIES & FX RATES
+### ===============================
+
+### 1. Get All Currencies
+GET {{baseUrl}}/currencies
+Authorization: Bearer {{accessToken}}
+
+### 2. Get All Currencies (Including Inactive)
+GET {{baseUrl}}/currencies?activeOnly=false
+Authorization: Bearer {{accessToken}}
+
+### 3. Create Currency
+POST {{baseUrl}}/currencies
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "code": "CHF",
+  "name": "Swiss Franc",
+  "symbol": "Fr",
+  "decimalPlaces": 2,
+  "displayOrder": 9
+}
+
+### 4. Create FX Rate (USD to TRY)
+POST {{baseUrl}}/currencies/fx-rates
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "baseCurrencyCode": "USD",
+  "quoteCurrencyCode": "TRY",
+  "rate": 32.50,
+  "effectiveDate": "2025-10-18",
+  "source": "Manual"
+}
+
+### 5. Create FX Rate (EUR to TRY)
+POST {{baseUrl}}/currencies/fx-rates
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "baseCurrencyCode": "EUR",
+  "quoteCurrencyCode": "TRY",
+  "rate": 35.20,
+  "effectiveDate": "2025-10-18",
+  "source": "Manual"
+}
+
+### 6. Get Current FX Rate (USD/TRY)
+GET {{baseUrl}}/currencies/fx-rates/USD/TRY
+Authorization: Bearer {{accessToken}}
+
+### 7. Get Current FX Rate (EUR/TRY)
+GET {{baseUrl}}/currencies/fx-rates/EUR/TRY
+Authorization: Bearer {{accessToken}}
+
+### 8. Get Historical FX Rate (USD/TRY for specific date)
+GET {{baseUrl}}/currencies/fx-rates/USD/TRY?asOfDate=2025-10-18
+Authorization: Bearer {{accessToken}}
+
+### 9. Get FX Rate for Same Currency (Should return 1)
+GET {{baseUrl}}/currencies/fx-rates/USD/USD
+Authorization: Bearer {{accessToken}}
+
+### ===============================
 ### PROTECTED ENDPOINTS (JWT Required)
 ### ===============================
 

@@ -1,4 +1,5 @@
 using AccountOS.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace AccountOS.Infrastructure.Persistence;
@@ -16,8 +17,11 @@ public static class ApplicationDbContextSeed
     {
         try
         {
+            // Currency seed data
+            await SeedCurrenciesAsync(context, logger);
+            
             // Company seed data
-            if (!context.Companies.Any())
+            if (!await context.Companies.AnyAsync())
             {
                 var testCompany = new Company
                 {
@@ -50,5 +54,119 @@ public static class ApplicationDbContextSeed
             logger.LogError(ex, "Seed data eklenirken hata oluştu");
             throw;
         }
+    }
+    
+    /// <summary>
+    /// Yaygın para birimlerini seed et
+    /// </summary>
+    private static async Task SeedCurrenciesAsync(ApplicationDbContext context, ILogger logger)
+    {
+        if (await context.Currencies.AnyAsync())
+            return;
+
+        var currencies = new List<Currency>
+        {
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Code = "TRY",
+                Name = "Turkish Lira",
+                Symbol = "₺",
+                DecimalPlaces = 2,
+                DisplayOrder = 1,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = Guid.Empty
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Code = "USD",
+                Name = "US Dollar",
+                Symbol = "$",
+                DecimalPlaces = 2,
+                DisplayOrder = 2,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = Guid.Empty
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Code = "EUR",
+                Name = "Euro",
+                Symbol = "€",
+                DecimalPlaces = 2,
+                DisplayOrder = 3,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = Guid.Empty
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Code = "GBP",
+                Name = "British Pound",
+                Symbol = "£",
+                DecimalPlaces = 2,
+                DisplayOrder = 4,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = Guid.Empty
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Code = "RUB",
+                Name = "Russian Ruble",
+                Symbol = "₽",
+                DecimalPlaces = 2,
+                DisplayOrder = 5,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = Guid.Empty
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Code = "UZS",
+                Name = "Uzbekistan Som",
+                Symbol = "сўм",
+                DecimalPlaces = 2,
+                DisplayOrder = 6,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = Guid.Empty
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Code = "AED",
+                Name = "UAE Dirham",
+                Symbol = "د.إ",
+                DecimalPlaces = 2,
+                DisplayOrder = 7,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = Guid.Empty
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Code = "SAR",
+                Name = "Saudi Riyal",
+                Symbol = "﷼",
+                DecimalPlaces = 2,
+                DisplayOrder = 8,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = Guid.Empty
+            }
+        };
+
+        await context.Currencies.AddRangeAsync(currencies);
+        await context.SaveChangesAsync();
+        
+        logger.LogInformation("Para birimi seed data eklendi: {Count} adet", currencies.Count);
     }
 }
