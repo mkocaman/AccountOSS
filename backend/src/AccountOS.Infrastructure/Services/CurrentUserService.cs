@@ -28,6 +28,17 @@ public class CurrentUserService : ICurrentUserService
         }
     }
 
+    public Guid? CompanyId
+    {
+        get
+        {
+            var companyIdClaim = _httpContextAccessor.HttpContext?.User?
+                .FindFirst("CompanyId")?.Value;
+            
+            return Guid.TryParse(companyIdClaim, out var companyId) ? companyId : null;
+        }
+    }
+
     public string? Email => _httpContextAccessor.HttpContext?.User?
         .FindFirst(ClaimTypes.Email)?.Value;
 

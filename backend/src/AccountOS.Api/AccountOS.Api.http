@@ -204,6 +204,102 @@ GET {{baseUrl}}/currencies/fx-rates/USD/USD
 Authorization: Bearer {{accessToken}}
 
 ### ===============================
+### CUSTOMERS (CARI HESAP)
+### ===============================
+
+### 1. Get All Customers
+GET {{baseUrl}}/customers
+Authorization: Bearer {{accessToken}}
+
+### 2. Search Customers
+GET {{baseUrl}}/customers?searchTerm=test&activeOnly=true
+Authorization: Bearer {{accessToken}}
+
+### 3. Create Individual Customer (Bireysel)
+# @name createIndividualCustomer
+POST {{baseUrl}}/customers
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Ahmet Yılmaz",
+  "type": 0,
+  "email": "ahmet@example.com",
+  "phone": "+90 532 123 4567",
+  "mobilePhone": "+90 532 123 4567",
+  "identityNumber": "12345678901",
+  "billingAddress": "İstanbul Caddesi No:123",
+  "city": "İstanbul",
+  "country": "Türkiye",
+  "postalCode": "34000",
+  "currency": "TRY",
+  "creditLimit": 50000,
+  "paymentTermDays": 30,
+  "notes": "VIP müşteri"
+}
+
+### 4. Create Corporate Customer (Kurumsal)
+# @name createCorporateCustomer
+POST {{baseUrl}}/customers
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "ABC Ticaret A.Ş.",
+  "type": 1,
+  "email": "info@abc.com",
+  "phone": "+90 212 555 1234",
+  "website": "www.abc.com",
+  "taxNumber": "1234567890",
+  "taxOffice": "Kadıköy Vergi Dairesi",
+  "billingAddress": "Atatürk Bulvarı No:456",
+  "shippingAddress": "Fabrika Caddesi No:789",
+  "city": "İstanbul",
+  "country": "Türkiye",
+  "postalCode": "34100",
+  "currency": "USD",
+  "creditLimit": 100000,
+  "paymentTermDays": 60,
+  "notes": "Kurumsal müşteri"
+}
+
+### 5. Extract Customer ID from Create Response
+@customerId = {{createCorporateCustomer.response.body.data.id}}
+
+### 6. Get Customer By ID
+GET {{baseUrl}}/customers/{{customerId}}
+Authorization: Bearer {{accessToken}}
+
+### 7. Update Customer
+PUT {{baseUrl}}/customers/{{customerId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "id": "{{customerId}}",
+  "name": "ABC Ticaret A.Ş. - Güncellendi",
+  "type": 1,
+  "email": "info.updated@abc.com",
+  "phone": "+90 212 555 9999",
+  "website": "www.abc-updated.com",
+  "taxNumber": "1234567890",
+  "taxOffice": "Kadıköy Vergi Dairesi",
+  "billingAddress": "Yeni Adres No:999",
+  "shippingAddress": "Yeni Fabrika Adresi",
+  "city": "Ankara",
+  "country": "Türkiye",
+  "postalCode": "06000",
+  "currency": "EUR",
+  "creditLimit": 150000,
+  "paymentTermDays": 90,
+  "notes": "Güncellendi - EUR'ya geçti"
+}
+
+### 8. Delete Customer (Soft Delete)
+DELETE {{baseUrl}}/customers/{{customerId}}
+Authorization: Bearer {{accessToken}}
+
+### ===============================
 ### PROTECTED ENDPOINTS (JWT Required)
 ### ===============================
 

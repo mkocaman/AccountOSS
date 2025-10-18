@@ -33,6 +33,7 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<UserRole> UserRoles => Set<UserRole>();
     public DbSet<Currency> Currencies => Set<Currency>();
     public DbSet<FxRate> FxRates => Set<FxRate>();
+    public DbSet<Customer> Customers => Set<Customer>();
     
     /// <summary>
     /// Model yapılandırması (entity configuration, indexes, relationships)

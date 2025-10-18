@@ -12,6 +12,11 @@ public interface ICurrentUserService
     Guid? UserId { get; }
     
     /// <summary>
+    /// Şirket ID'si (JWT claim'den veya varsayılan şirket)
+    /// </summary>
+    Guid? CompanyId { get; }
+    
+    /// <summary>
     /// Kullanıcı email adresi
     /// </summary>
     string? Email { get; }

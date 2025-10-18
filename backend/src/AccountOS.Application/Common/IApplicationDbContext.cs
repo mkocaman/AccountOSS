@@ -16,6 +16,7 @@ public interface IApplicationDbContext
     DbSet<UserRole> UserRoles { get; }
     DbSet<Currency> Currencies { get; }
     DbSet<FxRate> FxRates { get; }
+    DbSet<Customer> Customers { get; }
     
     /// <summary>
     /// Değişiklikleri veritabanına kaydet
