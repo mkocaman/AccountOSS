@@ -4,6 +4,8 @@ import { Dashboard } from '@/features/dashboard/Dashboard';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { CompanyList } from '@/features/companies/CompanyList';
 import { CompanyForm } from '@/features/companies/CompanyForm';
+import { CustomerList } from '@/features/customers/CustomerList';
+import { CustomerForm } from '@/features/customers/CustomerForm';
 import { useAuthStore } from '@/store/authStore';
 
 // Protected Route komponenti
@@ -77,7 +79,24 @@ export const router = createBrowserRouter([
       },
       {
         path: 'customers',
-        element: <div className="text-2xl">Müşteri Listesi (TODO)</div>,
+        children: [
+          {
+            index: true,
+            element: <CustomerList />,
+          },
+          {
+            path: 'create',
+            element: <CustomerForm />,
+          },
+          {
+            path: 'edit/:id',
+            element: <CustomerForm />,
+          },
+          {
+            path: ':id',
+            element: <div className="text-2xl">Müşteri Detay (TODO)</div>,
+          },
+        ],
       },
       {
         path: 'suppliers',
