@@ -300,6 +300,112 @@ DELETE {{baseUrl}}/customers/{{customerId}}
 Authorization: Bearer {{accessToken}}
 
 ### ===============================
+### PRODUCTS (ÜRÜNLER)
+### ===============================
+
+### 1. Get All Products
+GET {{baseUrl}}/products
+Authorization: Bearer {{accessToken}}
+
+### 2. Search Products
+GET {{baseUrl}}/products?searchTerm=laptop&activeOnly=true
+Authorization: Bearer {{accessToken}}
+
+### 3. Get Only Stock Tracked Products
+GET {{baseUrl}}/products?trackStockOnly=true
+Authorization: Bearer {{accessToken}}
+
+### 4. Create Product (Goods - Mal) with Translations
+# @name createProduct
+POST {{baseUrl}}/products
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Laptop Dell XPS 15",
+  "description": "15 inch, Intel i7, 16GB RAM",
+  "type": 0,
+  "barcode": "1234567890123",
+  "purchasePrice": 15000,
+  "salePrice": 22000,
+  "currency": "TRY",
+  "vatRate": 20,
+  "unit": "Adet",
+  "trackStock": true,
+  "minStockLevel": 5,
+  "imageUrl": "https://example.com/laptop.jpg",
+  "translations": [
+    {
+      "languageCode": "EN",
+      "name": "Dell XPS 15 Laptop",
+      "description": "15 inch, Intel i7, 16GB RAM"
+    },
+    {
+      "languageCode": "RU",
+      "name": "Ноутбук Dell XPS 15",
+      "description": "15 дюймов, Intel i7, 16 ГБ ОЗУ"
+    }
+  ]
+}
+
+### 5. Create Product (Service - Hizmet)
+POST {{baseUrl}}/products
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "name": "Web Tasarım Hizmeti",
+  "description": "Kurumsal web sitesi tasarımı",
+  "type": 1,
+  "purchasePrice": 0,
+  "salePrice": 5000,
+  "currency": "TRY",
+  "vatRate": 20,
+  "unit": "Saat",
+  "trackStock": false,
+  "minStockLevel": 0,
+  "translations": [
+    {
+      "languageCode": "EN",
+      "name": "Web Design Service",
+      "description": "Corporate website design"
+    }
+  ]
+}
+
+### 6. Extract Product ID from Create Response
+@productId = {{createProduct.response.body.data.id}}
+
+### 7. Get Product By ID
+GET {{baseUrl}}/products/{{productId}}
+Authorization: Bearer {{accessToken}}
+
+### 8. Update Product
+PUT {{baseUrl}}/products/{{productId}}
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "id": "{{productId}}",
+  "name": "Laptop Dell XPS 15 - Güncellendi",
+  "description": "15 inch, Intel i9, 32GB RAM",
+  "type": 0,
+  "barcode": "1234567890123",
+  "purchasePrice": 18000,
+  "salePrice": 25000,
+  "currency": "TRY",
+  "vatRate": 20,
+  "unit": "Adet",
+  "trackStock": true,
+  "minStockLevel": 10,
+  "imageUrl": "https://example.com/laptop-new.jpg"
+}
+
+### 9. Delete Product (Soft Delete)
+DELETE {{baseUrl}}/products/{{productId}}
+Authorization: Bearer {{accessToken}}
+
+### ===============================
 ### PROTECTED ENDPOINTS (JWT Required)
 ### ===============================
 

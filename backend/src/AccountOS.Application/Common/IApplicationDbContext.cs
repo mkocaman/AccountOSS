@@ -17,6 +17,8 @@ public interface IApplicationDbContext
     DbSet<Currency> Currencies { get; }
     DbSet<FxRate> FxRates { get; }
     DbSet<Customer> Customers { get; }
+    DbSet<Product> Products { get; }
+    DbSet<ProductTranslation> ProductTranslations { get; }
     
     /// <summary>
     /// Değişiklikleri veritabanına kaydet

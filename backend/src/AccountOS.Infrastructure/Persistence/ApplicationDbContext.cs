@@ -34,6 +34,8 @@ public class ApplicationDbContext : DbContext, IApplicationDbContext
     public DbSet<Currency> Currencies => Set<Currency>();
     public DbSet<FxRate> FxRates => Set<FxRate>();
     public DbSet<Customer> Customers => Set<Customer>();
+    public DbSet<Product> Products => Set<Product>();
+    public DbSet<ProductTranslation> ProductTranslations => Set<ProductTranslation>();
     
     /// <summary>
     /// Model yapılandırması (entity configuration, indexes, relationships)
