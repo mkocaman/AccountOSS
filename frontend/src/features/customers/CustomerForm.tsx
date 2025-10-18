@@ -37,6 +37,7 @@ export const CustomerForm = () => {
         return;
       }
       
+      console.log('🔧 CustomerForm - Loading customer with ID:', id);
       loadCustomer();
     }
   }, [id]);
@@ -45,12 +46,15 @@ export const CustomerForm = () => {
   const loadCustomer = async () => {
     setLoading(true);
     try {
+      console.log('🔧 CustomerForm - Calling API with ID:', id);
       const response = await customersApi.getById(id!);
+      console.log('🔧 CustomerForm - API response:', response);
       if (response.success) {
         form.setFieldsValue(response.data);
         setCustomerType(response.data.type);
       }
     } catch (error: any) {
+      console.log('🔧 CustomerForm - API error:', error);
       // 404 hatası durumunda özel mesaj
       if (error.response?.status === 404) {
         message.error('Müşteri bulunamadı. Bu müşteri silinmiş olabilir.');

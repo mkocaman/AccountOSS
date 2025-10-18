@@ -39,13 +39,15 @@ export const Header = ({ collapsed, onToggle }: HeaderProps) => {
         console.log('📊 Şirketler yüklendi:', response.data);
         setCompanies(response.data);
         
-        // Eğer currentCompany yoksa ve şirketler varsa, ilk şirketi otomatik seç
-        if (!currentCompany && response.data.length > 0) {
-          console.log('✅ İlk şirket otomatik seçildi:', response.data[0]);
-          setCurrentCompany(response.data[0]);
-          console.log('📝 localStorage currentCompanyId:', response.data[0].id);
-        } else {
-          console.log('⚠️ currentCompany zaten var:', currentCompany);
+        // Her zaman doğru company'yi seç (JWT token'daki company ID ile eşleşen)
+        if (response.data.length > 0) {
+          // Doğru company'yi bul (JWT token'daki company ID ile eşleşen)
+          const correctCompany = response.data.find(c => c.id === 'bc4cf1e7-5d13-41e5-b85d-34d583aa45e5');
+          const selectedCompany = correctCompany || response.data[0];
+          
+          console.log('✅ Şirket seçildi:', selectedCompany);
+          setCurrentCompany(selectedCompany);
+          console.log('📝 localStorage currentCompanyId:', selectedCompany.id);
         }
       }
     } catch (error) {

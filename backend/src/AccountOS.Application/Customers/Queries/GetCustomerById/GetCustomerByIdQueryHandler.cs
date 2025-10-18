@@ -32,7 +32,7 @@ public class GetCustomerByIdQueryHandler : IRequestHandler<GetCustomerByIdQuery,
         var companyId = _currentUser.CompanyId.Value;
 
         var customer = await _context.Customers
-            .Where(c => c.Id == request.Id && c.CompanyId == companyId)
+            .Where(c => c.Id == request.Id && c.CompanyId == companyId && !c.IsDeleted)
             .FirstOrDefaultAsync(cancellationToken);
 
         if (customer == null)

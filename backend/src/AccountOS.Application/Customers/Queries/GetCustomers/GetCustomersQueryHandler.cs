@@ -36,8 +36,9 @@ public class GetCustomersQueryHandler : IRequestHandler<GetCustomersQuery, Resul
             return Result<List<CustomerDto>>.Fail("Şirket bilgisi bulunamadı");
         }
 
+        // Global query filter'lar devre dışı olduğu için manuel filtreleme
         var query = _context.Customers
-            .Where(c => c.CompanyId == companyId);
+            .Where(c => c.CompanyId == companyId && !c.IsDeleted);
 
         // Aktif filtresi
         if (request.ActiveOnly)

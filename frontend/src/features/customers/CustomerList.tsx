@@ -43,7 +43,6 @@ export const CustomerList = () => {
           filtered = filtered.filter((c) => c.type === params.type);
         }
         
-        console.log('Filtered customers:', filtered);
         setCustomers(filtered);
       }
     } catch (error) {
@@ -183,8 +182,8 @@ export const CustomerList = () => {
             icon={<EditOutlined />}
             onClick={(e) => {
               e.stopPropagation();
-              console.log('Edit button clicked for customer ID:', record.id);
-              console.log('Customer record:', record);
+              console.log('🔧 Edit button clicked for customer ID:', record.id);
+              console.log('🔧 Customer record:', record);
               navigate(`/customers/edit/${record.id}`);
             }}
           />
