@@ -75,7 +75,7 @@ export const GrClearanceModal = ({ open, grQueueEntry, onCancel, onSuccess }: Pr
       message.error('Alış faturaları yüklenemedi');
     } finally {
       setLoading(false);
-    setLoading(false);
+    }
   };
 
   // Auto-fill amount when invoice selected
