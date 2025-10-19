@@ -7,4 +7,5 @@ export * from './products';
 export * from './invoices';
 export * from './payments';
 export * from './grQueue';
+export * from './dashboard';
 
