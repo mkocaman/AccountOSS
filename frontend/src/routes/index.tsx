@@ -43,6 +43,10 @@ import ExpenseForm from '@/features/expenses/ExpenseForm';
 import ExpenseDetail from '@/features/expenses/ExpenseDetail';
 import ChartOfAccountsList from '@/features/chartOfAccounts/ChartOfAccountsList';
 import TrialBalance from '@/features/chartOfAccounts/TrialBalance';
+import JournalEntryList from '@/features/journalEntries/JournalEntryList';
+import JournalEntryForm from '@/features/journalEntries/JournalEntryForm';
+import JournalEntryDetail from '@/features/journalEntries/JournalEntryDetail';
+import LedgerView from '@/features/journalEntries/LedgerView';
 import { useAuthStore } from '@/store/authStore';
 
 // Protected Route komponenti
@@ -315,6 +319,31 @@ export const router = createBrowserRouter([
               {
                 path: 'trial-balance',
                 element: <TrialBalance />,
+              },
+              {
+                path: 'journal-entries',
+                children: [
+                  {
+                    index: true,
+                    element: <JournalEntryList />,
+                  },
+                  {
+                    path: 'new',
+                    element: <JournalEntryForm />,
+                  },
+                  {
+                    path: 'edit/:id',
+                    element: <JournalEntryForm />,
+                  },
+                  {
+                    path: ':id',
+                    element: <JournalEntryDetail />,
+                  },
+                  {
+                    path: 'ledger',
+                    element: <LedgerView />,
+                  },
+                ],
               },
       {
         path: 'stock-movements',

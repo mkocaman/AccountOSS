@@ -115,7 +115,8 @@ const menuItems = [
             children: [
               { key: '/chart-of-accounts', label: 'Hesap Planı' },
               { key: '/trial-balance', label: 'Mizan' },
-              { key: '/journal-entries', label: 'Yevmiye' },
+              { key: '/journal-entries', label: 'Yevmiye Kayıtları' },
+              { key: '/journal-entries/ledger', label: 'Hesap Defteri' },
               { key: '/tax-rates', label: 'Vergi Oranları' },
             ],
           },
