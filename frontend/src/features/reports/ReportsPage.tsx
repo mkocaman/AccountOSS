@@ -4,14 +4,12 @@ import {
   Tabs, 
   DatePicker, 
   Select, 
-  Button, 
-  Space,
+  Button,
   Row,
   Col,
   message
 } from 'antd';
 import { 
-  DownloadOutlined,
   FileExcelOutlined 
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
@@ -26,7 +24,6 @@ import ProfitLossReport from './components/ProfitLossReport';
 import { reportsApi } from '@/api/reports';
 
 const { RangePicker } = DatePicker;
-const { TabPane } = Tabs;
 
 export default function ReportsPage() {
   const [activeTab, setActiveTab] = useState<ReportType>(ReportType.Sales);
@@ -49,6 +46,23 @@ export default function ReportsPage() {
       message.error(error.response?.data?.message || 'Excel export başarısız');
     } finally {
       setExporting(false);
+    }
+  };
+
+  const renderReportContent = () => {
+    switch (activeTab) {
+      case ReportType.Sales:
+        return <SalesReport filters={filters} />;
+      case ReportType.Payment:
+        return <PaymentReport filters={filters} />;
+      case ReportType.Stock:
+        return <StockReport filters={filters} />;
+      case ReportType.GrBalance:
+        return <GrBalanceReport filters={filters} />;
+      case ReportType.ProfitLoss:
+        return <ProfitLossReport filters={filters} />;
+      default:
+        return null;
     }
   };
 
@@ -79,7 +93,7 @@ export default function ReportsPage() {
       {/* Filters */}
       <Card className="mb-4">
         <Row gutter={16}>
-          <Col xs={24} sm={12} md={8}>
+          <Col xs={24} sm={12} md={10}>
             <div className="mb-2 text-sm text-gray-600">Tarih Aralığı</div>
             <RangePicker
               className="w-full"
@@ -98,12 +112,13 @@ export default function ReportsPage() {
                 { label: 'Bu Ay', value: [dayjs().startOf('month'), dayjs().endOf('month')] },
                 { label: 'Geçen Ay', value: [dayjs().subtract(1, 'month').startOf('month'), dayjs().subtract(1, 'month').endOf('month')] },
                 { label: 'Bu Yıl', value: [dayjs().startOf('year'), dayjs().endOf('year')] },
+                { label: 'Geçen Yıl', value: [dayjs().subtract(1, 'year').startOf('year'), dayjs().subtract(1, 'year').endOf('year')] },
                 { label: 'Son 90 Gün', value: [dayjs().subtract(90, 'days'), dayjs()] }
               ]}
             />
           </Col>
 
-          <Col xs={24} sm={12} md={8}>
+          <Col xs={24} sm={12} md={6}>
             <div className="mb-2 text-sm text-gray-600">Para Birimi</div>
             <Select
               className="w-full"
@@ -112,15 +127,13 @@ export default function ReportsPage() {
               value={filters.currency}
               onChange={(value) => setFilters({ ...filters, currency: value })}
               options={[
-                { label: 'TRY', value: 'TRY' },
-                { label: 'USD', value: 'USD' },
-                { label: 'EUR', value: 'EUR' },
-                { label: 'GBP', value: 'GBP' }
+                { label: 'TRY - Türk Lirası', value: 'TRY' },
+                { label: 'USD - Dolar', value: 'USD' },
+                { label: 'EUR - Euro', value: 'EUR' },
+                { label: 'GBP - Sterlin', value: 'GBP' }
               ]}
             />
           </Col>
-
-          {/* Add more filters based on active tab */}
         </Row>
       </Card>
 
@@ -130,42 +143,34 @@ export default function ReportsPage() {
           activeKey={activeTab} 
           onChange={(key) => setActiveTab(key as ReportType)}
           type="card"
-        >
-          <TabPane 
-            tab={reportTypeLabels[ReportType.Sales]} 
-            key={ReportType.Sales}
-          >
-            <SalesReport filters={filters} />
-          </TabPane>
-
-          <TabPane 
-            tab={reportTypeLabels[ReportType.Payment]} 
-            key={ReportType.Payment}
-          >
-            <PaymentReport filters={filters} />
-          </TabPane>
-
-          <TabPane 
-            tab={reportTypeLabels[ReportType.Stock]} 
-            key={ReportType.Stock}
-          >
-            <StockReport filters={filters} />
-          </TabPane>
-
-          <TabPane 
-            tab={reportTypeLabels[ReportType.GrBalance]} 
-            key={ReportType.GrBalance}
-          >
-            <GrBalanceReport filters={filters} />
-          </TabPane>
-
-          <TabPane 
-            tab={reportTypeLabels[ReportType.ProfitLoss]} 
-            key={ReportType.ProfitLoss}
-          >
-            <ProfitLossReport filters={filters} />
-          </TabPane>
-        </Tabs>
+          items={[
+            {
+              key: ReportType.Sales,
+              label: reportTypeLabels[ReportType.Sales],
+              children: renderReportContent()
+            },
+            {
+              key: ReportType.Payment,
+              label: reportTypeLabels[ReportType.Payment],
+              children: renderReportContent()
+            },
+            {
+              key: ReportType.Stock,
+              label: reportTypeLabels[ReportType.Stock],
+              children: renderReportContent()
+            },
+            {
+              key: ReportType.GrBalance,
+              label: reportTypeLabels[ReportType.GrBalance],
+              children: renderReportContent()
+            },
+            {
+              key: ReportType.ProfitLoss,
+              label: reportTypeLabels[ReportType.ProfitLoss],
+              children: renderReportContent()
+            }
+          ]}
+        />
       </Card>
     </div>
   );

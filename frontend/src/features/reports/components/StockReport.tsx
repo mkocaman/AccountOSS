@@ -1,14 +1,15 @@
 import React from 'react';
-import { Table, Tag, Statistic, Row, Col, Card, Empty } from 'antd';
+import { Table, Tag, Statistic, Row, Col, Card, Empty, Alert } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useQuery } from '@tanstack/react-query';
+import { WarningOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 
 import { reportsApi } from '@/api/reports';
 import type { StockReportItem, ReportFilters } from '@/types/report';
 import { formatCurrency, formatDate } from '@/lib/utils';
 
 interface Props {
-  filters: ReportFilters;
+  filters?: ReportFilters;
 }
 
 export default function StockReport({ filters }: Props) {
@@ -17,7 +18,39 @@ export default function StockReport({ filters }: Props) {
     queryFn: () => reportsApi.getStockReport(filters)
   });
 
+  const getStatusConfig = (status: string) => {
+    const configs = {
+      'Normal': { color: 'green', icon: <CheckCircleOutlined />, text: 'Normal' },
+      'Low': { color: 'orange', icon: <WarningOutlined />, text: 'Düşük' },
+      'OutOfStock': { color: 'red', icon: <CloseCircleOutlined />, text: 'Tükendi' }
+    };
+    return configs[status as keyof typeof configs] || configs['Normal'];
+  };
+
   const columns: ColumnsType<StockReportItem> = [
+    {
+      title: 'Durum',
+      dataIndex: 'status',
+      key: 'status',
+      width: 100,
+      align: 'center',
+      fixed: 'left',
+      render: (status: string) => {
+        const config = getStatusConfig(status);
+        return (
+          <Tag icon={config.icon} color={config.color}>
+            {config.text}
+          </Tag>
+        );
+      },
+      filters: [
+        { text: 'Normal', value: 'Normal' },
+        { text: 'Düşük', value: 'Low' },
+        { text: 'Tükendi', value: 'OutOfStock' }
+      ],
+      onFilter: (value, record) => record.status === value,
+      defaultFilteredValue: []
+    },
     {
       title: 'Ürün Kodu',
       dataIndex: 'productCode',
@@ -43,53 +76,52 @@ export default function StockReport({ filters }: Props) {
       title: 'Mevcut Stok',
       dataIndex: 'currentStock',
       key: 'currentStock',
-      width: 120,
-      align: 'center',
+      width: 130,
+      align: 'right',
       render: (stock: number, record) => (
-        <div>
-          <div className="font-semibold">{stock} {record.unit}</div>
-          <div className="text-xs text-gray-500">
-            Min: {record.minStockLevel} {record.unit}
-          </div>
-        </div>
+        <span className={
+          record.status === 'OutOfStock' ? 'text-red-600 font-semibold' :
+          record.status === 'Low' ? 'text-orange-600 font-semibold' :
+          'text-green-600 font-semibold'
+        }>
+          {stock.toFixed(2)} {record.unit}
+        </span>
       ),
       sorter: (a, b) => a.currentStock - b.currentStock
     },
     {
-      title: 'Durum',
-      dataIndex: 'status',
-      key: 'status',
-      width: 100,
-      align: 'center',
-      render: (status: string) => {
-        const colors = {
-          'Normal': 'green',
-          'Low': 'orange',
-          'OutOfStock': 'red'
-        };
-        const labels = {
-          'Normal': 'Normal',
-          'Low': 'Düşük',
-          'OutOfStock': 'Tükendi'
-        };
+      title: 'Min. Seviye',
+      dataIndex: 'minStockLevel',
+      key: 'minStockLevel',
+      width: 120,
+      align: 'right',
+      render: (level: number, record) => (
+        <span className="text-gray-600">
+          {level.toFixed(2)} {record.unit}
+        </span>
+      )
+    },
+    {
+      title: 'Fark',
+      key: 'difference',
+      width: 120,
+      align: 'right',
+      render: (_, record) => {
+        const diff = record.currentStock - record.minStockLevel;
         return (
-          <Tag color={colors[status as keyof typeof colors]}>
-            {labels[status as keyof typeof labels]}
-          </Tag>
+          <span className={diff < 0 ? 'text-red-600' : 'text-green-600'}>
+            {diff > 0 ? '+' : ''}{diff.toFixed(2)} {record.unit}
+          </span>
         );
       },
-      filters: [
-        { text: 'Normal', value: 'Normal' },
-        { text: 'Düşük', value: 'Low' },
-        { text: 'Tükendi', value: 'OutOfStock' }
-      ],
-      onFilter: (value, record) => record.status === value
+      sorter: (a, b) => 
+        (a.currentStock - a.minStockLevel) - (b.currentStock - b.minStockLevel)
     },
     {
       title: 'Ortalama Maliyet',
       dataIndex: 'averageCost',
       key: 'averageCost',
-      width: 130,
+      width: 140,
       align: 'right',
       render: (cost: number) => formatCurrency(cost, 'TRY')
     },
@@ -97,7 +129,7 @@ export default function StockReport({ filters }: Props) {
       title: 'Toplam Değer',
       dataIndex: 'totalValue',
       key: 'totalValue',
-      width: 130,
+      width: 150,
       align: 'right',
       render: (value: number) => (
         <span className="font-semibold">
@@ -112,16 +144,49 @@ export default function StockReport({ filters }: Props) {
       dataIndex: 'lastMovementDate',
       key: 'lastMovementDate',
       width: 120,
-      render: (date: string) => date ? formatDate(date) : '-'
+      render: (date?: string) => 
+        date ? formatDate(date) : <span className="text-gray-400">-</span>,
+      sorter: (a, b) => {
+        if (!a.lastMovementDate) return 1;
+        if (!b.lastMovementDate) return -1;
+        return new Date(a.lastMovementDate).getTime() - new Date(b.lastMovementDate).getTime();
+      }
     }
   ];
 
   if (!data || data.items.length === 0) {
-    return <Empty description="Rapor verisi bulunamadı" />;
+    return <Empty description="Stok raporu verisi bulunamadı" />;
   }
+
+  const lowStockItems = data.items.filter(item => item.status === 'Low');
+  const outOfStockItems = data.items.filter(item => item.status === 'OutOfStock');
 
   return (
     <div>
+      {/* Alerts */}
+      {outOfStockItems.length > 0 && (
+        <Alert
+          message="Stok Tükendi Uyarısı"
+          description={`${outOfStockItems.length} ürünün stoğu tükendi. Acil sipariş verin!`}
+          type="error"
+          icon={<CloseCircleOutlined />}
+          showIcon
+          closable
+          className="mb-4"
+        />
+      )}
+      {lowStockItems.length > 0 && (
+        <Alert
+          message="Düşük Stok Uyarısı"
+          description={`${lowStockItems.length} ürünün stoğu minimum seviyenin altında.`}
+          type="warning"
+          icon={<WarningOutlined />}
+          showIcon
+          closable
+          className="mb-4"
+        />
+      )}
+
       {/* Summary Cards */}
       <Row gutter={16} className="mb-4">
         <Col xs={24} sm={12} md={6}>
@@ -140,16 +205,18 @@ export default function StockReport({ filters }: Props) {
               value={data.summary.lowStockCount}
               precision={0}
               valueStyle={{ color: '#faad14' }}
+              prefix={<WarningOutlined />}
             />
           </Card>
         </Col>
         <Col xs={24} sm={12} md={6}>
           <Card>
             <Statistic
-              title="Tükenen Ürün"
+              title="Stok Tükendi"
               value={data.summary.outOfStockCount}
               precision={0}
               valueStyle={{ color: '#ff4d4f' }}
+              prefix={<CloseCircleOutlined />}
             />
           </Card>
         </Col>
@@ -160,7 +227,7 @@ export default function StockReport({ filters }: Props) {
               value={data.summary.totalStockValue}
               precision={2}
               suffix="₺"
-              valueStyle={{ color: '#1890ff' }}
+              valueStyle={{ color: '#52c41a' }}
             />
           </Card>
         </Col>
@@ -172,11 +239,16 @@ export default function StockReport({ filters }: Props) {
         dataSource={data.items}
         rowKey="productCode"
         loading={isLoading}
-        scroll={{ x: 1200 }}
+        scroll={{ x: 1400 }}
         pagination={{
           pageSize: 50,
           showSizeChanger: true,
           showTotal: (total) => `Toplam ${total} ürün`
+        }}
+        rowClassName={(record) => {
+          if (record.status === 'OutOfStock') return 'bg-red-50';
+          if (record.status === 'Low') return 'bg-orange-50';
+          return '';
         }}
         summary={() => (
           <Table.Summary fixed>
@@ -185,12 +257,18 @@ export default function StockReport({ filters }: Props) {
                 <strong>TOPLAM</strong>
               </Table.Summary.Cell>
               <Table.Summary.Cell index={6} align="right">
+                <span className="text-gray-600">-</span>
+              </Table.Summary.Cell>
+              <Table.Summary.Cell index={7} align="right">
                 <strong>
                   {formatCurrency(
                     data.items.reduce((sum, item) => sum + item.totalValue, 0),
                     'TRY'
                   )}
                 </strong>
+              </Table.Summary.Cell>
+              <Table.Summary.Cell index={8}>
+                <span className="text-gray-600">-</span>
               </Table.Summary.Cell>
             </Table.Summary.Row>
           </Table.Summary>

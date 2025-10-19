@@ -34,7 +34,7 @@ export default function PaymentReport({ filters }: Props) {
       sorter: (a, b) => new Date(a.paymentDate).getTime() - new Date(b.paymentDate).getTime()
     },
     {
-      title: 'Müşteri',
+      title: 'Müşteri/Tedarikçi',
       dataIndex: 'customerName',
       key: 'customerName',
       ellipsis: true
@@ -43,13 +43,18 @@ export default function PaymentReport({ filters }: Props) {
       title: 'Tip',
       dataIndex: 'type',
       key: 'type',
-      width: 100,
+      width: 120,
       align: 'center',
       render: (type: string) => (
         <Tag color={type === 'Receipt' ? 'green' : 'red'}>
           {type === 'Receipt' ? 'Tahsilat' : 'Ödeme'}
         </Tag>
-      )
+      ),
+      filters: [
+        { text: 'Tahsilat', value: 'Receipt' },
+        { text: 'Ödeme', value: 'Payment' }
+      ],
+      onFilter: (value, record) => record.type === value
     },
     {
       title: 'Yöntem',
@@ -57,28 +62,51 @@ export default function PaymentReport({ filters }: Props) {
       key: 'method',
       width: 120,
       align: 'center',
-      render: (method: string) => (
-        <Tag color="blue">{method}</Tag>
-      )
+      render: (method: string) => {
+        const methodColors: Record<string, string> = {
+          'Cash': 'blue',
+          'BankTransfer': 'cyan',
+          'CreditCard': 'purple',
+          'Check': 'orange'
+        };
+        const methodLabels: Record<string, string> = {
+          'Cash': 'Nakit',
+          'BankTransfer': 'Havale',
+          'CreditCard': 'Kredi Kartı',
+          'Check': 'Çek'
+        };
+        return (
+          <Tag color={methodColors[method] || 'default'}>
+            {methodLabels[method] || method}
+          </Tag>
+        );
+      },
+      filters: [
+        { text: 'Nakit', value: 'Cash' },
+        { text: 'Havale', value: 'BankTransfer' },
+        { text: 'Kredi Kartı', value: 'CreditCard' },
+        { text: 'Çek', value: 'Check' }
+      ],
+      onFilter: (value, record) => record.method === value
     },
     {
       title: 'Fatura No',
       dataIndex: 'invoiceNumber',
       key: 'invoiceNumber',
-      width: 150,
-      render: (number: string) => number || '-'
+      width: 140,
+      render: (number?: string) => number || <span className="text-gray-400">-</span>
     },
     {
       title: 'Hesap',
       dataIndex: 'accountName',
       key: 'accountName',
-      width: 150,
+      ellipsis: true,
       render: (name: string, record) => (
         <div>
           <div className="font-semibold">{name}</div>
-          <Tag color={record.accountType === 'Cash' ? 'orange' : 'blue'}>
-            {record.accountType === 'Cash' ? 'Kasa' : 'Banka'}
-          </Tag>
+          <div className="text-gray-500 text-xs">
+            {record.accountType === 'Cash' ? '💵 Kasa' : '🏦 Banka'}
+          </div>
         </div>
       )
     },
@@ -90,42 +118,48 @@ export default function PaymentReport({ filters }: Props) {
       align: 'right',
       render: (amount: number, record) => (
         <span className={`font-semibold ${record.type === 'Receipt' ? 'text-green-600' : 'text-red-600'}`}>
-          {record.type === 'Receipt' ? '+' : '-'}{formatCurrency(amount, record.currency)}
+          {record.type === 'Receipt' ? '+' : '-'}
+          {formatCurrency(amount, record.currency)}
         </span>
       ),
-      fixed: 'right'
+      fixed: 'right',
+      sorter: (a, b) => a.amount - b.amount
     }
   ];
 
   if (!data || data.items.length === 0) {
-    return <Empty description="Rapor verisi bulunamadı" />;
+    return <Empty description="Ödeme raporu verisi bulunamadı" />;
   }
 
   return (
     <div>
       {/* Summary Cards */}
       <Row gutter={16} className="mb-4">
-        <Col xs={24} sm={12} md={6}>
+        <Col xs={24} sm={8}>
           <Card>
             <Statistic
               title="Toplam Tahsilat"
               value={data.summary.totalReceipts}
-              precision={0}
+              precision={2}
+              suffix="₺"
               valueStyle={{ color: '#52c41a' }}
+              prefix="+"
             />
           </Card>
         </Col>
-        <Col xs={24} sm={12} md={6}>
+        <Col xs={24} sm={8}>
           <Card>
             <Statistic
               title="Toplam Ödeme"
               value={data.summary.totalPayments}
-              precision={0}
+              precision={2}
+              suffix="₺"
               valueStyle={{ color: '#ff4d4f' }}
+              prefix="-"
             />
           </Card>
         </Col>
-        <Col xs={24} sm={12} md={6}>
+        <Col xs={24} sm={8}>
           <Card>
             <Statistic
               title="Net Nakit Akışı"
@@ -135,18 +169,36 @@ export default function PaymentReport({ filters }: Props) {
               valueStyle={{ 
                 color: data.summary.netCashFlow >= 0 ? '#52c41a' : '#ff4d4f' 
               }}
+              prefix={data.summary.netCashFlow >= 0 ? '+' : ''}
             />
           </Card>
         </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Statistic
-              title="Tahsilat Tutarı"
-              value={data.summary.receiptsByMethod.reduce((sum, item) => sum + item.amount, 0)}
-              precision={2}
-              suffix="₺"
-              valueStyle={{ color: '#1890ff' }}
-            />
+      </Row>
+
+      {/* Payment Methods Breakdown */}
+      <Row gutter={16} className="mb-4">
+        <Col xs={24} md={12}>
+          <Card title="Tahsilat Yöntemleri" size="small">
+            {data.summary.receiptsByMethod.map(item => (
+              <div key={item.method} className="flex justify-between items-center py-2 border-b last:border-b-0">
+                <span className="text-gray-600">{item.method}</span>
+                <span className="font-semibold text-green-600">
+                  +{formatCurrency(item.amount, 'TRY')}
+                </span>
+              </div>
+            ))}
+          </Card>
+        </Col>
+        <Col xs={24} md={12}>
+          <Card title="Ödeme Yöntemleri" size="small">
+            {data.summary.paymentsByMethod.map(item => (
+              <div key={item.method} className="flex justify-between items-center py-2 border-b last:border-b-0">
+                <span className="text-gray-600">{item.method}</span>
+                <span className="font-semibold text-red-600">
+                  -{formatCurrency(item.amount, 'TRY')}
+                </span>
+              </div>
+            ))}
           </Card>
         </Col>
       </Row>
@@ -170,14 +222,17 @@ export default function PaymentReport({ filters }: Props) {
                 <strong>TOPLAM</strong>
               </Table.Summary.Cell>
               <Table.Summary.Cell index={7} align="right">
-                <strong className="text-green-600">
-                  {formatCurrency(
-                    data.items
-                      .filter(item => item.type === 'Receipt')
-                      .reduce((sum, item) => sum + item.amount, 0),
-                    'TRY'
-                  )}
-                </strong>
+                <div>
+                  <div className="text-green-600 font-semibold">
+                    +{formatCurrency(data.summary.totalReceipts, 'TRY')} Tahsilat
+                  </div>
+                  <div className="text-red-600 font-semibold">
+                    -{formatCurrency(data.summary.totalPayments, 'TRY')} Ödeme
+                  </div>
+                  <div className="font-bold text-lg mt-1">
+                    Net: {formatCurrency(data.summary.netCashFlow, 'TRY')}
+                  </div>
+                </div>
               </Table.Summary.Cell>
             </Table.Summary.Row>
           </Table.Summary>
