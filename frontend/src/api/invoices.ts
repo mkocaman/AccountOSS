@@ -1,59 +1,53 @@
 import { apiClient } from './client';
-import type {
-  Invoice,
-  CreateInvoiceRequest,
-  UpdateInvoiceRequest,
-} from '@/types/invoice';
-import type { ApiResponse, PagedResponse } from '@/types';
+import type { Invoice, InvoiceDetail, CreateInvoiceRequest, UpdateInvoiceRequest, InvoiceFilters } from '@/types/invoice';
+import type { ApiResponse } from './client';
 
-// Invoice API
 export const invoicesApi = {
-  // Fatura listesi
-  getAll: (params?: InvoiceListParams) =>
-    apiClient.get<ApiResponse<PagedResponse<Invoice>>>('/invoices', { params }),
+  // Fatura listesi getir
+  getAll: (filters?: InvoiceFilters) =>
+    apiClient.get<Invoice[]>('/invoices', { params: filters }),
 
-  // Fatura detayı
+  // Fatura detayı getir
   getById: (id: string) =>
-    apiClient.get<ApiResponse<Invoice>>(`/invoices/${id}`),
+    apiClient.get<InvoiceDetail>(`/invoices/${id}`),
 
-  // Yeni fatura
+  // Yeni fatura oluştur (Draft)
   create: (data: CreateInvoiceRequest) =>
-    apiClient.post<ApiResponse<Invoice>>('/invoices', data),
+    apiClient.post<Invoice>('/invoices', data),
 
   // Fatura güncelle
   update: (id: string, data: UpdateInvoiceRequest) =>
-    apiClient.put<ApiResponse<Invoice>>(`/invoices/${id}`, data),
+    apiClient.put<Invoice>(`/invoices/${id}`, data),
 
-  // Fatura sil
-  delete: (id: string) =>
-    apiClient.delete<ApiResponse<void>>(`/invoices/${id}`),
-
-  // Fatura onayla
-  approve: (id: string) =>
-    apiClient.post<ApiResponse<Invoice>>(`/invoices/${id}/approve`),
+  // Fatura kes (Draft → Issued + Stok hareketi)
+  issue: (id: string) =>
+    apiClient.post<Invoice>(`/invoices/${id}/issue`),
 
   // Fatura iptal et
-  cancel: (id: string, reason: string) =>
-    apiClient.post<ApiResponse<Invoice>>(`/invoices/${id}/cancel`, { reason }),
+  cancel: (id: string) =>
+    apiClient.post<boolean>(`/invoices/${id}/cancel`),
 
-  // PDF indir
-  downloadPdf: (id: string) =>
-    apiClient.get<Blob>(`/invoices/${id}/pdf`, { responseType: 'blob' }),
+  // Fatura PDF'i indir
+  downloadPdf: async (id: string, invoiceNumber: string) => {
+    const response = await fetch(`${apiClient.defaults.baseURL}/invoices/${id}/pdf`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
+      },
+    });
+    
+    if (!response.ok) {
+      throw new Error('PDF indirme başarısız');
+    }
+    
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${invoiceNumber}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  },
 };
-
-export interface InvoiceListParams {
-  pageNumber?: number;
-  pageSize?: number;
-  searchText?: string;
-  customerId?: string;
-  type?: number;
-  status?: number;
-  paymentStatus?: number;
-  isOfficial?: boolean;
-  startDate?: string;
-  endDate?: string;
-  currency?: string;
-  minAmount?: number;
-  maxAmount?: number;
-}
-

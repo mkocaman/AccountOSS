@@ -1,11 +1,15 @@
 import { apiClient } from './client';
 import type { DashboardStatistics } from '@/types/dashboard';
 
+// Dashboard filter types
 export interface DashboardFilters {
   currency?: string;
   startDate?: string;
   endDate?: string;
 }
+
+// Export for external use
+export type { DashboardFilters as DashboardApiFilters };
 
 export const dashboardApi = {
   // Dashboard istatistiklerini getir

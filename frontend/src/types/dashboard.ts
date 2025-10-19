@@ -66,10 +66,3 @@ export interface RecentActivity {
   amount: number;
   currency: string;
 }
-
-// Dashboard filters
-export interface DashboardFilters {
-  currency?: string;
-  startDate?: string;
-  endDate?: string;
-}

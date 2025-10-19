@@ -28,11 +28,18 @@ import dayjs from 'dayjs';
 import * as echarts from 'echarts';
 import ReactECharts from 'echarts-for-react';
 
-import { dashboardApi, DashboardFilters } from '@/api/dashboard';
+import { dashboardApi } from '@/api/dashboard';
 import type { DashboardStatistics } from '@/types/dashboard';
 import { formatCurrency, formatDate } from '@/lib/utils';
 
 const { RangePicker } = DatePicker;
+
+// Dashboard filter type
+interface DashboardFilters {
+  currency?: string;
+  startDate?: string;
+  endDate?: string;
+}
 
 export default function Dashboard() {
   const [filters, setFilters] = useState<DashboardFilters>({
