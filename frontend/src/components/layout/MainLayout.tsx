@@ -31,11 +31,17 @@ export const MainLayout = () => {
   const { user, clearAuth } = useAuthStore();
   const { currentCompany } = useCompanyStore();
   const [pathname, setPathname] = useState(location.pathname);
-  const [themeMode, setThemeMode] = useState<'light' | 'dark' | 'semi-dark' | 'system'>('system');
+  const [themeMode, setThemeMode] = useState<'light' | 'dark' | 'semi-dark' | 'system'>(() => {
+    // localStorage'dan tema tercihini al, yoksa 'system' kullan
+    const savedTheme = localStorage.getItem('accountos-theme') as 'light' | 'dark' | 'semi-dark' | 'system';
+    return savedTheme || 'system';
+  });
   
   // Tema değiştirici fonksiyonu
   const handleThemeChange = (newTheme: 'light' | 'dark' | 'semi-dark' | 'system') => {
     setThemeMode(newTheme);
+    // Tema tercihini localStorage'a kaydet
+    localStorage.setItem('accountos-theme', newTheme);
   };
 
   // Menü yapısı - ProLayout formatında
