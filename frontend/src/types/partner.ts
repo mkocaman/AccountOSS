@@ -1,16 +1,17 @@
-// Müşteri tipleri
-export interface Customer {
+// Partner entity (Customer + Supplier)
+export interface Partner {
   id: string;
   companyId: string;
-  code: string; // Müşteri kodu (AUTO: C-0001)
+  code: string;              // AUTO: P-0001
   name: string;
-  type: CustomerType;
+  type: PartnerType;
   
   // Contact
   email?: string;
   phone?: string;
   mobilePhone?: string;
   website?: string;
+  contactPerson?: string;
   
   // Tax Info
   taxNumber?: string;
@@ -28,7 +29,7 @@ export interface Customer {
   currency: string;
   creditLimit: number;
   paymentTermDays: number; // Vade gün sayısı
-  currentBalance: number; // Güncel bakiye (Alacak/Borç)
+  currentBalance: number;   // Güncel bakiye (Alacak/Borç)
   
   // Status
   isActive: boolean;
@@ -41,35 +42,32 @@ export interface Customer {
   updatedAt?: string;
 }
 
+export enum PartnerType {
+  Customer = 0,    // Müşteri
+  Supplier = 1,    // Tedarikçi
+  Both = 2         // Hem Müşteri Hem Tedarikçi
+}
+
+export const partnerTypeLabels: Record<PartnerType, string> = {
+  [PartnerType.Customer]: 'Müşteri',
+  [PartnerType.Supplier]: 'Tedarikçi',
+  [PartnerType.Both]: 'Müşteri & Tedarikçi'
+};
+
+// Customer specific
 export enum CustomerType {
   Individual = 0, // Bireysel
   Corporate = 1,  // Kurumsal
 }
 
-// Create/Update için
-export interface CreateCustomerRequest {
-  name: string;
-  type: CustomerType;
-  email?: string;
-  phone?: string;
-  mobilePhone?: string;
-  taxNumber?: string;
-  taxOffice?: string;
-  identityNumber?: string;
-  billingAddress?: string;
-  shippingAddress?: string;
-  city?: string;
-  country?: string;
-  currency: string;
-  creditLimit?: number;
-  paymentTermDays?: number;
-  notes?: string;
+// Supplier specific  
+export enum SupplierType {
+  Domestic = 0,     // Yerli
+  Foreign = 1       // Yabancı
 }
 
-export type UpdateCustomerRequest = CreateCustomerRequest;
-
-// Customer detail response
-export interface CustomerDetail extends Customer {
+// Partner detail
+export interface PartnerDetail extends Partner {
   // Balance history
   balanceHistory: BalanceHistoryItem[];
   
@@ -80,10 +78,10 @@ export interface CustomerDetail extends Customer {
   recentPayments: Payment[];
   
   // Addresses
-  addresses: CustomerAddress[];
+  addresses: PartnerAddress[];
   
   // Statistics
-  statistics: CustomerStatistics;
+  statistics: PartnerStatistics;
 }
 
 export interface BalanceHistoryItem {
@@ -92,12 +90,12 @@ export interface BalanceHistoryItem {
   debit: number;    // Borç
   credit: number;   // Alacak
   balance: number;  // Bakiye
-  referenceType: 'Invoice' | 'Payment';
+  referenceType: 'Invoice' | 'Payment' | 'PurchaseOrder';
   referenceId: string;
   referenceNumber: string;
 }
 
-export interface CustomerAddress {
+export interface PartnerAddress {
   id: string;
   type: 'Billing' | 'Shipping';
   title: string;
@@ -109,7 +107,7 @@ export interface CustomerAddress {
   isDefault: boolean;
 }
 
-export interface CustomerStatistics {
+export interface PartnerStatistics {
   totalInvoices: number;
   totalInvoiceAmount: number;
   totalPayments: number;
@@ -140,3 +138,38 @@ export interface Payment {
   currency: string;
 }
 
+// Create/Update
+export interface CreatePartnerRequest {
+  name: string;
+  type: PartnerType;
+  email?: string;
+  phone?: string;
+  mobilePhone?: string;
+  website?: string;
+  contactPerson?: string;
+  taxNumber?: string;
+  taxOffice?: string;
+  identityNumber?: string;
+  billingAddress?: string;
+  shippingAddress?: string;
+  city?: string;
+  country?: string;
+  postalCode?: string;
+  currency: string;
+  creditLimit?: number;
+  paymentTermDays?: number;
+  isActive: boolean;
+  notes?: string;
+}
+
+export type UpdatePartnerRequest = Partial<CreatePartnerRequest>;
+
+// Filters
+export interface PartnerFilters {
+  search?: string;
+  type?: PartnerType;
+  isActive?: boolean;
+  isBlocked?: boolean;
+  city?: string;
+  country?: string;
+}

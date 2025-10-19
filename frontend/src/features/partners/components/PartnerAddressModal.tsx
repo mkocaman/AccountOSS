@@ -2,20 +2,20 @@ import React from 'react';
 import { Modal, Form, Input, Select, Switch, message } from 'antd';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import { customersApi } from '@/api/customers';
-import type { CustomerAddress } from '@/types/customer';
+import { partnersApi } from '@/api/partners';
+import type { PartnerAddress } from '@/types/partner';
 
 interface Props {
   open: boolean;
-  customerId: string;
-  address?: CustomerAddress;
+  partnerId: string;
+  address?: PartnerAddress;
   onCancel: () => void;
   onSuccess: () => void;
 }
 
-export default function CustomerAddressModal({ 
+export default function PartnerAddressModal({ 
   open, 
-  customerId, 
+  partnerId, 
   address, 
   onCancel, 
   onSuccess 
@@ -27,12 +27,12 @@ export default function CustomerAddressModal({
   const saveMutation = useMutation({
     mutationFn: (data: any) => {
       if (address) {
-        return customersApi.updateAddress(customerId, address.id, data);
+        return partnersApi.updateAddress(partnerId, address.id, data);
       }
-      return customersApi.addAddress(customerId, data);
+      return partnersApi.addAddress(partnerId, data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['customerDetail', customerId] });
+      queryClient.invalidateQueries({ queryKey: ['partnerDetail', partnerId] });
       form.resetFields();
       onSuccess();
     },

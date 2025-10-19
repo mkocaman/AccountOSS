@@ -10,7 +10,6 @@ import {
   Table,
   Button,
   Space,
-  message,
   Spin,
   Avatar
 } from 'antd';
@@ -24,29 +23,34 @@ import {
   HistoryOutlined,
   HomeOutlined,
   EditOutlined,
-  ArrowLeftOutlined
+  ArrowLeftOutlined,
+  GlobalOutlined
 } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
 import type { ColumnsType } from 'antd/es/table';
 
-import { customersApi } from '@/api/customers';
-import type { BalanceHistoryItem, CustomerAddress } from '@/types/customer';
-import { formatCurrency, formatDate, formatDateTime, getInitials } from '@/lib/utils';
-import CustomerAddressModal from './components/CustomerAddressModal';
+import { partnersApi } from '@/api/partners';
+import type { BalanceHistoryItem, PartnerAddress } from '@/types/partner';
+import { formatCurrency, formatDate, getInitials } from '@/lib/utils';
+import { partnerTypeLabels } from '@/types/partner';
+import { usePageTitle } from '@/hooks/usePageTitle';
+import PartnerAddressModal from './components/PartnerAddressModal';
 
-export default function CustomerDetail() {
+export default function PartnerDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [addressModalOpen, setAddressModalOpen] = useState(false);
 
-  // Fetch customer detail
-  const { data: customer, isLoading } = useQuery({
-    queryKey: ['customerDetail', id],
-    queryFn: () => customersApi.getDetail(id!),
+  // Fetch partner detail
+  const { data: partner, isLoading } = useQuery({
+    queryKey: ['partnerDetail', id],
+    queryFn: () => partnersApi.getDetail(id!),
     enabled: !!id
   });
+
+  usePageTitle(partner ? `${partner.name} - Cari Hesap Detayı` : 'Cari Hesap Detayı');
 
   // Balance history columns
   const balanceHistoryColumns: ColumnsType<BalanceHistoryItem> = [
@@ -83,7 +87,7 @@ export default function CustomerDetail() {
       render: (amount: number) => 
         amount > 0 ? (
           <span className="text-red-600 font-semibold">
-            {formatCurrency(amount, customer?.currency || 'TRY')}
+            {formatCurrency(amount, partner?.currency || 'TRY')}
           </span>
         ) : '-'
     },
@@ -96,7 +100,7 @@ export default function CustomerDetail() {
       render: (amount: number) => 
         amount > 0 ? (
           <span className="text-green-600 font-semibold">
-            {formatCurrency(amount, customer?.currency || 'TRY')}
+            {formatCurrency(amount, partner?.currency || 'TRY')}
           </span>
         ) : '-'
     },
@@ -109,7 +113,7 @@ export default function CustomerDetail() {
       fixed: 'right',
       render: (balance: number) => (
         <span className={`font-bold ${balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-          {formatCurrency(balance, customer?.currency || 'TRY')}
+          {formatCurrency(balance, partner?.currency || 'TRY')}
         </span>
       )
     }
@@ -221,7 +225,7 @@ export default function CustomerDetail() {
 
   // Address list
   const renderAddresses = () => {
-    if (!customer?.addresses || customer.addresses.length === 0) {
+    if (!partner?.addresses || partner.addresses.length === 0) {
       return (
         <div className="text-center py-8 text-gray-500">
           Henüz adres eklenmemiş
@@ -231,7 +235,7 @@ export default function CustomerDetail() {
 
     return (
       <Row gutter={16}>
-        {customer.addresses.map(address => (
+        {partner.addresses.map(address => (
           <Col xs={24} md={12} key={address.id}>
             <Card
               size="small"
@@ -279,14 +283,14 @@ export default function CustomerDetail() {
     );
   }
 
-  if (!customer) {
+  if (!partner) {
     return (
       <div className="p-6">
         <Card>
           <div className="text-center py-12">
-            <div className="text-gray-500 text-lg">Müşteri bulunamadı</div>
-            <Button type="primary" onClick={() => navigate('/customers')} className="mt-4">
-              Müşteri Listesine Dön
+            <div className="text-gray-500 text-lg">Cari hesap bulunamadı</div>
+            <Button type="primary" onClick={() => navigate('/partners')} className="mt-4">
+              Cari Hesap Listesine Dön
             </Button>
           </div>
         </Card>
@@ -300,7 +304,7 @@ export default function CustomerDetail() {
       <div className="mb-6">
         <Button 
           icon={<ArrowLeftOutlined />} 
-          onClick={() => navigate('/customers')}
+          onClick={() => navigate('/partners')}
           className="mb-4"
         >
           Geri
@@ -313,27 +317,39 @@ export default function CustomerDetail() {
               icon={<UserOutlined />}
               className="bg-blue-500"
             >
-              {getInitials(customer.name)}
+              {getInitials(partner.name)}
             </Avatar>
             <div>
               <h1 className="text-2xl font-bold text-gray-900 mb-1">
-                {customer.name}
+                {partner.name}
               </h1>
               <div className="text-gray-600 space-y-1">
                 <div className="flex items-center gap-2">
-                  <Tag color="blue">{customer.code}</Tag>
-                  <Tag color={customer.type === 1 ? 'purple' : 'cyan'}>
-                    {customer.type === 1 ? 'Kurumsal' : 'Bireysel'}
+                  <Tag color="blue">{partner.code}</Tag>
+                  <Tag color={
+                    partner.type === 0 ? 'blue' : 
+                    partner.type === 1 ? 'purple' : 'cyan'
+                  }>
+                    {partnerTypeLabels[partner.type]}
                   </Tag>
-                  <Tag color={customer.isActive ? 'green' : 'red'}>
-                    {customer.isActive ? 'Aktif' : 'Pasif'}
+                  <Tag color={partner.isActive ? 'green' : 'red'}>
+                    {partner.isActive ? 'Aktif' : 'Pasif'}
                   </Tag>
+                  {partner.isBlocked && (
+                    <Tag color="orange">Bloke</Tag>
+                  )}
                 </div>
-                {customer.email && (
-                  <div><MailOutlined /> {customer.email}</div>
+                {partner.contactPerson && (
+                  <div>👤 {partner.contactPerson}</div>
                 )}
-                {customer.phone && (
-                  <div><PhoneOutlined /> {customer.phone}</div>
+                {partner.email && (
+                  <div><MailOutlined /> {partner.email}</div>
+                )}
+                {partner.phone && (
+                  <div><PhoneOutlined /> {partner.phone}</div>
+                )}
+                {partner.website && (
+                  <div><GlobalOutlined /> <a href={partner.website} target="_blank" rel="noreferrer">{partner.website}</a></div>
                 )}
               </div>
             </div>
@@ -342,7 +358,7 @@ export default function CustomerDetail() {
           <Button 
             type="primary" 
             icon={<EditOutlined />}
-            onClick={() => navigate(`/customers/edit/${customer.id}`)}
+            onClick={() => navigate(`/partners/edit/${partner.id}`)}
           >
             Düzenle
           </Button>
@@ -355,11 +371,11 @@ export default function CustomerDetail() {
           <Card>
             <Statistic
               title="Güncel Bakiye"
-              value={customer.currentBalance}
+              value={partner.currentBalance}
               precision={2}
-              suffix={customer.currency}
+              suffix={partner.currency}
               valueStyle={{ 
-                color: customer.currentBalance >= 0 ? '#52c41a' : '#ff4d4f' 
+                color: partner.currentBalance >= 0 ? '#52c41a' : '#ff4d4f' 
               }}
               prefix={<DollarOutlined />}
             />
@@ -369,11 +385,11 @@ export default function CustomerDetail() {
           <Card>
             <Statistic
               title="Toplam Fatura"
-              value={customer.statistics?.totalInvoices || 0}
+              value={partner.statistics?.totalInvoices || 0}
               prefix={<FileTextOutlined />}
             />
             <div className="text-xs text-gray-500 mt-2">
-              {formatCurrency(customer.statistics?.totalInvoiceAmount || 0, customer.currency)}
+              {formatCurrency(partner.statistics?.totalInvoiceAmount || 0, partner.currency)}
             </div>
           </Card>
         </Col>
@@ -381,11 +397,11 @@ export default function CustomerDetail() {
           <Card>
             <Statistic
               title="Toplam Ödeme"
-              value={customer.statistics?.totalPayments || 0}
+              value={partner.statistics?.totalPayments || 0}
               prefix={<DollarOutlined />}
             />
             <div className="text-xs text-gray-500 mt-2">
-              {formatCurrency(customer.statistics?.totalPaymentAmount || 0, customer.currency)}
+              {formatCurrency(partner.statistics?.totalPaymentAmount || 0, partner.currency)}
             </div>
           </Card>
         </Col>
@@ -393,7 +409,7 @@ export default function CustomerDetail() {
           <Card>
             <Statistic
               title="Ort. Ödeme Süresi"
-              value={customer.statistics?.averagePaymentDays || 0}
+              value={partner.statistics?.averagePaymentDays || 0}
               suffix="gün"
               prefix={<HistoryOutlined />}
             />
@@ -417,37 +433,61 @@ export default function CustomerDetail() {
               ),
               children: (
                 <Descriptions bordered column={{ xs: 1, sm: 2, md: 2 }}>
-                  <Descriptions.Item label="Müşteri Kodu">{customer.code}</Descriptions.Item>
+                  <Descriptions.Item label="Cari Hesap Kodu">{partner.code}</Descriptions.Item>
                   <Descriptions.Item label="Tip">
-                    {customer.type === 1 ? 'Kurumsal' : 'Bireysel'}
+                    {partnerTypeLabels[partner.type]}
                   </Descriptions.Item>
-                  <Descriptions.Item label="Email">{customer.email || '-'}</Descriptions.Item>
-                  <Descriptions.Item label="Telefon">{customer.phone || '-'}</Descriptions.Item>
-                  <Descriptions.Item label="Vergi No">{customer.taxNumber || '-'}</Descriptions.Item>
-                  <Descriptions.Item label="Vergi Dairesi">{customer.taxOffice || '-'}</Descriptions.Item>
-                  <Descriptions.Item label="Para Birimi">{customer.currency}</Descriptions.Item>
-                  <Descriptions.Item label="Vade (Gün)">{customer.paymentTermDays}</Descriptions.Item>
+                  <Descriptions.Item label="İlgili Kişi">{partner.contactPerson || '-'}</Descriptions.Item>
+                  <Descriptions.Item label="Email">{partner.email || '-'}</Descriptions.Item>
+                  <Descriptions.Item label="Telefon">{partner.phone || '-'}</Descriptions.Item>
+                  <Descriptions.Item label="Mobil">{partner.mobilePhone || '-'}</Descriptions.Item>
+                  <Descriptions.Item label="Website">
+                    {partner.website ? (
+                      <a href={partner.website} target="_blank" rel="noreferrer">
+                        {partner.website}
+                      </a>
+                    ) : '-'}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Vergi No">{partner.taxNumber || '-'}</Descriptions.Item>
+                  <Descriptions.Item label="Vergi Dairesi">{partner.taxOffice || '-'}</Descriptions.Item>
+                  <Descriptions.Item label="TC Kimlik">{partner.identityNumber || '-'}</Descriptions.Item>
+                  <Descriptions.Item label="Fatura Adresi" span={2}>
+                    {partner.billingAddress || '-'}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Sevkiyat Adresi" span={2}>
+                    {partner.shippingAddress || '-'}
+                  </Descriptions.Item>
+                  <Descriptions.Item label="Şehir">{partner.city || '-'}</Descriptions.Item>
+                  <Descriptions.Item label="Ülke">{partner.country || '-'}</Descriptions.Item>
+                  <Descriptions.Item label="Posta Kodu">{partner.postalCode || '-'}</Descriptions.Item>
+                  <Descriptions.Item label="Para Birimi">{partner.currency}</Descriptions.Item>
+                  <Descriptions.Item label="Vade (Gün)">{partner.paymentTermDays}</Descriptions.Item>
                   <Descriptions.Item label="Kredi Limiti">
-                    {formatCurrency(customer.creditLimit, customer.currency)}
+                    {formatCurrency(partner.creditLimit, partner.currency)}
                   </Descriptions.Item>
                   <Descriptions.Item label="Güncel Bakiye">
-                    <span className={customer.currentBalance >= 0 ? 'text-green-600' : 'text-red-600'}>
-                      {formatCurrency(customer.currentBalance, customer.currency)}
+                    <span className={partner.currentBalance >= 0 ? 'text-green-600' : 'text-red-600'}>
+                      {formatCurrency(partner.currentBalance, partner.currency)}
                     </span>
                   </Descriptions.Item>
                   <Descriptions.Item label="Durum">
-                    <Tag color={customer.isActive ? 'green' : 'red'}>
-                      {customer.isActive ? 'Aktif' : 'Pasif'}
+                    <Tag color={partner.isActive ? 'green' : 'red'}>
+                      {partner.isActive ? 'Aktif' : 'Pasif'}
                     </Tag>
                   </Descriptions.Item>
                   <Descriptions.Item label="Bloke">
-                    <Tag color={customer.isBlocked ? 'red' : 'green'}>
-                      {customer.isBlocked ? 'Evet' : 'Hayır'}
+                    <Tag color={partner.isBlocked ? 'red' : 'green'}>
+                      {partner.isBlocked ? 'Evet' : 'Hayır'}
                     </Tag>
                   </Descriptions.Item>
-                  {customer.notes && (
+                  {partner.isBlocked && partner.blockReason && (
+                    <Descriptions.Item label="Bloke Nedeni" span={2}>
+                      {partner.blockReason}
+                    </Descriptions.Item>
+                  )}
+                  {partner.notes && (
                     <Descriptions.Item label="Notlar" span={2}>
-                      {customer.notes}
+                      {partner.notes}
                     </Descriptions.Item>
                   )}
                 </Descriptions>
@@ -464,7 +504,7 @@ export default function CustomerDetail() {
               children: (
                 <Table
                   columns={balanceHistoryColumns}
-                  dataSource={customer.balanceHistory || []}
+                  dataSource={partner.balanceHistory || []}
                   rowKey={(record) => `${record.referenceId}-${record.date}`}
                   scroll={{ x: 900 }}
                   pagination={{ pageSize: 20 }}
@@ -476,13 +516,13 @@ export default function CustomerDetail() {
               label: (
                 <span>
                   <FileTextOutlined />
-                  <span className="ml-2">Faturalar ({customer.recentInvoices?.length || 0})</span>
+                  <span className="ml-2">Faturalar ({partner.recentInvoices?.length || 0})</span>
                 </span>
               ),
               children: (
                 <Table
                   columns={invoiceColumns}
-                  dataSource={customer.recentInvoices || []}
+                  dataSource={partner.recentInvoices || []}
                   rowKey="id"
                   scroll={{ x: 800 }}
                   pagination={{ pageSize: 10 }}
@@ -494,13 +534,13 @@ export default function CustomerDetail() {
               label: (
                 <span>
                   <DollarOutlined />
-                  <span className="ml-2">Ödemeler ({customer.recentPayments?.length || 0})</span>
+                  <span className="ml-2">Ödemeler ({partner.recentPayments?.length || 0})</span>
                 </span>
               ),
               children: (
                 <Table
                   columns={paymentColumns}
-                  dataSource={customer.recentPayments || []}
+                  dataSource={partner.recentPayments || []}
                   rowKey="id"
                   scroll={{ x: 700 }}
                   pagination={{ pageSize: 10 }}
@@ -512,7 +552,7 @@ export default function CustomerDetail() {
               label: (
                 <span>
                   <HomeOutlined />
-                  <span className="ml-2">Adresler ({customer.addresses?.length || 0})</span>
+                  <span className="ml-2">Adresler ({partner.addresses?.length || 0})</span>
                 </span>
               ),
               children: (
@@ -535,14 +575,14 @@ export default function CustomerDetail() {
       </Card>
 
       {/* Address Modal */}
-      {customer && (
-        <CustomerAddressModal
+      {partner && (
+        <PartnerAddressModal
           open={addressModalOpen}
-          customerId={customer.id}
+          partnerId={partner.id}
           onCancel={() => setAddressModalOpen(false)}
           onSuccess={() => {
             setAddressModalOpen(false);
-            message.success('Adres eklendi');
+            // Refresh partner data
           }}
         />
       )}

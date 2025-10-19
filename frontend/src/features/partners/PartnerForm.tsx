@@ -2,27 +2,27 @@ import React from 'react';
 import { Modal, Form, Input, Select, InputNumber, Switch, Row, Col, message } from 'antd';
 import { useMutation } from '@tanstack/react-query';
 
-import { suppliersApi } from '@/api/suppliers';
-import type { Supplier, CreateSupplierRequest } from '@/types/supplier';
-import { SupplierType } from '@/types/supplier';
+import { partnersApi } from '@/api/partners';
+import type { Partner, CreatePartnerRequest } from '@/types/partner';
+import { PartnerType } from '@/types/partner';
 
 interface Props {
   open: boolean;
-  supplier?: Supplier;
+  partner?: Partner;
   onCancel: () => void;
   onSuccess: () => void;
 }
 
-export default function SupplierForm({ open, supplier, onCancel, onSuccess }: Props) {
+export default function PartnerForm({ open, partner, onCancel, onSuccess }: Props) {
   const [form] = Form.useForm();
 
   // Create/Update mutation
   const saveMutation = useMutation({
-    mutationFn: (data: CreateSupplierRequest) => {
-      if (supplier) {
-        return suppliersApi.update(supplier.id, data);
+    mutationFn: (data: CreatePartnerRequest) => {
+      if (partner) {
+        return partnersApi.update(partner.id, data);
       }
-      return suppliersApi.create(data);
+      return partnersApi.create(data);
     },
     onSuccess: () => {
       form.resetFields();
@@ -35,12 +35,12 @@ export default function SupplierForm({ open, supplier, onCancel, onSuccess }: Pr
 
   // Set initial values
   React.useEffect(() => {
-    if (supplier) {
-      form.setFieldsValue(supplier);
+    if (partner) {
+      form.setFieldsValue(partner);
     } else {
       form.resetFields();
     }
-  }, [supplier, form, open]);
+  }, [partner, form, open]);
 
   const handleSubmit = async (values: any) => {
     await saveMutation.mutateAsync(values);
@@ -48,7 +48,7 @@ export default function SupplierForm({ open, supplier, onCancel, onSuccess }: Pr
 
   return (
     <Modal
-      title={supplier ? 'Tedarikçi Düzenle' : 'Yeni Tedarikçi'}
+      title={partner ? 'Cari Hesap Düzenle' : 'Yeni Cari Hesap'}
       open={open}
       onCancel={onCancel}
       onOk={() => form.submit()}
@@ -61,7 +61,7 @@ export default function SupplierForm({ open, supplier, onCancel, onSuccess }: Pr
         layout="vertical"
         onFinish={handleSubmit}
         initialValues={{
-          type: SupplierType.Domestic,
+          type: PartnerType.Customer,
           currency: 'TRY',
           paymentTermDays: 30,
           isActive: true
@@ -72,10 +72,10 @@ export default function SupplierForm({ open, supplier, onCancel, onSuccess }: Pr
           <Col span={12}>
             <Form.Item
               name="name"
-              label="Tedarikçi Adı"
-              rules={[{ required: true, message: 'Tedarikçi adı zorunludur' }]}
+              label="Ad"
+              rules={[{ required: true, message: 'Ad zorunludur' }]}
             >
-              <Input placeholder="Tedarikçi adı" />
+              <Input placeholder="Firma/Kişi adı" />
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -86,8 +86,9 @@ export default function SupplierForm({ open, supplier, onCancel, onSuccess }: Pr
             >
               <Select
                 options={[
-                  { label: 'Yerli', value: SupplierType.Domestic },
-                  { label: 'Yabancı', value: SupplierType.Foreign }
+                  { label: 'Müşteri', value: PartnerType.Customer },
+                  { label: 'Tedarikçi', value: PartnerType.Supplier },
+                  { label: 'Her İkisi', value: PartnerType.Both }
                 ]}
               />
             </Form.Item>
@@ -161,10 +162,24 @@ export default function SupplierForm({ open, supplier, onCancel, onSuccess }: Pr
           </Col>
         </Row>
 
+        <Form.Item
+          name="identityNumber"
+          label="TC Kimlik No"
+        >
+          <Input placeholder="12345678901" />
+        </Form.Item>
+
         {/* Address */}
         <Form.Item
-          name="address"
-          label="Adres"
+          name="billingAddress"
+          label="Fatura Adresi"
+        >
+          <Input.TextArea rows={2} placeholder="Sokak, mahalle, bina no..." />
+        </Form.Item>
+
+        <Form.Item
+          name="shippingAddress"
+          label="Sevkiyat Adresi"
         >
           <Input.TextArea rows={2} placeholder="Sokak, mahalle, bina no..." />
         </Form.Item>
@@ -240,6 +255,18 @@ export default function SupplierForm({ open, supplier, onCancel, onSuccess }: Pr
             </Form.Item>
           </Col>
         </Row>
+
+        <Form.Item
+          name="creditLimit"
+          label="Kredi Limiti"
+        >
+          <InputNumber
+            min={0}
+            className="w-full"
+            placeholder="0"
+            addonAfter="₺"
+          />
+        </Form.Item>
 
         {/* Notes */}
         <Form.Item

@@ -52,13 +52,9 @@ const menuItems = [
     label: 'Ayarlar',
   },
   {
-    key: 'customers',
+    key: 'partners',
     icon: <UserOutlined />,
-    label: 'Cari Hesap',
-    children: [
-      { key: '/customers', label: 'Müşteriler' },
-      { key: '/suppliers', label: 'Tedarikçiler' },
-    ],
+    label: <Link to="/partners">Cari Hesaplar</Link>,
   },
   {
     key: 'products',

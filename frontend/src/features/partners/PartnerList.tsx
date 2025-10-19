@@ -24,39 +24,39 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import type { ColumnsType } from 'antd/es/table';
 
-import { suppliersApi } from '@/api/suppliers';
-import type { Supplier, SupplierFilters } from '@/types/supplier';
-import { SupplierType, supplierTypeLabels } from '@/types/supplier';
+import { partnersApi } from '@/api/partners';
+import type { Partner, PartnerFilters } from '@/types/partner';
+import { PartnerType, partnerTypeLabels } from '@/types/partner';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { showConfirm } from '@/components/ui/ConfirmModal';
-import SupplierForm from './SupplierForm';
+import PartnerForm from './PartnerForm';
 
 const { Search } = Input;
 
-export default function SupplierList() {
-  usePageTitle('Tedarikçiler');
+export default function PartnerList() {
+  usePageTitle('Cari Hesaplar');
   
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [filters, setFilters] = useState<SupplierFilters>({});
+  const [filters, setFilters] = useState<PartnerFilters>({});
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
   const [formOpen, setFormOpen] = useState(false);
-  const [selectedSupplier, setSelectedSupplier] = useState<Supplier | undefined>();
+  const [selectedPartner, setSelectedPartner] = useState<Partner | undefined>();
 
-  // Fetch suppliers
+  // Fetch partners
   const { data, isLoading } = useQuery({
-    queryKey: ['suppliers', filters, page, pageSize],
-    queryFn: () => suppliersApi.getAll({ ...filters, page, pageSize })
+    queryKey: ['partners', filters, page, pageSize],
+    queryFn: () => partnersApi.getAll({ ...filters, page, pageSize })
   });
 
   // Delete mutation
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => suppliersApi.delete(id),
+    mutationFn: (id: string) => partnersApi.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['suppliers'] });
-      message.success('Tedarikçi silindi');
+      queryClient.invalidateQueries({ queryKey: ['partners'] });
+      message.success('Cari hesap silindi');
     },
     onError: (error: any) => {
       message.error(error.response?.data?.message || 'Silme işlemi başarısız');
@@ -66,24 +66,24 @@ export default function SupplierList() {
   // Block mutation
   const blockMutation = useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) => 
-      suppliersApi.block(id, reason),
+      partnersApi.block(id, reason),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['suppliers'] });
-      message.success('Tedarikçi bloke edildi');
+      queryClient.invalidateQueries({ queryKey: ['partners'] });
+      message.success('Cari hesap bloke edildi');
     }
   });
 
   // Unblock mutation
   const unblockMutation = useMutation({
-    mutationFn: (id: string) => suppliersApi.unblock(id),
+    mutationFn: (id: string) => partnersApi.unblock(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['suppliers'] });
+      queryClient.invalidateQueries({ queryKey: ['partners'] });
       message.success('Bloke kaldırıldı');
     }
   });
 
   // Table columns
-  const columns: ColumnsType<Supplier> = [
+  const columns: ColumnsType<Partner> = [
     {
       title: 'Durum',
       key: 'status',
@@ -114,7 +114,7 @@ export default function SupplierList() {
       sorter: true
     },
     {
-      title: 'Tedarikçi Adı',
+      title: 'Ad',
       dataIndex: 'name',
       key: 'name',
       ellipsis: true,
@@ -133,16 +133,24 @@ export default function SupplierList() {
       title: 'Tip',
       dataIndex: 'type',
       key: 'type',
-      width: 100,
+      width: 150,
       align: 'center',
-      render: (type: SupplierType) => (
-        <Tag color={type === SupplierType.Domestic ? 'blue' : 'purple'}>
-          {supplierTypeLabels[type]}
-        </Tag>
-      ),
+      render: (type: PartnerType) => {
+        const colors = {
+          [PartnerType.Customer]: 'blue',
+          [PartnerType.Supplier]: 'purple',
+          [PartnerType.Both]: 'cyan'
+        };
+        return (
+          <Tag color={colors[type]}>
+            {partnerTypeLabels[type]}
+          </Tag>
+        );
+      },
       filters: [
-        { text: 'Yerli', value: SupplierType.Domestic },
-        { text: 'Yabancı', value: SupplierType.Foreign }
+        { text: 'Müşteri', value: PartnerType.Customer },
+        { text: 'Tedarikçi', value: PartnerType.Supplier },
+        { text: 'Her İkisi', value: PartnerType.Both }
       ]
     },
     {
@@ -200,7 +208,7 @@ export default function SupplierList() {
           <Button
             size="small"
             icon={<EyeOutlined />}
-            onClick={() => navigate(`/suppliers/${record.id}`)}
+            onClick={() => navigate(`/partners/${record.id}`)}
           >
             Detay
           </Button>
@@ -208,7 +216,7 @@ export default function SupplierList() {
             size="small"
             icon={<EditOutlined />}
             onClick={() => {
-              setSelectedSupplier(record);
+              setSelectedPartner(record);
               setFormOpen(true);
             }}
           />
@@ -246,13 +254,13 @@ export default function SupplierList() {
     }
   ];
 
-  const handleDelete = (supplier: Supplier) => {
+  const handleDelete = (partner: Partner) => {
     showConfirm({
-      title: 'Tedarikçi Sil',
-      content: `${supplier.name} tedarikçisini silmek istediğinize emin misiniz?`,
+      title: 'Cari Hesap Sil',
+      content: `${partner.name} cari hesabını silmek istediğinize emin misiniz?`,
       okType: 'danger',
       onOk: async () => {
-        await deleteMutation.mutateAsync(supplier.id);
+        await deleteMutation.mutateAsync(partner.id);
       }
     });
   };
@@ -263,9 +271,9 @@ export default function SupplierList() {
       <div className="mb-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Tedarikçiler</h1>
+            <h1 className="text-2xl font-bold text-gray-900">Cari Hesaplar</h1>
             <p className="text-gray-600 mt-1">
-              Tedarikçi yönetimi ve satın alma takibi
+              Müşteri ve tedarikçi yönetimi
             </p>
           </div>
           <Button
@@ -273,11 +281,11 @@ export default function SupplierList() {
             icon={<PlusOutlined />}
             size="large"
             onClick={() => {
-              setSelectedSupplier(undefined);
+              setSelectedPartner(undefined);
               setFormOpen(true);
             }}
           >
-            Yeni Tedarikçi
+            Yeni Cari Hesap
           </Button>
         </div>
       </div>
@@ -287,7 +295,7 @@ export default function SupplierList() {
         <Row gutter={16}>
           <Col xs={24} sm={12} md={8}>
             <Search
-              placeholder="Tedarikçi ara (ad, kod, email...)"
+              placeholder="Cari hesap ara (ad, kod, email...)"
               allowClear
               prefix={<SearchOutlined />}
               onSearch={(value) => setFilters({ ...filters, search: value })}
@@ -305,8 +313,9 @@ export default function SupplierList() {
               allowClear
               onChange={(value) => setFilters({ ...filters, type: value })}
               options={[
-                { label: 'Yerli', value: SupplierType.Domestic },
-                { label: 'Yabancı', value: SupplierType.Foreign }
+                { label: 'Müşteri', value: PartnerType.Customer },
+                { label: 'Tedarikçi', value: PartnerType.Supplier },
+                { label: 'Her İkisi', value: PartnerType.Both }
               ]}
             />
           </Col>
@@ -350,7 +359,7 @@ export default function SupplierList() {
             pageSize,
             total: data?.totalCount || 0,
             showSizeChanger: true,
-            showTotal: (total) => `Toplam ${total} tedarikçi`,
+            showTotal: (total) => `Toplam ${total} cari hesap`,
             onChange: (page, pageSize) => {
               setPage(page);
               setPageSize(pageSize);
@@ -359,19 +368,19 @@ export default function SupplierList() {
         />
       </Card>
 
-      {/* Supplier Form Modal */}
-      <SupplierForm
+      {/* Partner Form Modal */}
+      <PartnerForm
         open={formOpen}
-        supplier={selectedSupplier}
+        partner={selectedPartner}
         onCancel={() => {
           setFormOpen(false);
-          setSelectedSupplier(undefined);
+          setSelectedPartner(undefined);
         }}
         onSuccess={() => {
           setFormOpen(false);
-          setSelectedSupplier(undefined);
-          queryClient.invalidateQueries({ queryKey: ['suppliers'] });
-          message.success(selectedSupplier ? 'Tedarikçi güncellendi' : 'Tedarikçi eklendi');
+          setSelectedPartner(undefined);
+          queryClient.invalidateQueries({ queryKey: ['partners'] });
+          message.success(selectedPartner ? 'Cari hesap güncellendi' : 'Cari hesap eklendi');
         }}
       />
     </div>
