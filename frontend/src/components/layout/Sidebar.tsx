@@ -63,7 +63,7 @@ const menuItems = [
     children: [
       { key: '/products', label: 'Ürün Listesi' },
       { key: '/categories', label: 'Kategoriler' },
-      { key: '/stock', label: 'Stok Hareketleri' },
+      { key: '/stock-movements', label: 'Stok Hareketleri' },
     ],
   },
   {

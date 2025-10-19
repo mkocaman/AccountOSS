@@ -19,6 +19,7 @@ import { BankAccountList } from '@/features/payments/BankAccountList';
 import { GrQueueList } from '@/features/grQueue/GrQueueList';
 import ReportsPage from '@/features/reports/ReportsPage';
 import SettingsPage from '@/features/settings/SettingsPage';
+import StockMovementList from '@/features/stockMovements/StockMovementList';
 import { useAuthStore } from '@/store/authStore';
 
 // Protected Route komponenti
@@ -179,8 +180,8 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        path: 'stock',
-        element: <div className="text-2xl">Stok Hareketleri (TODO)</div>,
+        path: 'stock-movements',
+        element: <StockMovementList />,
       },
       {
         path: 'purchase-orders',
