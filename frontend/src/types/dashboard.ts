@@ -1,89 +1,75 @@
-// Dashboard metrics
-export interface DashboardMetrics {
-  // Sales metrics
-  totalSales: number;
-  totalSalesAmount: number;
-  monthlySalesGrowth: number; // Percentage
-  
-  // Payment metrics
-  totalPayments: number;
-  totalPaymentsAmount: number;
-  monthlyPaymentsGrowth: number;
-  
-  // Profit metrics
-  totalProfit: number;
-  profitMargin: number; // Percentage
-  monthlyProfitGrowth: number;
-  
-  // GR Queue metrics
-  grQueueCount: number;
-  grQueueTotalAmount: number;
-  grQueueWaitingAmount: number;
-  
-  // Stock metrics
-  lowStockProductsCount: number;
-  outOfStockProductsCount: number;
-  totalStockValue: number;
-  
-  // Customer metrics
+// Dashboard API types
+export interface DashboardStatistics {
+  generatedAt: string;
+  sales: SalesStatistics;
+  purchases: PurchaseStatistics;
+  payments: PaymentStatistics;
+  customers: CustomerStatistics;
+  stock: StockStatistics;
+  recentActivities: RecentActivity[];
+}
+
+export interface SalesStatistics {
+  thisMonth: number;
+  lastMonth: number;
+  comparison: PeriodComparison;
+  invoiceCount: number;
+  averageInvoiceValue: number;
+  currency: string;
+}
+
+export interface PurchaseStatistics {
+  thisMonth: number;
+  lastMonth: number;
+  comparison: PeriodComparison;
+  invoiceCount: number;
+  averageInvoiceValue: number;
+  currency: string;
+}
+
+export interface PaymentStatistics {
+  totalReceived: number;
+  totalPaid: number;
+  netCashFlow: number;
+  pendingReceivables: number;
+  overdueReceivables: number;
+  currency: string;
+}
+
+export interface CustomerStatistics {
   totalCustomers: number;
-  activeCustomersThisMonth: number;
+  activeCustomers: number;
+  newCustomersThisMonth: number;
+  averageCustomerValue: number;
+  currency: string;
 }
 
-// Sales chart data
-export interface SalesChartData {
-  period: string; // "2025-01", "2025-02"
-  sales: number;
-  purchases: number;
-  profit: number;
+export interface StockStatistics {
+  totalProducts: number;
+  lowStockProducts: number;
+  outOfStockProducts: number;
+  totalStockValue: number;
+  currency: string;
 }
 
-// Payment chart data
-export interface PaymentChartData {
-  method: string; // "Cash", "Bank", "Card"
-  count: number;
+export interface PeriodComparison {
+  percentage: number;
+  trend: 'up' | 'down' | 'stable';
+  description: string;
+}
+
+export interface RecentActivity {
+  timestamp: string;
+  activityType: string;
+  description: string;
+  referenceNumber: string;
   amount: number;
-}
-
-// Top customer
-export interface TopCustomer {
-  customerId: string;
-  customerName: string;
-  customerCode: string;
-  totalPurchases: number;
-  totalAmount: number;
   currency: string;
-  lastPurchaseDate: string;
-}
-
-// Low stock product
-export interface LowStockProduct {
-  productId: string;
-  productName: string;
-  productCode: string;
-  currentStock: number;
-  minStockLevel: number;
-  unit: string;
-  lastUpdated: string;
-}
-
-// Recent invoice
-export interface RecentInvoice {
-  id: string;
-  invoiceNumber: string;
-  invoiceDate: string;
-  customerName: string;
-  type: 'Sales' | 'Purchase';
-  isOfficial: boolean;
-  grandTotal: number;
-  currency: string;
-  status: string;
 }
 
 // Dashboard filters
 export interface DashboardFilters {
-  dateFrom?: string;
-  dateTo?: string;
-  customerId?: string;
   currency?: string;
+  startDate?: string;
+  endDate?: string;
 }

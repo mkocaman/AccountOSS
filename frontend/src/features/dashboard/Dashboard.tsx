@@ -29,51 +29,45 @@ import * as echarts from 'echarts';
 import ReactECharts from 'echarts-for-react';
 
 import { dashboardApi } from '@/api/dashboard';
-import type { DashboardFilters } from '@/types/dashboard';
+import type { DashboardFilters, DashboardStatistics } from '@/types/dashboard';
 import { formatCurrency, formatDate } from '@/lib/utils';
 
 const { RangePicker } = DatePicker;
 
 export default function Dashboard() {
   const [filters, setFilters] = useState<DashboardFilters>({
-    dateFrom: dayjs().subtract(30, 'days').format('YYYY-MM-DD'),
-    dateTo: dayjs().format('YYYY-MM-DD')
+    startDate: dayjs().subtract(30, 'days').format('YYYY-MM-DD'),
+    endDate: dayjs().format('YYYY-MM-DD'),
+    currency: 'TRY'
   });
 
-  // Fetch metrics
-  const { data: metrics, isLoading: metricsLoading } = useQuery({
-    queryKey: ['dashboardMetrics', filters],
-    queryFn: () => dashboardApi.getMetrics(filters)
+  // Fetch dashboard statistics
+  const { data: dashboardData, isLoading: dashboardLoading, error: dashboardError } = useQuery({
+    queryKey: ['dashboardStatistics', filters],
+    queryFn: () => dashboardApi.getStatistics(filters)
   });
 
-  // Fetch sales chart
-  const { data: salesChart, isLoading: salesChartLoading } = useQuery({
-    queryKey: ['salesChart', filters],
-    queryFn: () => dashboardApi.getSalesChart(filters)
+  // Fetch sales report
+  const { data: salesReport, isLoading: salesReportLoading } = useQuery({
+    queryKey: ['salesReport', filters],
+    queryFn: () => dashboardApi.getSalesReport({
+      startDate: filters.startDate!,
+      endDate: filters.endDate!,
+      currency: filters.currency || 'TRY',
+      includeComparison: true
+    }),
+    enabled: !!filters.startDate && !!filters.endDate
   });
 
-  // Fetch payment chart
-  const { data: paymentChart, isLoading: paymentChartLoading } = useQuery({
-    queryKey: ['paymentChart', filters],
-    queryFn: () => dashboardApi.getPaymentChart(filters)
-  });
-
-  // Fetch top customers
-  const { data: topCustomers, isLoading: topCustomersLoading } = useQuery({
-    queryKey: ['topCustomers', filters],
-    queryFn: () => dashboardApi.getTopCustomers(filters)
-  });
-
-  // Fetch low stock
-  const { data: lowStock, isLoading: lowStockLoading } = useQuery({
-    queryKey: ['lowStock'],
-    queryFn: () => dashboardApi.getLowStockProducts()
-  });
-
-  // Fetch recent invoices
-  const { data: recentInvoices, isLoading: recentInvoicesLoading } = useQuery({
-    queryKey: ['recentInvoices', filters],
-    queryFn: () => dashboardApi.getRecentInvoices(filters)
+  // Fetch stock report
+  const { data: stockReport, isLoading: stockReportLoading } = useQuery({
+    queryKey: ['stockReport', filters],
+    queryFn: () => dashboardApi.getStockReport({
+      startDate: filters.startDate!,
+      endDate: filters.endDate!,
+      currency: filters.currency || 'TRY'
+    }),
+    enabled: !!filters.startDate && !!filters.endDate
   });
 
   // Sales chart options
@@ -285,10 +279,23 @@ export default function Dashboard() {
     }
   ];
 
-  if (metricsLoading) {
+  if (dashboardLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <Spin size="large" />
+      </div>
+    );
+  }
+
+  if (dashboardError) {
+    return (
+      <div className="p-6">
+        <Alert
+          message="Dashboard verileri yüklenirken hata oluştu"
+          description="Lütfen sayfayı yenileyin veya daha sonra tekrar deneyin."
+          type="error"
+          showIcon
+        />
       </div>
     );
   }
@@ -307,14 +314,14 @@ export default function Dashboard() {
           <Space>
             <RangePicker
               value={[
-                filters.dateFrom ? dayjs(filters.dateFrom) : null,
-                filters.dateTo ? dayjs(filters.dateTo) : null
+                filters.startDate ? dayjs(filters.startDate) : null,
+                filters.endDate ? dayjs(filters.endDate) : null
               ]}
               onChange={(dates) => {
                 setFilters({
                   ...filters,
-                  dateFrom: dates?.[0]?.format('YYYY-MM-DD'),
-                  dateTo: dates?.[1]?.format('YYYY-MM-DD')
+                  startDate: dates?.[0]?.format('YYYY-MM-DD'),
+                  endDate: dates?.[1]?.format('YYYY-MM-DD')
                 });
               }}
             />
@@ -328,24 +335,24 @@ export default function Dashboard() {
           <Card>
             <Statistic
               title="Toplam Satış"
-              value={metrics?.totalSalesAmount || 0}
+              value={dashboardData?.sales?.thisMonth || 0}
               precision={2}
               prefix={<ShoppingCartOutlined />}
-              suffix="₺"
+              suffix={dashboardData?.sales?.currency || '₺'}
               valueStyle={{ color: '#1890ff' }}
             />
             <div className="mt-2 flex items-center text-sm">
-              {(metrics?.monthlySalesGrowth || 0) >= 0 ? (
+              {dashboardData?.sales?.comparison?.trend === 'up' ? (
                 <ArrowUpOutlined className="text-green-600 mr-1" />
               ) : (
                 <ArrowDownOutlined className="text-red-600 mr-1" />
               )}
               <span className={
-                (metrics?.monthlySalesGrowth || 0) >= 0 
+                dashboardData?.sales?.comparison?.trend === 'up' 
                   ? 'text-green-600' 
                   : 'text-red-600'
               }>
-                {Math.abs(metrics?.monthlySalesGrowth || 0).toFixed(1)}%
+                {Math.abs(dashboardData?.sales?.comparison?.percentage || 0).toFixed(1)}%
               </span>
               <span className="text-gray-500 ml-1">bu ay</span>
             </div>
@@ -356,26 +363,16 @@ export default function Dashboard() {
           <Card>
             <Statistic
               title="Toplam Tahsilat"
-              value={metrics?.totalPaymentsAmount || 0}
+              value={dashboardData?.payments?.totalReceived || 0}
               precision={2}
               prefix={<CreditCardOutlined />}
-              suffix="₺"
+              suffix={dashboardData?.payments?.currency || '₺'}
               valueStyle={{ color: '#52c41a' }}
             />
             <div className="mt-2 flex items-center text-sm">
-              {(metrics?.monthlyPaymentsGrowth || 0) >= 0 ? (
-                <ArrowUpOutlined className="text-green-600 mr-1" />
-              ) : (
-                <ArrowDownOutlined className="text-red-600 mr-1" />
-              )}
-              <span className={
-                (metrics?.monthlyPaymentsGrowth || 0) >= 0 
-                  ? 'text-green-600' 
-                  : 'text-red-600'
-              }>
-                {Math.abs(metrics?.monthlyPaymentsGrowth || 0).toFixed(1)}%
+              <span className="text-gray-600">
+                Net Nakit: {formatCurrency(dashboardData?.payments?.netCashFlow || 0, dashboardData?.payments?.currency || '₺')}
               </span>
-              <span className="text-gray-500 ml-1">bu ay</span>
             </div>
           </Card>
         </Col>
@@ -384,15 +381,15 @@ export default function Dashboard() {
           <Card>
             <Statistic
               title="Toplam Kâr"
-              value={metrics?.totalProfit || 0}
+              value={(dashboardData?.sales?.thisMonth || 0) - (dashboardData?.purchases?.thisMonth || 0)}
               precision={2}
               prefix={<TrophyOutlined />}
-              suffix="₺"
+              suffix={dashboardData?.sales?.currency || '₺'}
               valueStyle={{ color: '#faad14' }}
             />
             <div className="mt-2 flex items-center text-sm">
               <span className="text-gray-600">
-                Kâr Marjı: {(metrics?.profitMargin || 0).toFixed(1)}%
+                Satış: {formatCurrency(dashboardData?.sales?.thisMonth || 0, dashboardData?.sales?.currency || '₺')}
               </span>
             </div>
           </Card>
@@ -401,16 +398,16 @@ export default function Dashboard() {
         <Col xs={24} sm={12} lg={6}>
           <Card>
             <Statistic
-              title="GR Kuyruk Bakiyesi"
-              value={metrics?.grQueueWaitingAmount || 0}
+              title="Bekleyen Alacaklar"
+              value={dashboardData?.payments?.pendingReceivables || 0}
               precision={2}
               prefix={<DollarOutlined />}
-              suffix="₺"
+              suffix={dashboardData?.payments?.currency || '₺'}
               valueStyle={{ color: '#ff4d4f' }}
             />
             <div className="mt-2 flex items-center text-sm">
-              <Tag color="orange">{metrics?.grQueueCount || 0} kayıt</Tag>
-              <span className="text-gray-500 ml-2">bekliyor</span>
+              <Tag color="orange">{dashboardData?.customers?.totalCustomers || 0} müşteri</Tag>
+              <span className="text-gray-500 ml-2">toplam</span>
             </div>
           </Card>
         </Col>
@@ -419,12 +416,36 @@ export default function Dashboard() {
       {/* Charts */}
       <Row gutter={16} className="mb-6">
         <Col xs={24} lg={16}>
-          <Card title="Satış & Alış Grafiği" loading={salesChartLoading}>
-            {salesChart && salesChart.length > 0 ? (
-              <ReactECharts 
-                option={salesChartOptions} 
-                style={{ height: '400px' }}
-              />
+          <Card title="Satış & Alış Grafiği" loading={salesReportLoading}>
+            {salesReport ? (
+              <div className="p-4">
+                <Row gutter={16}>
+                  <Col span={8}>
+                    <Statistic
+                      title="Bu Ay Satış"
+                      value={dashboardData?.sales?.thisMonth || 0}
+                      suffix={dashboardData?.sales?.currency || '₺'}
+                      valueStyle={{ color: '#1890ff' }}
+                    />
+                  </Col>
+                  <Col span={8}>
+                    <Statistic
+                      title="Bu Ay Alış"
+                      value={dashboardData?.purchases?.thisMonth || 0}
+                      suffix={dashboardData?.purchases?.currency || '₺'}
+                      valueStyle={{ color: '#ff4d4f' }}
+                    />
+                  </Col>
+                  <Col span={8}>
+                    <Statistic
+                      title="Net Kâr"
+                      value={(dashboardData?.sales?.thisMonth || 0) - (dashboardData?.purchases?.thisMonth || 0)}
+                      suffix={dashboardData?.sales?.currency || '₺'}
+                      valueStyle={{ color: '#52c41a' }}
+                    />
+                  </Col>
+                </Row>
+              </div>
             ) : (
               <Empty description="Veri bulunamadı" />
             )}
@@ -432,12 +453,32 @@ export default function Dashboard() {
         </Col>
 
         <Col xs={24} lg={8}>
-          <Card title="Ödeme Dağılımı" loading={paymentChartLoading}>
-            {paymentChart && paymentChart.length > 0 ? (
-              <ReactECharts 
-                option={paymentChartOptions} 
-                style={{ height: '400px' }}
-              />
+          <Card title="Stok Durumu" loading={stockReportLoading}>
+            {dashboardData?.stock ? (
+              <div className="p-4">
+                <Statistic
+                  title="Toplam Ürün"
+                  value={dashboardData.stock.totalProducts}
+                  suffix="adet"
+                  valueStyle={{ color: '#1890ff' }}
+                />
+                <div className="mt-4">
+                  <div className="flex justify-between mb-2">
+                    <span>Düşük Stok:</span>
+                    <Tag color="orange">{dashboardData.stock.lowStockProducts}</Tag>
+                  </div>
+                  <div className="flex justify-between mb-2">
+                    <span>Stokta Yok:</span>
+                    <Tag color="red">{dashboardData.stock.outOfStockProducts}</Tag>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Toplam Değer:</span>
+                    <span className="font-semibold">
+                      {formatCurrency(dashboardData.stock.totalStockValue, dashboardData.stock.currency)}
+                    </span>
+                  </div>
+                </div>
+              </div>
             ) : (
               <Empty description="Veri bulunamadı" />
             )}
@@ -445,67 +486,42 @@ export default function Dashboard() {
         </Col>
       </Row>
 
-      {/* Tables */}
-      <Row gutter={16} className="mb-6">
-        <Col xs={24} lg={12}>
-          <Card 
-            title="En Çok Alışveriş Yapan Müşteriler" 
-            loading={topCustomersLoading}
-          >
-            <Table
-              columns={topCustomersColumns}
-              dataSource={topCustomers || []}
-              rowKey="customerId"
-              pagination={false}
-              size="small"
-            />
-          </Card>
-        </Col>
-
-        <Col xs={24} lg={12}>
-          <Card 
-            title={
-              <div className="flex items-center">
-                <WarningOutlined className="text-orange-500 mr-2" />
-                <span>Düşük Stok Uyarıları</span>
-              </div>
-            }
-            loading={lowStockLoading}
-          >
-            {lowStock && lowStock.length > 0 ? (
-              <Table
-                columns={lowStockColumns}
-                dataSource={lowStock}
-                rowKey="productId"
-                pagination={false}
-                size="small"
-              />
-            ) : (
-              <Empty description="Düşük stok yok" />
-            )}
-          </Card>
-        </Col>
-      </Row>
-
-      {/* Recent Invoices */}
+      {/* Recent Activities */}
       <Row gutter={16}>
         <Col span={24}>
           <Card 
             title={
               <div className="flex items-center">
                 <FileTextOutlined className="mr-2" />
-                <span>Son Faturalar</span>
+                <span>Son Faaliyetler</span>
               </div>
             }
-            loading={recentInvoicesLoading}
           >
-            <Table
-              columns={recentInvoicesColumns}
-              dataSource={recentInvoices || []}
-              rowKey="id"
-              pagination={false}
-              size="small"
-            />
+            {dashboardData?.recentActivities && dashboardData.recentActivities.length > 0 ? (
+              <div className="space-y-3">
+                {dashboardData.recentActivities.map((activity, index) => (
+                  <div key={index} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full mr-3"></div>
+                      <div>
+                        <div className="font-semibold">{activity.activityType}</div>
+                        <div className="text-sm text-gray-600">{activity.description}</div>
+                        <div className="text-xs text-gray-500">
+                          {formatDate(activity.timestamp)} - {activity.referenceNumber}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-semibold">
+                        {formatCurrency(activity.amount, activity.currency)}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <Empty description="Son faaliyet bulunamadı" />
+            )}
           </Card>
         </Col>
       </Row>
