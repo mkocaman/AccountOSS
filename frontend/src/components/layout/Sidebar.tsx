@@ -10,6 +10,7 @@ import {
   SettingOutlined,
   ShoppingCartOutlined,
   BankOutlined,
+  SwapOutlined,
 } from '@ant-design/icons';
 
 const { Sider } = Layout;
@@ -33,8 +34,12 @@ const menuItems = [
     children: [
       { key: '/invoices', label: 'Fatura Listesi' },
       { key: '/invoices/create', label: 'Yeni Fatura' },
-      { key: '/invoices/gr-queue', label: 'GR Kuyruğu' },
     ],
+  },
+  {
+    key: '/gr-queue',
+    icon: <SwapOutlined />,
+    label: 'GR Kuyruğu',
   },
   {
     key: 'customers',
