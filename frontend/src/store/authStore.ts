@@ -44,7 +44,13 @@ export const useAuthStore = create<AuthState>()(
       },
 
       clearAuth: () => {
+        // Tema tercihini koru, sadece auth verilerini temizle
+        const savedTheme = localStorage.getItem('accountos-theme');
         localStorage.clear();
+        if (savedTheme) {
+          localStorage.setItem('accountos-theme', savedTheme);
+        }
+        
         set({
           user: null,
           accessToken: null,
