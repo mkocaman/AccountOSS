@@ -1,11 +1,17 @@
 import { apiClient } from './client';
-import { DashboardStatistics, DashboardFilters } from '@/types/dashboard';
+import type { DashboardStatistics } from '@/types/dashboard';
+
+export interface DashboardFilters {
+  currency?: string;
+  startDate?: string;
+  endDate?: string;
+}
 
 export const dashboardApi = {
   // Dashboard istatistiklerini getir
-  getStatistics: (filters?: DashboardFilters) =>
+  getStatistics: (currency: string = 'TRY') =>
     apiClient.get<DashboardStatistics>('/reports/dashboard', { 
-      params: filters 
+      params: { currency } 
     }),
 
   // Satış raporu
@@ -31,23 +37,16 @@ export const dashboardApi = {
     apiClient.get('/reports/purchases', { params: filters }),
 
   // Stok raporu
-  getStockReport: (filters: {
-    startDate: string;
-    endDate: string;
-    productId?: string;
-    categoryId?: string;
-    currency?: string;
-  }) =>
-    apiClient.get('/reports/stock', { params: filters }),
+  getStockReport: (currency: string = 'TRY', includeLowStockOnly: boolean = false) =>
+    apiClient.get('/reports/stock', { 
+      params: { currency, includeLowStockOnly } 
+    }),
 
   // Müşteri bakiyeleri
-  getCustomerBalances: (filters: {
-    startDate: string;
-    endDate: string;
-    customerId?: string;
-    currency?: string;
-  }) =>
-    apiClient.get('/reports/customer-balances', { params: filters }),
+  getCustomerBalances: (currency: string = 'TRY', includeAging: boolean = true) =>
+    apiClient.get('/reports/customer-balances', { 
+      params: { currency, includeAging } 
+    }),
 
   // Kar/Zarar raporu
   getProfitLossReport: (filters: {

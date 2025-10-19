@@ -28,8 +28,8 @@ import dayjs from 'dayjs';
 import * as echarts from 'echarts';
 import ReactECharts from 'echarts-for-react';
 
-import { dashboardApi } from '@/api/dashboard';
-import type { DashboardFilters, DashboardStatistics } from '@/types/dashboard';
+import { dashboardApi, DashboardFilters } from '@/api/dashboard';
+import type { DashboardStatistics } from '@/types/dashboard';
 import { formatCurrency, formatDate } from '@/lib/utils';
 
 const { RangePicker } = DatePicker;
@@ -43,8 +43,8 @@ export default function Dashboard() {
 
   // Fetch dashboard statistics
   const { data: dashboardData, isLoading: dashboardLoading, error: dashboardError } = useQuery({
-    queryKey: ['dashboardStatistics', filters],
-    queryFn: () => dashboardApi.getStatistics(filters)
+    queryKey: ['dashboardStatistics', filters.currency],
+    queryFn: () => dashboardApi.getStatistics(filters.currency || 'TRY')
   });
 
   // Fetch sales report
@@ -61,13 +61,8 @@ export default function Dashboard() {
 
   // Fetch stock report
   const { data: stockReport, isLoading: stockReportLoading } = useQuery({
-    queryKey: ['stockReport', filters],
-    queryFn: () => dashboardApi.getStockReport({
-      startDate: filters.startDate!,
-      endDate: filters.endDate!,
-      currency: filters.currency || 'TRY'
-    }),
-    enabled: !!filters.startDate && !!filters.endDate
+    queryKey: ['stockReport', filters.currency],
+    queryFn: () => dashboardApi.getStockReport(filters.currency || 'TRY', false)
   });
 
   // Sales chart options
