@@ -36,14 +36,6 @@ export const MainLayout = () => {
   // Tema değiştirici fonksiyonu
   const handleThemeChange = (newTheme: 'light' | 'dark' | 'semi-dark' | 'system') => {
     setThemeMode(newTheme);
-    
-    if (newTheme === 'system') {
-      // Sistem temasını algıla
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
-    } else {
-      document.documentElement.setAttribute('data-theme', newTheme);
-    }
   };
 
   // Menü yapısı - ProLayout formatında
@@ -219,7 +211,7 @@ export const MainLayout = () => {
   return (
     <ConfigProvider
       theme={{
-        algorithm: themeMode === 'dark' ? theme.darkAlgorithm : theme.defaultAlgorithm,
+        algorithm: (themeMode === 'dark' || themeMode === 'semi-dark') ? theme.darkAlgorithm : theme.defaultAlgorithm,
       }}
     >
       <ProLayout
