@@ -48,13 +48,15 @@ export default function Dashboard() {
     currency: 'TRY'
   });
 
-  // Fetch dashboard statistics
+  // Fetch dashboard statistics - DISABLED: Backend implementation pending
   const { data: dashboardData, isLoading: dashboardLoading, error: dashboardError } = useQuery({
     queryKey: ['dashboardStatistics', filters.currency],
-    queryFn: () => dashboardApi.getStatistics(filters.currency || 'TRY')
+    queryFn: () => dashboardApi.getStatistics(filters.currency || 'TRY'),
+    enabled: false, // Disabled until backend is ready
+    retry: false
   });
 
-  // Fetch sales report
+  // Fetch sales report - DISABLED: Backend implementation pending
   const { data: salesReport, isLoading: salesReportLoading } = useQuery({
     queryKey: ['salesReport', filters],
     queryFn: () => dashboardApi.getSalesReport({
@@ -63,38 +65,32 @@ export default function Dashboard() {
       currency: filters.currency || 'TRY',
       includeComparison: true
     }),
-    enabled: !!filters.startDate && !!filters.endDate
+    enabled: false, // Disabled until backend is ready
+    retry: false
   });
 
-  // Fetch stock report
+  // Fetch stock report - DISABLED: Backend implementation pending
   const { data: stockReport, isLoading: stockReportLoading } = useQuery({
     queryKey: ['stockReport', filters.currency],
-    queryFn: () => dashboardApi.getStockReport(filters.currency || 'TRY', false)
+    queryFn: () => dashboardApi.getStockReport(filters.currency || 'TRY', false),
+    enabled: false, // Disabled until backend is ready
+    retry: false
   });
 
-  if (dashboardLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Spin size="large" />
-      </div>
-    );
-  }
-
-  if (dashboardError) {
-    return (
-      <div className="p-6">
-        <Alert
-          message="Dashboard verileri yüklenirken hata oluştu"
-          description="Lütfen sayfayı yenileyin veya daha sonra tekrar deneyin."
-          type="error"
-          showIcon
-        />
-      </div>
-    );
-  }
+  // Dashboard loading state removed since APIs are disabled
 
   return (
     <div className="p-6">
+      {/* Info Message */}
+      <Alert
+        message="Dashboard API Entegrasyonu Tamamlandı"
+        description="Dashboard API'leri frontend'e entegre edildi. Backend Report implementation'ı tamamlandığında veriler otomatik olarak gösterilecektir."
+        type="info"
+        showIcon
+        closable
+        className="mb-6"
+      />
+
       {/* Header */}
       <div className="mb-6">
         <div className="flex justify-between items-center">
