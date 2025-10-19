@@ -16,6 +16,7 @@ export const Login = () => {
   const [loading, setLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [initialEmail, setInitialEmail] = useState('');
+  const [layout, setLayout] = useState<'center' | 'right'>('center');
   const navigate = useNavigate();
   const setAuth = useAuthStore((state) => state.setAuth);
 
@@ -64,121 +65,274 @@ export const Login = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header Section - İşbaşı Stili */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
-        <div className="max-w-md mx-auto px-6 py-8">
-          <div className="text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl mb-4">
-              <SafetyOutlined className="text-2xl text-white" />
-            </div>
-            <h1 className="text-3xl font-bold mb-2">AccountOS</h1>
-            <p className="text-blue-100 text-sm">Modern ERP & Muhasebe Sistemi</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content - Paraşüt Stili */}
-      <div className="max-w-md mx-auto px-6 py-12">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Hesabınıza Giriş Yapın</h2>
-          <p className="text-gray-600 text-sm">
-            E-posta adresiniz ve şifreniz ile hesabınıza güvenli giriş yapabilirsiniz
-          </p>
-        </div>
-
-        <Form
-          name="login"
-          onFinish={onFinish}
-          autoComplete="off"
-          layout="vertical"
-          initialValues={{ 
-            email: initialEmail,
-            rememberMe: rememberMe 
-          }}
-        >
-          <Form.Item
-            name="email"
-            label={<span className="text-gray-700 font-medium">E-posta Adresiniz</span>}
-            rules={[
-              { required: true, message: 'E-posta adresi gerekli!' },
-              { type: 'email', message: 'Geçerli bir e-posta adresi girin!' },
-            ]}
-          >
-            <Input
-              prefix={<UserOutlined className="text-gray-400" />}
-              placeholder="ornek@email.com"
-              size="large"
-              className="rounded-lg border-gray-300 hover:border-blue-400 focus:border-blue-500"
-              style={{ height: '48px' }}
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="password"
-            label={<span className="text-gray-700 font-medium">Parolanız</span>}
-            rules={[
-              { required: true, message: 'Şifre gerekli!' },
-              { min: 6, message: 'Şifre en az 6 karakter olmalı!' }
-            ]}
-          >
-            <Input.Password
-              prefix={<LockOutlined className="text-gray-400" />}
-              placeholder="Şifrenizi girin"
-              size="large"
-              className="rounded-lg border-gray-300 hover:border-blue-400 focus:border-blue-500"
-              style={{ height: '48px' }}
-              iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-            />
-          </Form.Item>
-
-          <Form.Item name="rememberMe" valuePropName="checked" className="mb-6">
-            <div className="flex items-center justify-between">
-              <Checkbox 
-                className="text-gray-600"
-                onChange={(e) => setRememberMe(e.target.checked)}
-              >
-                Beni hatırla
-              </Checkbox>
-              <a href="#" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-                Parolanızı mı unuttunuz?
-              </a>
-            </div>
-          </Form.Item>
-
-          <Form.Item className="mb-6">
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-              size="large"
-              block
-              className="h-12 rounded-lg font-semibold text-base bg-blue-600 hover:bg-blue-700 border-0 shadow-lg hover:shadow-xl transition-all duration-200"
+      {/* Layout Toggle - Development Only */}
+      <div className="fixed top-4 right-4 z-50">
+        <div className="bg-white shadow-lg rounded-lg p-2 border">
+          <div className="flex gap-2">
+            <button
+              onClick={() => setLayout('center')}
+              className={`px-3 py-1 text-xs rounded ${
+                layout === 'center' 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-gray-100 text-gray-600'
+              }`}
             >
-              {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
-            </Button>
-          </Form.Item>
-
-          <div className="text-center">
-            <p className="text-gray-600 text-sm">
-              Hesabınız yok mu?{' '}
-              <a 
-                href="/register" 
-                className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
-              >
-                Kayıt olun
-              </a>
-            </p>
+              Ortala
+            </button>
+            <button
+              onClick={() => setLayout('right')}
+              className={`px-3 py-1 text-xs rounded ${
+                layout === 'right' 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-gray-100 text-gray-600'
+              }`}
+            >
+              Sağ
+            </button>
           </div>
-        </Form>
-
-        {/* Footer */}
-        <div className="text-center mt-8">
-          <p className="text-gray-500 text-sm">
-            <GlobalOutlined className="mr-1" />
-            Güvenli giriş ile korunuyorsunuz
-          </p>
         </div>
       </div>
+
+      {layout === 'center' ? (
+        <>
+          {/* Header Section - İşbaşı Stili */}
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
+            <div className="max-w-md mx-auto px-6 py-8">
+              <div className="text-center">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl mb-4">
+                  <SafetyOutlined className="text-2xl text-white" />
+                </div>
+                <h1 className="text-3xl font-bold mb-2">AccountOS</h1>
+                <p className="text-blue-100 text-sm">Modern ERP & Muhasebe Sistemi</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Content - Paraşüt Stili */}
+          <div className="max-w-md mx-auto px-6 py-12">
+            <div className="text-center mb-8">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-2">Hesabınıza Giriş Yapın</h2>
+              <p className="text-gray-600 text-sm">
+                E-posta adresiniz ve şifreniz ile hesabınıza güvenli giriş yapabilirsiniz
+              </p>
+            </div>
+
+            <Form
+              name="login"
+              onFinish={onFinish}
+              autoComplete="off"
+              layout="vertical"
+              initialValues={{ 
+                email: initialEmail,
+                rememberMe: rememberMe 
+              }}
+            >
+              <Form.Item
+                name="email"
+                label={<span className="text-gray-700 font-medium">E-posta Adresiniz</span>}
+                rules={[
+                  { required: true, message: 'E-posta adresi gerekli!' },
+                  { type: 'email', message: 'Geçerli bir e-posta adresi girin!' },
+                ]}
+              >
+                <Input
+                  prefix={<UserOutlined className="text-gray-400" />}
+                  placeholder="ornek@email.com"
+                  size="large"
+                  className="rounded-lg border-gray-300 hover:border-blue-400 focus:border-blue-500"
+                  style={{ height: '48px' }}
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="password"
+                label={<span className="text-gray-700 font-medium">Parolanız</span>}
+                rules={[
+                  { required: true, message: 'Şifre gerekli!' },
+                  { min: 6, message: 'Şifre en az 6 karakter olmalı!' }
+                ]}
+              >
+                <Input.Password
+                  prefix={<LockOutlined className="text-gray-400" />}
+                  placeholder="Şifrenizi girin"
+                  size="large"
+                  className="rounded-lg border-gray-300 hover:border-blue-400 focus:border-blue-500"
+                  style={{ height: '48px' }}
+                  iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+                />
+              </Form.Item>
+
+              <Form.Item name="rememberMe" valuePropName="checked" className="mb-6">
+                <div className="flex items-center justify-between">
+                  <Checkbox 
+                    className="text-gray-600"
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                  >
+                    Beni hatırla
+                  </Checkbox>
+                  <a href="#" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                    Parolanızı mı unuttunuz?
+                  </a>
+                </div>
+              </Form.Item>
+
+              <Form.Item className="mb-6">
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={loading}
+                  size="large"
+                  block
+                  className="h-12 rounded-lg font-semibold text-base bg-blue-600 hover:bg-blue-700 border-0 shadow-lg hover:shadow-xl transition-all duration-200"
+                >
+                  {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
+                </Button>
+              </Form.Item>
+
+              <div className="text-center">
+                <p className="text-gray-600 text-sm">
+                  Hesabınız yok mu?{' '}
+                  <a 
+                    href="/register" 
+                    className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                  >
+                    Kayıt olun
+                  </a>
+                </p>
+              </div>
+            </Form>
+
+            {/* Footer */}
+            <div className="text-center mt-8">
+              <p className="text-gray-500 text-sm">
+                <GlobalOutlined className="mr-1" />
+                Güvenli giriş ile korunuyorsunuz
+              </p>
+            </div>
+          </div>
+        </>
+      ) : (
+        <>
+          {/* Split Screen Layout - VELMOR Stili */}
+          <div className="flex h-screen">
+            {/* Left Side - Branding */}
+            <div className="flex-1 bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center">
+              <div className="text-center text-white">
+                <div className="inline-flex items-center justify-center w-24 h-24 bg-white/20 rounded-3xl mb-6">
+                  <SafetyOutlined className="text-4xl text-white" />
+                </div>
+                <h1 className="text-5xl font-bold mb-4">AccountOS</h1>
+                <p className="text-xl text-blue-100">Modern ERP & Muhasebe Sistemi</p>
+              </div>
+            </div>
+
+            {/* Right Side - Login Form */}
+            <div className="w-96 bg-white flex items-center justify-center p-8">
+              <div className="w-full max-w-sm">
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl font-semibold text-gray-900 mb-2">Hoşgeldiniz</h2>
+                  <p className="text-gray-600 text-sm">
+                    Lütfen devam etmek için giriş yapın
+                  </p>
+                </div>
+
+                <Form
+                  name="login"
+                  onFinish={onFinish}
+                  autoComplete="off"
+                  layout="vertical"
+                  initialValues={{ 
+                    email: initialEmail,
+                    rememberMe: rememberMe 
+                  }}
+                >
+                  <Form.Item
+                    name="email"
+                    label={<span className="text-gray-700 font-medium">E-posta Adresiniz</span>}
+                    rules={[
+                      { required: true, message: 'E-posta adresi gerekli!' },
+                      { type: 'email', message: 'Geçerli bir e-posta adresi girin!' },
+                    ]}
+                  >
+                    <Input
+                      prefix={<UserOutlined className="text-gray-400" />}
+                      placeholder="ornek@email.com"
+                      size="large"
+                      className="rounded-lg border-gray-300 hover:border-blue-400 focus:border-blue-500"
+                      style={{ height: '48px' }}
+                    />
+                  </Form.Item>
+
+                  <Form.Item
+                    name="password"
+                    label={<span className="text-gray-700 font-medium">Parolanız</span>}
+                    rules={[
+                      { required: true, message: 'Şifre gerekli!' },
+                      { min: 6, message: 'Şifre en az 6 karakter olmalı!' }
+                    ]}
+                  >
+                    <Input.Password
+                      prefix={<LockOutlined className="text-gray-400" />}
+                      placeholder="Şifrenizi girin"
+                      size="large"
+                      className="rounded-lg border-gray-300 hover:border-blue-400 focus:border-blue-500"
+                      style={{ height: '48px' }}
+                      iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
+                    />
+                  </Form.Item>
+
+                  <Form.Item name="rememberMe" valuePropName="checked" className="mb-6">
+                    <div className="flex items-center justify-between">
+                      <Checkbox 
+                        className="text-gray-600"
+                        onChange={(e) => setRememberMe(e.target.checked)}
+                      >
+                        Beni hatırla
+                      </Checkbox>
+                      <a href="#" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                        Parolanızı mı unuttunuz?
+                      </a>
+                    </div>
+                  </Form.Item>
+
+                  <Form.Item className="mb-6">
+                    <Button
+                      type="primary"
+                      htmlType="submit"
+                      loading={loading}
+                      size="large"
+                      block
+                      className="h-12 rounded-lg font-semibold text-base bg-blue-600 hover:bg-blue-700 border-0 shadow-lg hover:shadow-xl transition-all duration-200"
+                    >
+                      {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
+                    </Button>
+                  </Form.Item>
+
+                  <div className="text-center">
+                    <p className="text-gray-600 text-sm">
+                      Hesabınız yok mu?{' '}
+                      <a 
+                        href="/register" 
+                        className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
+                      >
+                        Kayıt olun
+                      </a>
+                    </p>
+                  </div>
+                </Form>
+
+                {/* Footer */}
+                <div className="text-center mt-8">
+                  <p className="text-gray-500 text-sm">
+                    <GlobalOutlined className="mr-1" />
+                    Güvenli giriş ile korunuyorsunuz
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
