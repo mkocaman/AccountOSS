@@ -11,6 +11,10 @@ import { ProductForm } from '@/features/products/ProductForm';
 import { InvoiceList } from '@/features/invoices/InvoiceList';
 import { InvoiceForm } from '@/features/invoices/InvoiceForm';
 import { InvoiceDetail } from '@/features/invoices/InvoiceDetail';
+import { PaymentList } from '@/features/payments/PaymentList';
+import { PaymentForm } from '@/features/payments/PaymentForm';
+import { CashAccountList } from '@/features/payments/CashAccountList';
+import { BankAccountList } from '@/features/payments/BankAccountList';
 import { useAuthStore } from '@/store/authStore';
 
 // Protected Route komponenti
@@ -94,6 +98,35 @@ export const router = createBrowserRouter([
             element: <div className="text-2xl">GR Kuyruğu (TODO - Later)</div>,
           },
         ],
+      },
+      {
+        path: 'payments',
+        children: [
+          {
+            index: true,
+            element: <PaymentList />,
+          },
+          {
+            path: 'create',
+            element: <PaymentForm />,
+          },
+          {
+            path: 'edit/:id',
+            element: <PaymentForm />,
+          },
+          {
+            path: ':id',
+            element: <div className="text-2xl">Payment Detail (TODO)</div>,
+          },
+        ],
+      },
+      {
+        path: 'cash-accounts',
+        element: <CashAccountList />,
+      },
+      {
+        path: 'bank-accounts',
+        element: <BankAccountList />,
       },
       {
         path: 'customers',
