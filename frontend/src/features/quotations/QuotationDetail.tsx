@@ -9,7 +9,8 @@ import {
   Row,
   Col,
   Spin,
-  message
+  message,
+  Alert
 } from 'antd';
 import { 
   ArrowLeftOutlined,
@@ -104,6 +105,12 @@ export default function QuotationDetail() {
       )
     },
     {
+      title: 'Açıklama',
+      dataIndex: 'description',
+      ellipsis: true,
+      render: (desc) => desc || '-'
+    },
+    {
       title: 'Miktar',
       dataIndex: 'quantity',
       width: 120,
@@ -122,7 +129,16 @@ export default function QuotationDetail() {
       dataIndex: 'discountPercent',
       width: 100,
       align: 'right',
-      render: (percent) => `${percent || 0}%`
+      render: (percent, record) => (
+        <div>
+          <div>{percent || 0}%</div>
+          {record.discountAmount > 0 && (
+            <div className="text-xs text-red-600">
+              -{formatCurrency(record.discountAmount, quotation?.currency || 'TRY')}
+            </div>
+          )}
+        </div>
+      )
     },
     {
       title: 'KDV',
@@ -141,12 +157,6 @@ export default function QuotationDetail() {
           {formatCurrency(total, quotation?.currency || 'TRY')}
         </span>
       )
-    },
-    {
-      title: 'Açıklama',
-      dataIndex: 'description',
-      ellipsis: true,
-      render: (desc) => desc || '-'
     }
   ];
 
@@ -242,10 +252,19 @@ export default function QuotationDetail() {
                 </Button>
                 <Button
                   danger
-                  icon={<CloseOutlined />}
-                >
-                  Reddet
-                </Button>
+                icon={<CloseOutlined />}
+                onClick={() => {
+                  const reason = prompt('Red nedeni:');
+                  if (reason) {
+                    quotationsApi.reject(quotation.id, reason).then(() => {
+                      queryClient.invalidateQueries({ queryKey: ['quotation', id] });
+                      message.success('Teklif reddedildi');
+                    });
+                  }
+                }}
+              >
+                Reddet
+              </Button>
               </>
             )}
             {quotation.status === QuotationStatus.Accepted && !quotation.isConvertedToOrder && (
@@ -277,9 +296,37 @@ export default function QuotationDetail() {
         </div>
       </div>
 
+      {/* Expiry Warning */}
+      {isExpired && (
+        <Alert
+          message="Bu teklifin süresi dolmuştur"
+          description={`Geçerlilik tarihi: ${formatDate(quotation.validUntil)}`}
+          type="warning"
+          showIcon
+          className="mb-4"
+        />
+      )}
+
+      {/* Converted Info */}
+      {quotation.isConvertedToOrder && quotation.salesOrder && (
+        <Alert
+          message="Bu teklif satış siparişine dönüştürüldü"
+          description={
+            <div>
+              Sipariş No: <Button type="link" size="small" onClick={() => navigate(`/sales-orders/${quotation.salesOrderId}`)}>
+                {quotation.salesOrder.orderNumber}
+              </Button>
+            </div>
+          }
+          type="success"
+          showIcon
+          className="mb-4"
+        />
+      )}
+
       {/* Summary Cards */}
       <Row gutter={16} className="mb-6">
-        <Col xs={24} sm={12} md={6}>
+        <Col xs={24} sm={12} md={8}>
           <Card>
             <Statistic
               title="Toplam Tutar"
@@ -290,31 +337,23 @@ export default function QuotationDetail() {
             />
           </Card>
         </Col>
-        <Col xs={24} sm={12} md={6}>
+        <Col xs={24} sm={12} md={8}>
           <Card>
-            <Statistic
-              title="Ürün Sayısı"
-              value={quotation.items.length}
-            />
+            <div className="text-gray-600 mb-2">Geçerlilik Tarihi</div>
+            <div className={`text-2xl font-bold ${isExpired ? 'text-red-600' : 'text-green-600'}`}>
+              {formatDate(quotation.validUntil)}
+            </div>
+            <div className="text-sm text-gray-500 mt-1">
+              {isExpired ? 'Süresi doldu' : `${dayjs(quotation.validUntil).diff(dayjs(), 'days')} gün kaldı`}
+            </div>
           </Card>
         </Col>
-        <Col xs={24} sm={12} md={6}>
+        <Col xs={24} sm={12} md={8}>
           <Card>
-            <Statistic
-              title="Geçerlilik"
-              value={dayjs(quotation.validUntil).diff(dayjs(), 'days')}
-              suffix="gün"
-              valueStyle={{ color: isExpired ? '#ff4d4f' : '#52c41a' }}
-            />
-          </Card>
-        </Col>
-        <Col xs={24} sm={12} md={6}>
-          <Card>
-            <Statistic
-              title="Toplam Miktar"
-              value={quotation.items.reduce((sum, item) => sum + item.quantity, 0)}
-              precision={2}
-            />
+            <div className="text-gray-600 mb-2">Ürün Sayısı</div>
+            <div className="text-2xl font-bold text-purple-600">
+              {quotation.items.length}
+            </div>
           </Card>
         </Col>
       </Row>
@@ -340,12 +379,8 @@ export default function QuotationDetail() {
             <div className="text-xs text-gray-500">{quotation.customer?.code}</div>
           </Descriptions.Item>
           <Descriptions.Item label="İletişim">
-            {quotation.customer?.email && (
-              <div className="text-sm">{quotation.customer.email}</div>
-            )}
-            {quotation.customer?.phone && (
-              <div className="text-sm">{quotation.customer.phone}</div>
-            )}
+            {quotation.customer?.email && <div>📧 {quotation.customer.email}</div>}
+            {quotation.customer?.phone && <div>📞 {quotation.customer.phone}</div>}
           </Descriptions.Item>
           <Descriptions.Item label="Para Birimi">{quotation.currency}</Descriptions.Item>
           <Descriptions.Item label="Oluşturan">
@@ -375,44 +410,42 @@ export default function QuotationDetail() {
           summary={() => (
             <Table.Summary fixed>
               <Table.Summary.Row>
-                <Table.Summary.Cell index={0} colSpan={3}>
-                  <strong>TOPLAM</strong>
+                <Table.Summary.Cell index={0} colSpan={4}>
+                  <strong>ARA TOPLAM</strong>
                 </Table.Summary.Cell>
-                <Table.Summary.Cell index={3} align="right">
-                  <strong>Ara Toplam:</strong>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={4} align="right" colSpan={2}>
+                <Table.Summary.Cell index={4} align="right" colSpan={3} />
+                <Table.Summary.Cell index={7} align="right">
                   <strong>{formatCurrency(quotation.subtotal, quotation.currency)}</strong>
                 </Table.Summary.Cell>
               </Table.Summary.Row>
               <Table.Summary.Row>
-                <Table.Summary.Cell index={0} colSpan={3} />
-                <Table.Summary.Cell index={3} align="right">
-                  <strong>İskonto:</strong>
+                <Table.Summary.Cell index={0} colSpan={4}>
+                  <strong>İSKONTO</strong>
                 </Table.Summary.Cell>
-                <Table.Summary.Cell index={4} align="right" colSpan={2}>
+                <Table.Summary.Cell index={4} align="right" colSpan={3} />
+                <Table.Summary.Cell index={7} align="right">
                   <strong className="text-red-600">
                     -{formatCurrency(quotation.discountAmount, quotation.currency)}
                   </strong>
                 </Table.Summary.Cell>
               </Table.Summary.Row>
               <Table.Summary.Row>
-                <Table.Summary.Cell index={0} colSpan={3} />
-                <Table.Summary.Cell index={3} align="right">
-                  <strong>KDV:</strong>
+                <Table.Summary.Cell index={0} colSpan={4}>
+                  <strong>KDV</strong>
                 </Table.Summary.Cell>
-                <Table.Summary.Cell index={4} align="right" colSpan={2}>
+                <Table.Summary.Cell index={4} align="right" colSpan={3} />
+                <Table.Summary.Cell index={7} align="right">
                   <strong className="text-blue-600">
                     {formatCurrency(quotation.taxAmount, quotation.currency)}
                   </strong>
                 </Table.Summary.Cell>
               </Table.Summary.Row>
               <Table.Summary.Row>
-                <Table.Summary.Cell index={0} colSpan={3} />
-                <Table.Summary.Cell index={3} align="right">
-                  <strong className="text-lg">GENEL TOPLAM:</strong>
+                <Table.Summary.Cell index={0} colSpan={4}>
+                  <strong className="text-lg">GENEL TOPLAM</strong>
                 </Table.Summary.Cell>
-                <Table.Summary.Cell index={4} align="right" colSpan={2}>
+                <Table.Summary.Cell index={4} align="right" colSpan={3} />
+                <Table.Summary.Cell index={7} align="right">
                   <strong className="text-lg text-green-600">
                     {formatCurrency(quotation.totalAmount, quotation.currency)}
                   </strong>

@@ -155,6 +155,7 @@ export default function QuotationForm() {
       updateItem(key, 'productId', productId);
       updateItem(key, 'product', product);
       updateItem(key, 'unitPrice', product.salePrice || 0);
+      updateItem(key, 'description', product.name);
     }
   };
 
@@ -199,7 +200,7 @@ export default function QuotationForm() {
     {
       title: 'Ürün *',
       dataIndex: 'productId',
-      width: 250,
+      width: 200,
       render: (productId, record) => (
         <Select
           className="w-full"
@@ -212,6 +213,18 @@ export default function QuotationForm() {
             label: `${p.code} - ${p.name}`,
             value: p.id
           }))}
+        />
+      )
+    },
+    {
+      title: 'Açıklama',
+      dataIndex: 'description',
+      width: 200,
+      render: (desc, record) => (
+        <Input
+          value={desc}
+          onChange={(e) => updateItem(record.key, 'description', e.target.value)}
+          placeholder="Ürün açıklaması..."
         />
       )
     },
