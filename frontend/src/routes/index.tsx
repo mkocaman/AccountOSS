@@ -8,6 +8,8 @@ import { CustomerList } from '@/features/customers/CustomerList';
 import { CustomerForm } from '@/features/customers/CustomerForm';
 import { ProductList } from '@/features/products/ProductList';
 import { ProductForm } from '@/features/products/ProductForm';
+import { InvoiceList } from '@/features/invoices/InvoiceList';
+import { InvoiceForm } from '@/features/invoices/InvoiceForm';
 import { useAuthStore } from '@/store/authStore';
 
 // Protected Route komponenti
@@ -69,15 +71,28 @@ export const router = createBrowserRouter([
       },
       {
         path: 'invoices',
-        element: <div className="text-2xl">Fatura Listesi (TODO)</div>,
-      },
-      {
-        path: 'invoices/create',
-        element: <div className="text-2xl">Yeni Fatura (TODO)</div>,
-      },
-      {
-        path: 'invoices/gr-queue',
-        element: <div className="text-2xl">GR Kuyruğu (TODO)</div>,
+        children: [
+          {
+            index: true,
+            element: <InvoiceList />,
+          },
+          {
+            path: 'create',
+            element: <InvoiceForm />,
+          },
+          {
+            path: 'edit/:id',
+            element: <InvoiceForm />,
+          },
+          {
+            path: ':id',
+            element: <div className="text-2xl">Fatura Detay (TODO - Part 2)</div>,
+          },
+          {
+            path: 'gr-queue',
+            element: <div className="text-2xl">GR Kuyruğu (TODO - Later)</div>,
+          },
+        ],
       },
       {
         path: 'customers',
