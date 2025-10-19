@@ -13,6 +13,7 @@ import {
   SwapOutlined,
   SolutionOutlined,
   FileProtectOutlined,
+  CrownOutlined,
 } from '@ant-design/icons';
 
 const { Sider } = Layout;
@@ -115,6 +116,14 @@ const menuItems = [
             children: [
               { key: '/contracts', label: 'Sözleşmeler' },
               { key: '/power-of-attorney', label: 'Vekalet Belgeleri' },
+            ],
+          },
+          {
+            key: 'owner',
+            icon: <CrownOutlined />,
+            label: 'Owner Panel',
+            children: [
+              { key: '/owner/settings', label: 'System Settings' },
             ],
           },
   {

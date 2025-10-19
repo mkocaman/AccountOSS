@@ -36,6 +36,7 @@ import ContractList from '@/features/contracts/ContractList';
 import ContractForm from '@/features/contracts/ContractForm';
 import ContractDetail from '@/features/contracts/ContractDetail';
 import PowerOfAttorneyList from '@/features/powerOfAttorney/PowerOfAttorneyList';
+import OwnerSettingsPage from '@/features/ownerSettings/OwnerSettingsPage';
 import { useAuthStore } from '@/store/authStore';
 
 // Protected Route komponenti
@@ -264,6 +265,15 @@ export const router = createBrowserRouter([
                   {
                     index: true,
                     element: <PowerOfAttorneyList />,
+                  },
+                ],
+              },
+              {
+                path: 'owner',
+                children: [
+                  {
+                    path: 'settings',
+                    element: <OwnerSettingsPage />,
                   },
                 ],
               },
