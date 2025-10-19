@@ -11,6 +11,7 @@ import {
   ShoppingCartOutlined,
   BankOutlined,
   SwapOutlined,
+  SolutionOutlined,
 } from '@ant-design/icons';
 
 const { Sider } = Layout;
@@ -55,6 +56,15 @@ const menuItems = [
     key: '/partners',
     icon: <UserOutlined />,
     label: 'Cari Hesaplar',
+  },
+  {
+    key: 'sales',
+    icon: <SolutionOutlined />,
+    label: 'Satış',
+    children: [
+      { key: '/quotations', label: 'Teklifler' },
+      { key: '/sales-orders', label: 'Satış Siparişleri' },
+    ],
   },
   {
     key: 'products',

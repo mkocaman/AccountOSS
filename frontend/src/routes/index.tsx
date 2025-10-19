@@ -26,6 +26,9 @@ import PurchaseOrderDetail from '@/features/purchaseOrders/PurchaseOrderDetail';
 import GoodsReceiptList from '@/features/goodsReceipts/GoodsReceiptList';
 import GoodsReceiptForm from '@/features/goodsReceipts/GoodsReceiptForm';
 import GoodsReceiptDetail from '@/features/goodsReceipts/GoodsReceiptDetail';
+import QuotationList from '@/features/quotations/QuotationList';
+import QuotationForm from '@/features/quotations/QuotationForm';
+import QuotationDetail from '@/features/quotations/QuotationDetail';
 import { useAuthStore } from '@/store/authStore';
 
 // Protected Route komponenti
@@ -182,6 +185,27 @@ export const router = createBrowserRouter([
           {
             path: ':id',
             element: <div className="text-2xl">Ürün Detay (TODO)</div>,
+          },
+        ],
+      },
+      {
+        path: 'quotations',
+        children: [
+          {
+            index: true,
+            element: <QuotationList />,
+          },
+          {
+            path: 'new',
+            element: <QuotationForm />,
+          },
+          {
+            path: 'edit/:id',
+            element: <QuotationForm />,
+          },
+          {
+            path: ':id',
+            element: <QuotationDetail />,
           },
         ],
       },
