@@ -45,5 +45,9 @@ export const reportsApi = {
   
   // Export to Excel
   exportExcel: (reportType: string, params: any) =>
-    apiClient.get(`/reports/${reportType}/excel`, { params, responseType: 'blob' })
+    apiClient.get(`/reports/${reportType}/excel`, { params, responseType: 'blob' }),
+  
+  // Legacy export (for old ReportsPage.tsx)
+  exportReport: (data: { reportType: string; filters: any; format: string }) =>
+    apiClient.post('/reports/export', data, { responseType: 'blob' })
 };

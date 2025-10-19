@@ -17,6 +17,23 @@ export const reportCategoryLabels: Record<ReportCategory, string> = {
   [ReportCategory.Custom]: 'Özel Raporlar'
 };
 
+// Report Types (for old ReportsPage.tsx compatibility)
+export enum ReportType {
+  Sales = 'sales',
+  Payment = 'payment',
+  Stock = 'stock',
+  GrBalance = 'grBalance',
+  ProfitLoss = 'profitLoss'
+}
+
+export const reportTypeLabels: Record<ReportType, string> = {
+  [ReportType.Sales]: 'Satış Raporu',
+  [ReportType.Payment]: 'Ödeme Raporu',
+  [ReportType.Stock]: 'Stok Raporu',
+  [ReportType.GrBalance]: 'GR Bakiye Raporu',
+  [ReportType.ProfitLoss]: 'Kar/Zarar Raporu'
+};
+
 // Report Definitions
 export interface ReportDefinition {
   id: string;

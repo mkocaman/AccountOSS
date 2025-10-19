@@ -88,6 +88,8 @@ builder.Services.AddCors(options =>
         policy.WithOrigins(
                 "http://localhost:3000",      // Vite dev server
                 "http://localhost:3001",      // Alternative port
+                "http://localhost:3005",      // Current frontend port
+                "https://localhost:3005",     // HTTPS frontend port
                 "https://accountos.com",      // Production (future)
                 "https://www.accountos.com"   // Production www
             )

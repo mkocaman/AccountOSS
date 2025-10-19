@@ -30,7 +30,7 @@ public class FilesController : ControllerBase
     /// </summary>
     [HttpPost("upload")]
     [ProducesResponseType(typeof(Result<FileDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> UploadFile(IFormFile file, [FromForm] string? description = null, [FromForm] bool isPublic = false)
+    public async Task<IActionResult> UploadFile([FromForm] IFormFile file, [FromForm] string? description = null, [FromForm] bool isPublic = false)
     {
         using var stream = file.OpenReadStream();
         

@@ -17,7 +17,7 @@ import { PaymentForm } from '@/features/payments/PaymentForm';
 import { CashAccountList } from '@/features/payments/CashAccountList';
 import { BankAccountList } from '@/features/payments/BankAccountList';
 import { GrQueueList } from '@/features/grQueue/GrQueueList';
-// import ReportsPage from '@/features/reports/ReportsPage'; // Old - replaced with ReportsDashboard
+import ReportsPage from '@/features/reports/ReportsPage';
 import SettingsPage from '@/features/settings/SettingsPage';
 import StockMovementList from '@/features/stockMovements/StockMovementList';
 import PurchaseOrderList from '@/features/purchaseOrders/PurchaseOrderList';
@@ -165,7 +165,10 @@ export const router = createBrowserRouter([
         path: 'gr-queue',
         element: <GrQueueList />,
       },
-      // Old reports route removed - now using /reports children routes with ReportsDashboard
+      {
+        path: 'reports',
+        element: <ReportsPage />,
+      },
       {
         path: 'settings',
         element: <SettingsPage />,
