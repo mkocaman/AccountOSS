@@ -32,6 +32,10 @@ import QuotationDetail from '@/features/quotations/QuotationDetail';
 import SalesOrderList from '@/features/salesOrders/SalesOrderList';
 import SalesOrderForm from '@/features/salesOrders/SalesOrderForm';
 import SalesOrderDetail from '@/features/salesOrders/SalesOrderDetail';
+import ContractList from '@/features/contracts/ContractList';
+import ContractForm from '@/features/contracts/ContractForm';
+import ContractDetail from '@/features/contracts/ContractDetail';
+import PowerOfAttorneyList from '@/features/powerOfAttorney/PowerOfAttorneyList';
 import { useAuthStore } from '@/store/authStore';
 
 // Protected Route komponenti
@@ -230,6 +234,36 @@ export const router = createBrowserRouter([
                   {
                     path: ':id',
                     element: <SalesOrderDetail />,
+                  },
+                ],
+              },
+              {
+                path: 'contracts',
+                children: [
+                  {
+                    index: true,
+                    element: <ContractList />,
+                  },
+                  {
+                    path: 'new',
+                    element: <ContractForm />,
+                  },
+                  {
+                    path: 'edit/:id',
+                    element: <ContractForm />,
+                  },
+                  {
+                    path: ':id',
+                    element: <ContractDetail />,
+                  },
+                ],
+              },
+              {
+                path: 'power-of-attorney',
+                children: [
+                  {
+                    index: true,
+                    element: <PowerOfAttorneyList />,
                   },
                 ],
               },

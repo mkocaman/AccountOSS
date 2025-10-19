@@ -12,6 +12,7 @@ import {
   BankOutlined,
   SwapOutlined,
   SolutionOutlined,
+  FileProtectOutlined,
 } from '@ant-design/icons';
 
 const { Sider } = Layout;
@@ -96,17 +97,26 @@ const menuItems = [
       { key: '/expenses', label: 'Masraflar' },
     ],
   },
-  {
-    key: 'accounting',
-    icon: <BankOutlined />,
-    label: 'Muhasebe',
-    children: [
-      { key: '/chart-of-accounts', label: 'Hesap Planı' },
-      { key: '/journal-entries', label: 'Yevmiye' },
-      { key: '/trial-balance', label: 'Mizan' },
-      { key: '/tax-rates', label: 'Vergi Oranları' },
-    ],
-  },
+          {
+            key: 'accounting',
+            icon: <BankOutlined />,
+            label: 'Muhasebe',
+            children: [
+              { key: '/chart-of-accounts', label: 'Hesap Planı' },
+              { key: '/journal-entries', label: 'Yevmiye' },
+              { key: '/trial-balance', label: 'Mizan' },
+              { key: '/tax-rates', label: 'Vergi Oranları' },
+            ],
+          },
+          {
+            key: 'uzbekistan',
+            icon: <FileProtectOutlined />,
+            label: 'Özbekistan',
+            children: [
+              { key: '/contracts', label: 'Sözleşmeler' },
+              { key: '/power-of-attorney', label: 'Vekalet Belgeleri' },
+            ],
+          },
   {
     key: 'reports',
     icon: <BarChartOutlined />,
