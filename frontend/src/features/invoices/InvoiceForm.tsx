@@ -87,14 +87,17 @@ export const InvoiceForm = () => {
     if (partner) {
       setSelectedPartner(partner);
       const newCurrency = partner.currency;
-      form.setFieldValue('currency', newCurrency);
       setCurrency(newCurrency);
 
       const invoiceDate = form.getFieldValue('invoiceDate');
+      const updates: any = { currency: newCurrency };
+      
       if (invoiceDate && partner.paymentTermDays) {
         const dueDate = invoiceDate.add(partner.paymentTermDays, 'day');
-        form.setFieldValue('dueDate', dueDate);
+        updates.dueDate = dueDate;
       }
+
+      form.setFieldsValue(updates);
     }
   };
 
