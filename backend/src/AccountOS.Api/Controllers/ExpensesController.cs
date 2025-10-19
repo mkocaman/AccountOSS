@@ -17,6 +17,7 @@ namespace AccountOS.Api.Controllers;
 /// Gider yönetimi
 /// </summary>
 [Authorize]
+[Route("api/v1/expenses")]
 public class ExpensesController : BaseApiController
 {
     /// <summary>
@@ -121,6 +122,23 @@ public class ExpensesController : BaseApiController
     }
 
     /// <summary>
+    /// Gideri onaya gönder
+    /// </summary>
+    [HttpPost("{id}/submit-for-approval")]
+    [ProducesResponseType(typeof(Application.Common.Result<Application.Expenses.Common.ExpenseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> SubmitForApproval(Guid id)
+    {
+        var expense = await Mediator.Send(new GetExpenseByIdQuery(id));
+        if (!expense.Success || expense.Data == null)
+            return NotFound(expense);
+
+        // TODO: Burada onay sürecini başlat
+        // Şimdilik sadece expense'i geri dön
+        return Ok(expense);
+    }
+
+    /// <summary>
     /// Gider onayla
     /// </summary>
     [HttpPost("{id}/approve")]
@@ -172,6 +190,55 @@ public class ExpensesController : BaseApiController
             return BadRequest(result);
 
         return Ok(result);
+    }
+
+    /// <summary>
+    /// Gider ödemesi kaydet
+    /// </summary>
+    [HttpPost("{id}/record-payment")]
+    [ProducesResponseType(typeof(Application.Common.Result<Application.Expenses.Common.ExpenseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> RecordPayment(Guid id, [FromBody] MarkExpenseAsPaidCommand command)
+    {
+        if (id != command.ExpenseId)
+            return BadRequest("ID mismatch");
+
+        var result = await Mediator.Send(command);
+
+        if (!result.Success)
+            return BadRequest(Application.Common.Result<Application.Expenses.Common.ExpenseDto>.Fail(result.Error));
+
+        // Güncel expense'i getir
+        var expense = await Mediator.Send(new GetExpenseByIdQuery(id));
+        return Ok(expense);
+    }
+
+    /// <summary>
+    /// Gidere dosya ekle
+    /// </summary>
+    [HttpPost("{id}/attachments")]
+    [ProducesResponseType(typeof(Application.Common.Result<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> UploadAttachment(Guid id, IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+            return BadRequest("Dosya seçilmedi");
+
+        // TODO: Dosya yükleme mantığı implement edilecek
+        // Şimdilik basit bir response dön
+        return Ok(Application.Common.Result<object>.SuccessResult(new { message = "Dosya yükleme henüz implement edilmedi" }));
+    }
+
+    /// <summary>
+    /// Giderden dosya sil
+    /// </summary>
+    [HttpDelete("{id}/attachments/{attachmentId}")]
+    [ProducesResponseType(typeof(Application.Common.Result<bool>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> DeleteAttachment(Guid id, Guid attachmentId)
+    {
+        // TODO: Dosya silme mantığı implement edilecek
+        return Ok(Application.Common.Result<bool>.SuccessResult(true));
     }
 }
 

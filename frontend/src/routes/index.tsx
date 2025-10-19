@@ -1,15 +1,24 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { Login } from '@/features/auth/Login';
+import { Register } from '@/features/auth/Register';
+import { ForgotPassword } from '@/features/auth/ForgotPassword';
 import Dashboard from '@/features/dashboard/Dashboard';
-import { MainLayout } from '@/components/layout/MainLayout';
+import { ProMainLayout } from '@/layouts/ProMainLayout';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { Error403 } from '@/pages/errors/403';
+import { Error404 } from '@/pages/errors/404';
+import NotFoundPage from '@/pages/404';
+import ForbiddenPage from '@/pages/403';
+import ServerErrorPage from '@/pages/500';
 import { CompanyList } from '@/features/companies/CompanyList';
 import { CompanyForm } from '@/features/companies/CompanyForm';
 import CategoryList from '@/features/categories/CategoryList';
 import PartnerList from '@/features/partners/PartnerList';
 import PartnerDetail from '@/features/partners/PartnerDetail';
-import { ProductList } from '@/features/products/ProductList';
+import ProductList from '@/features/products/ProductList';
 import { ProductForm } from '@/features/products/ProductForm';
-import { InvoiceList } from '@/features/invoices/InvoiceList';
+import ProductCategoryList from '@/features/products/CategoryList';
+import InvoiceList from '@/features/invoices/InvoiceList';
 import { InvoiceForm } from '@/features/invoices/InvoiceForm';
 import { InvoiceDetail } from '@/features/invoices/InvoiceDetail';
 import { PaymentList } from '@/features/payments/PaymentList';
@@ -52,18 +61,8 @@ import IncomeStatementReport from '@/features/reports/IncomeStatementReport';
 import SalesReport from '@/features/reports/SalesReport';
 import InventoryReport from '@/features/reports/InventoryReport';
 import AgingReport from '@/features/reports/AgingReport';
-import { useAuthStore } from '@/store/authStore';
 
-// Protected Route komponenti
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return <>{children}</>;
-};
+// Protected Route komponenti - useAuth hook'u kullanıyor
 
 // Router yapılandırması
 export const router = createBrowserRouter([
@@ -74,17 +73,21 @@ export const router = createBrowserRouter([
   },
   {
     path: '/register',
-    element: <div>Register Page (TODO)</div>,
+    element: <Register />,
+  },
+  {
+    path: '/forgot-password',
+    element: <ForgotPassword />,
   },
 
   // Protected routes (Layout içinde)
-  {
-    path: '/',
-    element: (
-      <ProtectedRoute>
-        <MainLayout />
-      </ProtectedRoute>
-    ),
+          {
+            path: '/',
+            element: (
+              <ProtectedRoute>
+                <ProMainLayout />
+              </ProtectedRoute>
+            ),
     children: [
       {
         index: true,
@@ -204,6 +207,10 @@ export const router = createBrowserRouter([
           {
             path: 'edit/:id',
             element: <ProductForm />,
+          },
+          {
+            path: 'categories',
+            element: <ProductCategoryList />,
           },
           {
             path: ':id',
@@ -500,10 +507,24 @@ export const router = createBrowserRouter([
     ],
   },
 
-  // 404
+  // Error pages
+  {
+    path: '/404',
+    element: <Error404 />,
+  },
+  {
+    path: '/403',
+    element: <Error403 />,
+  },
+  {
+    path: '/500',
+    element: <ServerErrorPage />,
+  },
+  
+  // 404 fallback
   {
     path: '*',
-    element: <div className="text-2xl p-8">404 - Sayfa bulunamadı</div>,
+    element: <NotFoundPage />,
   },
 ]);
 

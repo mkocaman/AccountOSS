@@ -20,6 +20,7 @@ import {
   DollarOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { paymentsApi, type PaymentListParams } from '@/api/payments';
 import type { Payment } from '@/types/payment';
@@ -39,6 +40,7 @@ const { RangePicker } = DatePicker;
 
 // Ödeme listesi sayfası
 export const PaymentList = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(false);
@@ -234,21 +236,21 @@ export const PaymentList = () => {
       {/* Başlık */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Ödemeler</h1>
-          <p className="text-gray-500">Tahsilat ve ödeme kayıtları</p>
+          <h1 className="text-2xl font-bold">{t('payments.title')}</h1>
+          <p className="text-gray-500">{t('payments.subtitle')}</p>
         </div>
         <Space>
           <Button
             icon={<DollarOutlined />}
             onClick={() => navigate('/cash-accounts')}
           >
-            Kasa Hesapları
+            {t('menu.cashAccounts')}
           </Button>
           <Button
             icon={<DollarOutlined />}
             onClick={() => navigate('/bank-accounts')}
           >
-            Banka Hesapları
+            {t('menu.bankAccounts')}
           </Button>
           <Button
             type="primary"
@@ -256,7 +258,7 @@ export const PaymentList = () => {
             onClick={() => navigate('/payments/create')}
             size="large"
           >
-            Yeni Ödeme
+            {t('payments.newPayment')}
           </Button>
         </Space>
       </div>
@@ -266,14 +268,14 @@ export const PaymentList = () => {
         <SearchBar
           onSearch={handleSearch}
           onRefresh={loadPayments}
-          placeholder="Ödeme no, müşteri adı..."
+          placeholder={t('payments.searchPlaceholder')}
         />
 
         <Row gutter={16} className="mt-4">
           <Col span={6}>
             <RangePicker
               style={{ width: '100%' }}
-              placeholder={['Başlangıç', 'Bitiş']}
+              placeholder={[t('payments.startDate'), t('payments.endDate')]}
               onChange={(dates) => {
                 setParams({
                   ...params,
@@ -287,21 +289,21 @@ export const PaymentList = () => {
 
           <Col span={4}>
             <Select
-              placeholder="Tür"
+              placeholder={t('payments.type')}
               style={{ width: '100%' }}
               allowClear
               onChange={(value) =>
                 setParams({ ...params, type: value, pageNumber: 1 })
               }
             >
-              <Select.Option value={PaymentType.Receipt}>Tahsilat</Select.Option>
-              <Select.Option value={PaymentType.Payment}>Ödeme</Select.Option>
+              <Select.Option value={PaymentType.Receipt}>{t('payments.receipt')}</Select.Option>
+              <Select.Option value={PaymentType.Payment}>{t('payments.payment')}</Select.Option>
             </Select>
           </Col>
 
           <Col span={5}>
             <Select
-              placeholder="Yöntem"
+              placeholder={t('payments.method')}
               style={{ width: '100%' }}
               allowClear
               onChange={(value) =>
@@ -324,7 +326,7 @@ export const PaymentList = () => {
 
           <Col span={4}>
             <Select
-              placeholder="Durum"
+              placeholder={t('payments.status')}
               style={{ width: '100%' }}
               allowClear
               onChange={(value) =>

@@ -2,12 +2,22 @@ import dayjs from 'dayjs';
 
 // Currency formatting
 export const formatCurrency = (amount: number, currency: string = 'TRY'): string => {
-  return new Intl.NumberFormat('tr-TR', {
-    style: 'currency',
-    currency: currency,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(amount);
+  // Handle Turkish Lira symbol
+  if (currency === '₺' || currency === 'TL') {
+    currency = 'TRY';
+  }
+  
+  try {
+    return new Intl.NumberFormat('tr-TR', {
+      style: 'currency',
+      currency: currency,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  } catch (error) {
+    // Fallback for invalid currency codes
+    return `${amount.toFixed(2)} ${currency}`;
+  }
 };
 
 // Date formatting

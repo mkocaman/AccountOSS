@@ -1,0 +1,232 @@
+/**
+ * Ant Design Pro Components için global stiller
+ */
+
+/* ProTable özelleştirmeleri */
+.ant-pro-table {
+  /* Tablo başlığı */
+  .ant-pro-table-list-toolbar-title {
+    font-weight: 600;
+    font-size: 16px;
+  }
+
+  /* Arama formu */
+  .ant-pro-table-search {
+    margin-bottom: 16px;
+    padding: 16px;
+    background: #fafafa;
+    border-radius: 6px;
+  }
+
+  /* Toolbar butonları */
+  .ant-pro-table-list-toolbar-right {
+    gap: 8px;
+  }
+
+  /* Seçili satır uyarısı */
+  .ant-pro-table-alert {
+    margin-bottom: 16px;
+  }
+}
+
+/* ProCard özelleştirmeleri */
+.ant-pro-card {
+  margin-bottom: 16px;
+
+  /* Kart başlığı */
+  .ant-pro-card-header-title {
+    font-weight: 600;
+  }
+
+  /* Collapsible kart */
+  &.ant-pro-card-collapsible {
+    .ant-pro-card-collapsible-icon {
+      font-size: 16px;
+    }
+  }
+
+  /* Bordered kart */
+  &.ant-pro-card-bordered {
+    border: 1px solid #f0f0f0;
+  }
+}
+
+/* ProForm özelleştirmeleri */
+.ant-pro-form {
+  /* Form başlığı */
+  .ant-pro-form-group-title {
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+
+  /* Form item'ları */
+  .ant-pro-form-item {
+    margin-bottom: 16px;
+  }
+
+  /* Form submitter */
+  .ant-pro-form-submitter {
+    margin-top: 24px;
+  }
+}
+
+/* ProDescriptions özelleştirmeleri */
+.ant-pro-descriptions {
+  /* Başlık */
+  .ant-pro-descriptions-title {
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+
+  /* Item label */
+  .ant-pro-descriptions-item-label {
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.65);
+  }
+
+  /* Item content */
+  .ant-pro-descriptions-item-content {
+    color: rgba(0, 0, 0, 0.85);
+  }
+}
+
+/* ProLayout özelleştirmeleri */
+.ant-pro-layout {
+  /* Sidebar */
+  .ant-pro-sider {
+    box-shadow: 2px 0 8px 0 rgba(29, 35, 41, 0.05);
+  }
+
+  /* Header */
+  .ant-pro-global-header {
+    box-shadow: 0 2px 8px 0 rgba(29, 35, 41, 0.05);
+  }
+
+  /* Content */
+  .ant-pro-page-container {
+    margin: 16px;
+
+    @media (max-width: 768px) {
+      margin: 8px;
+    }
+  }
+}
+
+/* PageContainer özelleştirmeleri */
+.ant-pro-page-container-children-content {
+  margin-top: 16px;
+}
+
+/* StatisticCard özelleştirmeleri */
+.ant-statistic-card {
+  .ant-statistic-content {
+    font-size: 24px;
+    font-weight: 600;
+  }
+
+  .ant-statistic-title {
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.65);
+    margin-bottom: 8px;
+  }
+}
+
+/* ProList özelleştirmeleri */
+.ant-pro-list {
+  .ant-pro-list-row {
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .ant-pro-list-row-avatar {
+    margin-right: 16px;
+  }
+}
+
+/* QueryFilter özelleştirmeleri */
+.ant-pro-query-filter {
+  background: #fafafa;
+  padding: 16px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+
+  /* Collapse button */
+  .ant-pro-query-filter-collapse-button {
+    margin-top: 8px;
+  }
+}
+
+/* ModalForm özelleştirmeleri */
+.ant-pro-modal-form {
+  .ant-modal-body {
+    padding: 24px;
+  }
+
+  .ant-pro-form-item {
+    margin-bottom: 16px;
+  }
+}
+
+/* Responsive ayarları */
+@media (max-width: 768px) {
+  .ant-pro-table {
+    .ant-pro-table-search {
+      padding: 12px;
+    }
+  }
+
+  .ant-pro-card {
+    margin-bottom: 12px;
+  }
+
+  .ant-pro-page-container {
+    margin: 8px;
+  }
+
+  .ant-pro-descriptions {
+    /* Mobilde tek kolon */
+    .ant-pro-descriptions-row {
+      display: block;
+    }
+  }
+}
+
+/* Dark mode desteği */
+[data-theme='dark'] {
+  .ant-pro-table-search {
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .ant-pro-query-filter {
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .ant-pro-card-bordered {
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+}
+
+/* Print stili */
+@media print {
+  .ant-pro-layout {
+    .ant-pro-sider,
+    .ant-pro-global-header {
+      display: none !important;
+    }
+  }
+
+  .ant-pro-page-container {
+    margin: 0 !important;
+  }
+
+  .ant-pro-table-list-toolbar,
+  .ant-pro-table-search {
+    display: none !important;
+  }
+}

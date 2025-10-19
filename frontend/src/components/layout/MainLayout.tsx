@@ -21,8 +21,9 @@ import {
 } from '@ant-design/icons';
 import { useAuthStore } from '@/store/authStore';
 import { useCompanyStore } from '@/store/companyStore';
-import { Dropdown, Space, Avatar, Select, Switch, Button, ConfigProvider, theme } from 'antd';
-import { GlobalOutlined, SunOutlined, MoonOutlined, DesktopOutlined } from '@ant-design/icons';
+import { Dropdown, Space, Avatar, Select, ConfigProvider, theme } from 'antd';
+import { SunOutlined, MoonOutlined, DesktopOutlined } from '@ant-design/icons';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
 
 // Ana layout bileşeni - Ant Design Pro Layout ile
 export const MainLayout = () => {
@@ -265,17 +266,7 @@ export const MainLayout = () => {
       }}
       actionsRender={() => [
         // Dil Değiştirici
-        <Select
-          key="language"
-          defaultValue="tr"
-          style={{ width: 120 }}
-          size="small"
-          suffixIcon={<GlobalOutlined />}
-          options={[
-            { value: 'tr', label: '🇹🇷 Türkçe' },
-            { value: 'en', label: '🇺🇸 English' },
-          ]}
-        />,
+        <LanguageSwitcher key="language" />,
         
         // Tema Değiştirici
         <Select

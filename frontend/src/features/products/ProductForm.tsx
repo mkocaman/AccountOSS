@@ -1,360 +1,212 @@
-import { useEffect, useState } from 'react';
-import {
-  Form,
-  Input,
-  Button,
-  Card,
-  Select,
-  InputNumber,
-  Switch,
-  message,
-  Spin,
-  Tabs,
-  Row,
-  Col,
-} from 'antd';
+import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
-import { productsApi, categoriesApi } from '@/api/products';
-import type { CreateProductRequest, Category } from '@/types/product';
-import { ProductType, UNIT_OPTIONS, VAT_RATES } from '@/types/product';
+import { PageContainer, ProForm, ProFormText, ProFormTextArea, ProFormSelect, ProFormDigit, ProFormSwitch } from '@ant-design/pro-components';
+import { Card, message } from 'antd';
+import { useCreateProduct, useUpdateProduct } from '@/hooks/useProducts';
+import { useCategories } from '@/hooks/useCategories';
+import type { Product, ProductCategory } from '@/types/product';
 
-export const ProductForm = () => {
-  const [form] = Form.useForm();
+/**
+ * Ürün oluşturma/düzenleme formu - ProForm ile
+ */
+export const ProductForm: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams();
-  const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [productType, setProductType] = useState<ProductType>(ProductType.Goods);
+  const isEdit = !!id;
 
-  const isEditMode = !!id;
+  // Hooks
+  const createProduct = useCreateProduct();
+  const updateProduct = useUpdateProduct();
+  const { data: categories } = useCategories();
 
-  useEffect(() => {
-    loadCategories();
-    if (isEditMode) {
-      loadProduct();
-    }
-  }, [id]);
-
-  const loadCategories = async () => {
+  /**
+   * Form submit handler
+   */
+  const handleSubmit = async (values: any) => {
     try {
-      const response = await categoriesApi.getAll();
-      if (response.success) {
-        setCategories(response.data);
-      }
-    } catch (error) {
-      console.error('Kategoriler yüklenemedi');
-    }
-  };
-
-  const loadProduct = async () => {
-    setLoading(true);
-    try {
-      const response = await productsApi.getById(id!);
-      if (response.success) {
-        form.setFieldsValue(response.data);
-        setProductType(response.data.type);
-      }
-    } catch (error) {
-      message.error('Ürün bilgileri yüklenemedi');
-      navigate('/products');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSubmit = async (values: CreateProductRequest) => {
-    setSaving(true);
-    try {
-      if (isEditMode) {
-        await productsApi.update(id!, values);
-        message.success('Ürün güncellendi');
+      if (isEdit) {
+        await updateProduct.mutateAsync({ id: id!, ...values });
       } else {
-        await productsApi.create(values);
-        message.success('Ürün oluşturuldu');
+        await createProduct.mutateAsync(values);
       }
-      navigate('/products');
-    } catch (error: any) {
-      message.error(
-        error.response?.data?.message ||
-          (isEditMode ? 'Ürün güncellenemedi' : 'Ürün oluşturulamadı')
-      );
-    } finally {
-      setSaving(false);
+      navigate('/products/list');
+    } catch (error) {
+      // Error handling hooks'ta yapılıyor
     }
   };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <Spin size="large" />
-      </div>
-    );
-  }
 
   return (
-    <div>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">
-          {isEditMode ? 'Ürün Düzenle' : 'Yeni Ürün'}
-        </h1>
-        <p className="text-gray-500">
-          {isEditMode ? 'Ürün bilgilerini güncelleyin' : 'Yeni ürün bilgilerini girin'}
-        </p>
-      </div>
-
+    <PageContainer
+      header={{
+        title: isEdit ? t('products.editProduct') : t('products.createProduct'),
+        onBack: () => navigate('/products/list')
+      }}
+    >
       <Card>
-        <Form
-          form={form}
-          layout="vertical"
+        <ProForm
           onFinish={handleSubmit}
-          autoComplete="off"
-          initialValues={{
-            type: ProductType.Goods,
-            currency: 'TRY',
-            vatRate: 20,
-            unit: 'Adet',
-            trackStock: true,
-            isForSale: true,
-            isForPurchase: true,
-            minStockLevel: 0,
-            purchasePrice: 0,
-            salePrice: 0,
+          submitter={{
+            searchConfig: {
+              submitText: t('common.save'),
+              resetText: t('common.cancel')
+            }
           }}
         >
-          <Tabs
-            items={[
-              {
-                key: 'general',
-                label: 'Genel Bilgiler',
-                children: (
-                  <Row gutter={16}>
-                    <Col span={12}>
-                      <Form.Item
-                        name="name"
-                        label="Ürün Adı"
-                        rules={[{ required: true, message: 'Ürün adı gerekli!' }]}
-                      >
-                        <Input placeholder="Örn: Laptop Dell XPS 15" size="large" />
-                      </Form.Item>
-                    </Col>
+          <ProForm.Group>
+            <ProFormText
+              name="code"
+              label={t('products.form.code')}
+              placeholder={t('products.form.codePlaceholder')}
+              rules={[
+                { required: true, message: t('products.form.codeRequired') }
+              ]}
+              width="md"
+            />
 
-                    <Col span={12}>
-                      <Form.Item name="barcode" label="Barkod">
-                        <Input placeholder="1234567890123" size="large" />
-                      </Form.Item>
-                    </Col>
+            <ProFormText
+              name="name"
+              label={t('products.form.name')}
+              placeholder={t('products.form.namePlaceholder')}
+              rules={[
+                { required: true, message: t('products.form.nameRequired') }
+              ]}
+              width="md"
+            />
+          </ProForm.Group>
 
-                    <Col span={12}>
-                      <Form.Item
-                        name="type"
-                        label="Ürün Türü"
-                        rules={[{ required: true, message: 'Ürün türü gerekli!' }]}
-                      >
-                        <Select
-                          size="large"
-                          onChange={(value) => setProductType(value)}
-                        >
-                          <Select.Option value={ProductType.Goods}>
-                            📦 Mal (Stok Takipli)
-                          </Select.Option>
-                          <Select.Option value={ProductType.Service}>
-                            ⚙️ Hizmet (Stok Takipsiz)
-                          </Select.Option>
-                        </Select>
-                      </Form.Item>
-                    </Col>
-
-                    <Col span={12}>
-                      <Form.Item name="categoryId" label="Kategori">
-                        <Select
-                          size="large"
-                          placeholder="Kategori seçin"
-                          allowClear
-                        >
-                          {categories.map((cat) => (
-                            <Select.Option key={cat.id} value={cat.id}>
-                              {cat.name}
-                            </Select.Option>
-                          ))}
-                        </Select>
-                      </Form.Item>
-                    </Col>
-
-                    <Col span={24}>
-                      <Form.Item name="description" label="Açıklama">
-                        <Input.TextArea 
-                          rows={3} 
-                          size="large"
-                          placeholder="Ürün açıklaması..."
-                        />
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                ),
-              },
-              {
-                key: 'pricing',
-                label: 'Fiyatlandırma',
-                children: (
-                  <Row gutter={16}>
-                    <Col span={8}>
-                      <Form.Item
-                        name="purchasePrice"
-                        label="Alış Fiyatı"
-                        rules={[{ required: true, message: 'Alış fiyatı gerekli!' }]}
-                      >
-                        <InputNumber
-                          min={0}
-                          style={{ width: '100%' }}
-                          size="large"
-                          placeholder="0.00"
-                          precision={2}
-                        />
-                      </Form.Item>
-                    </Col>
-
-                    <Col span={8}>
-                      <Form.Item
-                        name="salePrice"
-                        label="Satış Fiyatı"
-                        rules={[{ required: true, message: 'Satış fiyatı gerekli!' }]}
-                      >
-                        <InputNumber
-                          min={0}
-                          style={{ width: '100%' }}
-                          size="large"
-                          placeholder="0.00"
-                          precision={2}
-                        />
-                      </Form.Item>
-                    </Col>
-
-                    <Col span={8}>
-                      <Form.Item
-                        name="currency"
-                        label="Para Birimi"
-                        rules={[{ required: true, message: 'Para birimi gerekli!' }]}
-                      >
-                        <Select size="large">
-                          <Select.Option value="TRY">🇹🇷 TRY</Select.Option>
-                          <Select.Option value="USD">🇺🇸 USD</Select.Option>
-                          <Select.Option value="EUR">🇪🇺 EUR</Select.Option>
-                          <Select.Option value="GBP">🇬🇧 GBP</Select.Option>
-                        </Select>
-                      </Form.Item>
-                    </Col>
-
-                    <Col span={12}>
-                      <Form.Item
-                        name="vatRate"
-                        label="KDV Oranı"
-                        rules={[{ required: true, message: 'KDV oranı gerekli!' }]}
-                      >
-                        <Select size="large">
-                          {VAT_RATES.map((rate) => (
-                            <Select.Option key={rate.value} value={rate.value}>
-                              {rate.label}
-                            </Select.Option>
-                          ))}
-                        </Select>
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                ),
-              },
-              {
-                key: 'stock',
-                label: 'Stok Bilgileri',
-                children: (
-                  <Row gutter={16}>
-                    <Col span={12}>
-                      <Form.Item
-                        name="unit"
-                        label="Birim"
-                        rules={[{ required: true, message: 'Birim gerekli!' }]}
-                      >
-                        <Select size="large">
-                          {UNIT_OPTIONS.map((unit) => (
-                            <Select.Option key={unit.value} value={unit.value}>
-                              {unit.label}
-                            </Select.Option>
-                          ))}
-                        </Select>
-                      </Form.Item>
-                    </Col>
-
-                    <Col span={12}>
-                      <Form.Item name="minStockLevel" label="Minimum Stok Seviyesi">
-                        <InputNumber
-                          min={0}
-                          style={{ width: '100%' }}
-                          size="large"
-                          placeholder="Uyarı için minimum değer"
-                        />
-                      </Form.Item>
-                    </Col>
-
-                    {productType === ProductType.Goods && (
-                      <Col span={24}>
-                        <Form.Item
-                          name="trackStock"
-                          label="Stok Takibi"
-                          valuePropName="checked"
-                        >
-                          <Switch
-                            checkedChildren="Açık"
-                            unCheckedChildren="Kapalı"
-                          />
-                        </Form.Item>
-                        <p className="text-sm text-gray-500 mt-2">
-                          Stok takibi açık olduğunda, her alım ve satımda otomatik olarak stok güncellenir.
-                        </p>
-                      </Col>
-                    )}
-
-                    <Col span={12}>
-                      <Form.Item
-                        name="isForSale"
-                        label="Satışa Açık"
-                        valuePropName="checked"
-                      >
-                        <Switch />
-                      </Form.Item>
-                      <p className="text-sm text-gray-500">
-                        Bu ürün satış faturalarında kullanılabilir.
-                      </p>
-                    </Col>
-
-                    <Col span={12}>
-                      <Form.Item
-                        name="isForPurchase"
-                        label="Satın Alınabilir"
-                        valuePropName="checked"
-                      >
-                        <Switch />
-                      </Form.Item>
-                      <p className="text-sm text-gray-500">
-                        Bu ürün alış faturalarında kullanılabilir.
-                      </p>
-                    </Col>
-                  </Row>
-                ),
-              },
-            ]}
+          <ProFormTextArea
+            name="description"
+            label={t('products.form.description')}
+            placeholder={t('products.form.descriptionPlaceholder')}
+            width="xl"
           />
 
-          <div className="mt-6 flex gap-4">
-            <Button type="primary" htmlType="submit" loading={saving} size="large">
-              {isEditMode ? 'Güncelle' : 'Oluştur'}
-            </Button>
-            <Button size="large" onClick={() => navigate('/products')}>
-              İptal
-            </Button>
-          </div>
-        </Form>
+          <ProForm.Group>
+            <ProFormText
+              name="barcode"
+              label={t('products.form.barcode')}
+              placeholder={t('products.form.barcodePlaceholder')}
+              width="md"
+            />
+
+            <ProFormSelect
+              name="unit"
+              label={t('products.form.unit')}
+              placeholder={t('products.form.unitPlaceholder')}
+              rules={[
+                { required: true, message: t('products.form.unitRequired') }
+              ]}
+              options={[
+                { label: t('products.units.piece'), value: 'Adet' },
+                { label: t('products.units.kg'), value: 'Kg' },
+                { label: t('products.units.liter'), value: 'Litre' },
+                { label: t('products.units.meter'), value: 'Metre' },
+                { label: t('products.units.box'), value: 'Kutu' }
+              ]}
+              width="md"
+            />
+          </ProForm.Group>
+
+          <ProForm.Group>
+            <ProFormDigit
+              name="purchasePrice"
+              label={t('products.form.purchasePrice')}
+              placeholder={t('products.form.purchasePricePlaceholder')}
+              rules={[
+                { required: true, message: t('products.form.purchasePriceRequired') }
+              ]}
+              fieldProps={{
+                precision: 2,
+                prefix: '₺'
+              }}
+              width="md"
+            />
+
+            <ProFormDigit
+              name="salePrice"
+              label={t('products.form.salePrice')}
+              placeholder={t('products.form.salePricePlaceholder')}
+              rules={[
+                { required: true, message: t('products.form.salePriceRequired') }
+              ]}
+              fieldProps={{
+                precision: 2,
+                prefix: '₺'
+              }}
+              width="md"
+            />
+          </ProForm.Group>
+
+          <ProForm.Group>
+            <ProFormDigit
+              name="taxRate"
+              label={t('products.form.taxRate')}
+              placeholder={t('products.form.taxRatePlaceholder')}
+              rules={[
+                { required: true, message: t('products.form.taxRateRequired') }
+              ]}
+              fieldProps={{
+                precision: 2,
+                suffix: '%',
+                min: 0,
+                max: 100
+              }}
+              initialValue={20}
+              width="md"
+            />
+
+            <ProFormSelect
+              name="categoryId"
+              label={t('products.form.category')}
+              placeholder={t('products.form.categoryPlaceholder')}
+              options={categories?.items?.map((cat: ProductCategory) => ({
+                label: cat.name,
+                value: cat.id
+              })) || []}
+              width="md"
+            />
+          </ProForm.Group>
+
+          <ProForm.Group>
+            <ProFormDigit
+              name="minStockLevel"
+              label={t('products.form.minStockLevel')}
+              placeholder={t('products.form.minStockLevelPlaceholder')}
+              rules={[
+                { required: true, message: t('products.form.minStockLevelRequired') }
+              ]}
+              fieldProps={{
+                precision: 2,
+                min: 0
+              }}
+              width="md"
+            />
+
+            <ProFormDigit
+              name="maxStockLevel"
+              label={t('products.form.maxStockLevel')}
+              placeholder={t('products.form.maxStockLevelPlaceholder')}
+              fieldProps={{
+                precision: 2,
+                min: 0
+              }}
+              width="md"
+            />
+          </ProForm.Group>
+
+          <ProFormSwitch
+            name="isActive"
+            label={t('products.form.isActive')}
+            checkedChildren={t('common.active')}
+            unCheckedChildren={t('common.inactive')}
+            initialValue={true}
+          />
+        </ProForm>
       </Card>
-    </div>
+    </PageContainer>
   );
 };
 
+export default ProductForm;

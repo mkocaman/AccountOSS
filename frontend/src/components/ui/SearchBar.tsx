@@ -1,5 +1,6 @@
 import { Input, Space, Button } from 'antd';
 import { FilterOutlined, ReloadOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
 
 // Arama ve filtre çubuğu
 interface SearchBarProps {
@@ -14,15 +15,17 @@ export const SearchBar = ({
   onSearch,
   onFilter,
   onRefresh,
-  placeholder = 'Ara...',
+  placeholder,
   filters,
 }: SearchBarProps) => {
+  const { t } = useTranslation();
+  
   return (
     <div className="mb-4 flex items-center justify-between">
       <Space size="middle">
         {/* Arama */}
         <Input.Search
-          placeholder={placeholder}
+          placeholder={placeholder || t('common.searchPlaceholder')}
           onSearch={onSearch}
           style={{ width: 300 }}
           size="large"
@@ -35,7 +38,7 @@ export const SearchBar = ({
         {/* Filtre butonu */}
         {onFilter && (
           <Button icon={<FilterOutlined />} onClick={onFilter} size="large">
-            Filtreler
+            {t('common.filters')}
           </Button>
         )}
       </Space>
@@ -43,7 +46,7 @@ export const SearchBar = ({
       {/* Yenile butonu */}
       {onRefresh && (
         <Button icon={<ReloadOutlined />} onClick={onRefresh} size="large">
-          Yenile
+          {t('common.refresh')}
         </Button>
       )}
     </div>

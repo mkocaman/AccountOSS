@@ -22,6 +22,7 @@ import {
 } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import type { ColumnsType } from 'antd/es/table';
 
 import { partnersApi } from '@/api/partners';
@@ -35,7 +36,8 @@ import PartnerForm from './PartnerForm';
 const { Search } = Input;
 
 export default function PartnerList() {
-  usePageTitle('Cari Hesaplar');
+  const { t } = useTranslation();
+  usePageTitle(t('partners.title'));
   
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -56,10 +58,10 @@ export default function PartnerList() {
     mutationFn: (id: string) => partnersApi.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['partners'] });
-      message.success('Cari hesap silindi');
+      message.success(t('partners.deleteSuccess'));
     },
     onError: (error: any) => {
-      message.error(error.response?.data?.message || 'Silme işlemi başarısız');
+      message.error(error.response?.data?.message || t('partners.deleteError'));
     }
   });
 
@@ -69,7 +71,7 @@ export default function PartnerList() {
       partnersApi.block(id, reason),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['partners'] });
-      message.success('Cari hesap bloke edildi');
+      message.success(t('partners.blockSuccess'));
     }
   });
 
@@ -78,25 +80,25 @@ export default function PartnerList() {
     mutationFn: (id: string) => partnersApi.unblock(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['partners'] });
-      message.success('Bloke kaldırıldı');
+      message.success(t('partners.unblockSuccess'));
     }
   });
 
   // Table columns
   const columns: ColumnsType<Partner> = [
     {
-      title: 'Durum',
+      title: t('partners.status'),
       key: 'status',
       width: 100,
       align: 'center',
       render: (_, record) => (
         <Space direction="vertical" size={2}>
           <Tag color={record.isActive ? 'green' : 'red'}>
-            {record.isActive ? 'Aktif' : 'Pasif'}
+            {record.isActive ? t('partners.active') : t('partners.inactive')}
           </Tag>
           {record.isBlocked && (
             <Tag color="orange" icon={<LockOutlined />}>
-              Bloke
+              {t('partners.blocked')}
             </Tag>
           )}
         </Space>
@@ -309,25 +311,25 @@ export default function PartnerList() {
           <Col xs={24} sm={12} md={4}>
             <Select
               className="w-full"
-              placeholder="Tip"
+              placeholder={t('partners.partnerType')}
               allowClear
               onChange={(value) => setFilters({ ...filters, type: value })}
               options={[
-                { label: 'Müşteri', value: PartnerType.Customer },
-                { label: 'Tedarikçi', value: PartnerType.Supplier },
-                { label: 'Her İkisi', value: PartnerType.Both }
+                { label: t('partners.customer'), value: PartnerType.Customer },
+                { label: t('partners.supplier'), value: PartnerType.Supplier },
+                { label: t('partners.both'), value: PartnerType.Both }
               ]}
             />
           </Col>
           <Col xs={24} sm={12} md={4}>
             <Select
               className="w-full"
-              placeholder="Durum"
+              placeholder={t('partners.status')}
               allowClear
               onChange={(value) => setFilters({ ...filters, isActive: value })}
               options={[
-                { label: 'Aktif', value: true },
-                { label: 'Pasif', value: false }
+                { label: t('partners.active'), value: true },
+                { label: t('partners.inactive'), value: false }
               ]}
             />
           </Col>

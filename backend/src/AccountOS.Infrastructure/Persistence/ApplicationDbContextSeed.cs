@@ -1,4 +1,5 @@
 using AccountOS.Domain.Entities;
+using AccountOS.Infrastructure.Persistence.Seeds;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -181,115 +182,23 @@ public static class ApplicationDbContextSeed
         if (await context.Languages.AnyAsync())
             return;
 
-        var languages = new List<Language>
-        {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Code = "TR",
-                Name = "Turkish",
-                NativeName = "Türkçe",
-                FlagIcon = "🇹🇷",
-                IsRtl = false,
-                IsActive = true,
-                IsDefault = true,
-                DisplayOrder = 1,
-                CreatedAt = DateTime.UtcNow,
-                CreatedBy = Guid.Empty
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Code = "EN",
-                Name = "English",
-                NativeName = "English",
-                FlagIcon = "🇬🇧",
-                IsRtl = false,
-                IsActive = true,
-                IsDefault = false,
-                DisplayOrder = 2,
-                CreatedAt = DateTime.UtcNow,
-                CreatedBy = Guid.Empty
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Code = "RU",
-                Name = "Russian",
-                NativeName = "Русский",
-                FlagIcon = "🇷🇺",
-                IsRtl = false,
-                IsActive = true,
-                IsDefault = false,
-                DisplayOrder = 3,
-                CreatedAt = DateTime.UtcNow,
-                CreatedBy = Guid.Empty
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Code = "UZ",
-                Name = "Uzbek",
-                NativeName = "O'zbek",
-                FlagIcon = "🇺🇿",
-                IsRtl = false,
-                IsActive = true,
-                IsDefault = false,
-                DisplayOrder = 4,
-                CreatedAt = DateTime.UtcNow,
-                CreatedBy = Guid.Empty
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Code = "AR",
-                Name = "Arabic",
-                NativeName = "العربية",
-                FlagIcon = "🇸🇦",
-                IsRtl = true,
-                IsActive = true,
-                IsDefault = false,
-                DisplayOrder = 5,
-                CreatedAt = DateTime.UtcNow,
-                CreatedBy = Guid.Empty
-            }
-        };
-
+        // 6 dil: TR, EN, UZ, AR, RU, DE (LanguageSeedData kullan)
+        var languages = LanguageSeedData.GetLanguages();
         await context.Languages.AddRangeAsync(languages);
         await context.SaveChangesAsync();
 
-        // Temel çeviriler (örnek)
-        var trLanguage = languages.First(l => l.Code == "TR");
-        var enLanguage = languages.First(l => l.Code == "EN");
-        var ruLanguage = languages.First(l => l.Code == "RU");
+        // Türkçe ve İngilizce çeviriler (frontend JSON'lardan)
+        var turkishTranslations = LanguageSeedData.GetTurkishTranslations();
+        var englishTranslations = LanguageSeedData.GetEnglishTranslations();
 
-        var translations = new List<Translation>
-        {
-            // Turkish
-            new() { Id = Guid.NewGuid(), LanguageId = trLanguage.Id, Key = "common.save", Value = "Kaydet", Category = "common", CreatedAt = DateTime.UtcNow, CreatedBy = Guid.Empty },
-            new() { Id = Guid.NewGuid(), LanguageId = trLanguage.Id, Key = "common.cancel", Value = "İptal", Category = "common", CreatedAt = DateTime.UtcNow, CreatedBy = Guid.Empty },
-            new() { Id = Guid.NewGuid(), LanguageId = trLanguage.Id, Key = "common.delete", Value = "Sil", Category = "common", CreatedAt = DateTime.UtcNow, CreatedBy = Guid.Empty },
-            new() { Id = Guid.NewGuid(), LanguageId = trLanguage.Id, Key = "invoice.create.title", Value = "Fatura Oluştur", Category = "invoice", CreatedAt = DateTime.UtcNow, CreatedBy = Guid.Empty },
-            new() { Id = Guid.NewGuid(), LanguageId = trLanguage.Id, Key = "customer.list.title", Value = "Cari Hesaplar", Category = "customer", CreatedAt = DateTime.UtcNow, CreatedBy = Guid.Empty },
-            
-            // English
-            new() { Id = Guid.NewGuid(), LanguageId = enLanguage.Id, Key = "common.save", Value = "Save", Category = "common", CreatedAt = DateTime.UtcNow, CreatedBy = Guid.Empty },
-            new() { Id = Guid.NewGuid(), LanguageId = enLanguage.Id, Key = "common.cancel", Value = "Cancel", Category = "common", CreatedAt = DateTime.UtcNow, CreatedBy = Guid.Empty },
-            new() { Id = Guid.NewGuid(), LanguageId = enLanguage.Id, Key = "common.delete", Value = "Delete", Category = "common", CreatedAt = DateTime.UtcNow, CreatedBy = Guid.Empty },
-            new() { Id = Guid.NewGuid(), LanguageId = enLanguage.Id, Key = "invoice.create.title", Value = "Create Invoice", Category = "invoice", CreatedAt = DateTime.UtcNow, CreatedBy = Guid.Empty },
-            new() { Id = Guid.NewGuid(), LanguageId = enLanguage.Id, Key = "customer.list.title", Value = "Customers", Category = "customer", CreatedAt = DateTime.UtcNow, CreatedBy = Guid.Empty },
-            
-            // Russian
-            new() { Id = Guid.NewGuid(), LanguageId = ruLanguage.Id, Key = "common.save", Value = "Сохранить", Category = "common", CreatedAt = DateTime.UtcNow, CreatedBy = Guid.Empty },
-            new() { Id = Guid.NewGuid(), LanguageId = ruLanguage.Id, Key = "common.cancel", Value = "Отмена", Category = "common", CreatedAt = DateTime.UtcNow, CreatedBy = Guid.Empty },
-            new() { Id = Guid.NewGuid(), LanguageId = ruLanguage.Id, Key = "common.delete", Value = "Удалить", Category = "common", CreatedAt = DateTime.UtcNow, CreatedBy = Guid.Empty },
-            new() { Id = Guid.NewGuid(), LanguageId = ruLanguage.Id, Key = "invoice.create.title", Value = "Создать счет", Category = "invoice", CreatedAt = DateTime.UtcNow, CreatedBy = Guid.Empty },
-            new() { Id = Guid.NewGuid(), LanguageId = ruLanguage.Id, Key = "customer.list.title", Value = "Клиенты", Category = "customer", CreatedAt = DateTime.UtcNow, CreatedBy = Guid.Empty },
-        };
+        var allTranslations = new List<Translation>();
+        allTranslations.AddRange(turkishTranslations);
+        allTranslations.AddRange(englishTranslations);
 
-        await context.Translations.AddRangeAsync(translations);
+        await context.Translations.AddRangeAsync(allTranslations);
         await context.SaveChangesAsync();
         
-        logger.LogInformation("Dil ve çeviri seed data eklendi: {LanguageCount} dil, {TranslationCount} çeviri", languages.Count, translations.Count);
+        logger.LogInformation("Dil ve çeviri seed data eklendi: {LanguageCount} dil, {TranslationCount} çeviri", 
+            languages.Count, allTranslations.Count);
     }
 }

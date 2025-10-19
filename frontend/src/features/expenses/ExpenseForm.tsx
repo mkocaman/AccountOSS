@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Card, 
   Form, 
@@ -90,7 +90,7 @@ export default function ExpenseForm() {
   });
 
   // Load existing expense data
-  React.useEffect(() => {
+  useEffect(() => {
     if (expense) {
       form.setFieldsValue({
         expenseDate: dayjs(expense.expenseDate),

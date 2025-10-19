@@ -54,5 +54,27 @@ public class Result<T> : Result
     /// Başarısız sonuç döndürür
     /// </summary>
     public new static Result<T> Fail(string error) => new(default, false, error);
+    
+    /// <summary>
+    /// Başarısız sonuç döndürür (errors listesi ile)
+    /// </summary>
+    public static Result<T> Failure(List<string> errors) => new(default, false, string.Join(", ", errors));
+    
+    /// <summary>
+    /// Başarılı sonuç döndürür (SuccessResult methodu)
+    /// </summary>
+    public static Result<T> SuccessResult(T data) => new(data, true, string.Empty);
+}
+
+/// <summary>
+/// Sayfalanmış veri döndüren sonuç tipi
+/// </summary>
+public class PagedResult<T>
+{
+    public List<T> Items { get; set; } = new();
+    public int TotalCount { get; set; }
+    public int Page { get; set; }
+    public int PageSize { get; set; }
+    public int TotalPages { get; set; }
 }
 

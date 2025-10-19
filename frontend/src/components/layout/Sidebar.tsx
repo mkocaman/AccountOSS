@@ -1,5 +1,6 @@
 import { Layout, Menu } from 'antd';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   DashboardOutlined,
   FileTextOutlined,
@@ -15,7 +16,6 @@ import {
   FileProtectOutlined,
   CrownOutlined,
   WalletOutlined,
-  FolderOutlined,
 } from '@ant-design/icons';
 
 const { Sider } = Layout;
@@ -25,145 +25,171 @@ interface SidebarProps {
   onCollapse: (collapsed: boolean) => void;
 }
 
-// Menü yapısı
-const menuItems = [
-  {
-    key: '/dashboard',
-    icon: <DashboardOutlined />,
-    label: 'Dashboard',
-  },
-  {
-    key: 'invoices',
-    icon: <FileTextOutlined />,
-    label: 'Faturalar',
-    children: [
-      { key: '/invoices', label: 'Fatura Listesi' },
-      { key: '/invoices/create', label: 'Yeni Fatura' },
-    ],
-  },
-  {
-    key: '/gr-queue',
-    icon: <SwapOutlined />,
-    label: 'GR Kuyruğu',
-  },
-  {
-    key: '/reports',
-    icon: <BarChartOutlined />,
-    label: 'Raporlar',
-  },
-  {
-    key: '/settings',
-    icon: <SettingOutlined />,
-    label: 'Ayarlar',
-  },
-  {
-    key: '/partners',
-    icon: <UserOutlined />,
-    label: 'Cari Hesaplar',
-  },
-  {
-    key: 'sales',
-    icon: <SolutionOutlined />,
-    label: 'Satış',
-    children: [
-      { key: '/quotations', label: 'Teklifler' },
-      { key: '/sales-orders', label: 'Satış Siparişleri' },
-    ],
-  },
-  {
-    key: 'products',
-    icon: <ShoppingOutlined />,
-    label: 'Ürünler',
-    children: [
-      { key: '/products', label: 'Ürün Listesi' },
-      { key: '/categories', label: 'Kategoriler' },
-      { key: '/stock-movements', label: 'Stok Hareketleri' },
-    ],
-  },
-  {
-    key: 'purchase',
-    icon: <ShoppingCartOutlined />,
-    label: 'Satın Alma',
-    children: [
-      { key: '/purchase-orders', label: 'Satın Alma Siparişleri' },
-      { key: '/goods-receipts', label: 'Mal Kabul' },
-    ],
-  },
-  {
-    key: 'finance',
-    icon: <DollarOutlined />,
-    label: 'Finans',
-    children: [
-      { key: '/payments', label: 'Tahsilat/Ödeme' },
-      { key: '/cash-accounts', label: 'Kasa' },
-      { key: '/bank-accounts', label: 'Banka' },
-    ],
-  },
-  {
-    key: 'expenses',
-    icon: <WalletOutlined />,
-    label: 'Masraflar',
-    children: [
-      { key: '/expense-categories', label: 'Kategoriler' },
-      { key: '/expenses', label: 'Masraflar' },
-    ],
-  },
-          {
-            key: 'accounting',
-            icon: <BankOutlined />,
-            label: 'Muhasebe',
-            children: [
-              { key: '/chart-of-accounts', label: 'Hesap Planı' },
-              { key: '/trial-balance', label: 'Mizan' },
-              { key: '/journal-entries', label: 'Yevmiye Kayıtları' },
-              { key: '/journal-entries/ledger', label: 'Hesap Defteri' },
-              { key: '/tax-rates', label: 'Vergi Oranları' },
-            ],
-          },
-          {
-            key: 'uzbekistan',
-            icon: <FileProtectOutlined />,
-            label: 'Özbekistan',
-            children: [
-              { key: '/contracts', label: 'Sözleşmeler' },
-              { key: '/power-of-attorney', label: 'Vekalet Belgeleri' },
-            ],
-          },
-          {
-            key: 'owner',
-            icon: <CrownOutlined />,
-            label: 'Owner Panel',
-            children: [
-              { key: '/owner/settings', label: 'System Settings' },
-            ],
-          },
-  {
-    key: 'reports',
-    icon: <BarChartOutlined />,
-    label: 'Raporlar',
-    children: [
-      { key: '/reports/profit-loss', label: 'Kar/Zarar' },
-      { key: '/reports/stock', label: 'Stok Raporu' },
-      { key: '/reports/fifo', label: 'FIFO Maliyet' },
-      { key: '/reports/gr-balance', label: 'GR Bakiyesi' },
-    ],
-  },
-  {
-    key: 'settings',
-    icon: <SettingOutlined />,
-    label: 'Ayarlar',
-    children: [
-      { key: '/settings/company', label: 'Şirket Bilgileri' },
-      { key: '/settings/users', label: 'Kullanıcılar' },
-      { key: '/settings/preferences', label: 'Tercihler' },
-    ],
-  },
-];
-
 // Sidebar bileşeni
 export const Sidebar = ({ collapsed, onCollapse }: SidebarProps) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Menü yapısı - i18n ile
+  const menuItems = [
+    {
+      key: '/dashboard',
+      icon: <DashboardOutlined />,
+      label: t('menu.dashboard'),
+    },
+    {
+      key: 'invoices',
+      icon: <FileTextOutlined />,
+      label: t('menu.invoices'),
+      children: [
+        { key: '/invoices', label: t('menu.invoiceList') },
+        { key: '/invoices/create', label: t('menu.newInvoice') },
+      ],
+    },
+    {
+      key: '/gr-queue',
+      icon: <SwapOutlined />,
+      label: t('menu.grQueue'),
+    },
+    {
+      key: '/reports',
+      icon: <BarChartOutlined />,
+      label: t('menu.reports'),
+    },
+    {
+      key: '/settings',
+      icon: <SettingOutlined />,
+      label: t('menu.settings'),
+    },
+    {
+      key: '/partners',
+      icon: <UserOutlined />,
+      label: t('menu.currentAccounts'),
+    },
+    {
+      key: 'sales',
+      icon: <SolutionOutlined />,
+      label: t('menu.sales'),
+      children: [
+        { key: '/quotations', label: t('menu.quotations') },
+        { key: '/sales-orders', label: t('menu.salesOrders') },
+        { key: '/invoices', label: t('menu.invoices') },
+        { key: '/sales-reports', label: t('menu.salesReports') },
+      ],
+    },
+    {
+      key: 'products',
+      icon: <ShoppingOutlined />,
+      label: t('menu.products'),
+      children: [
+        { key: '/products', label: t('menu.productList') },
+        { key: '/products/categories', label: t('menu.categories') },
+        { key: '/stock-movements', label: t('menu.stockMovements') },
+        { key: '/products/low-stock', label: t('menu.lowStock') },
+        { key: '/products/out-of-stock', label: t('menu.outOfStock') },
+      ],
+    },
+    {
+      key: 'purchase',
+      icon: <ShoppingCartOutlined />,
+      label: t('menu.purchasing'),
+      children: [
+        { key: '/purchase-orders', label: t('menu.purchaseOrders') },
+        { key: '/goods-receipts', label: t('menu.goodsReceipts') },
+        { key: '/purchase-reports', label: t('menu.purchaseReports') },
+        { key: '/supplier-reports', label: t('menu.supplierReports') },
+      ],
+    },
+    {
+      key: 'finance',
+      icon: <DollarOutlined />,
+      label: t('menu.finance'),
+      children: [
+        { key: '/payments', label: t('menu.paymentsReceivables') },
+        { key: '/cash-accounts', label: t('menu.cash') },
+        { key: '/bank-accounts', label: t('menu.bank') },
+        { key: '/tax-rates', label: t('menu.taxRates') },
+        { key: '/currencies', label: t('menu.currencies') },
+        { key: '/financial-reports', label: t('menu.financialReports') },
+      ],
+    },
+    {
+      key: 'expenses',
+      icon: <WalletOutlined />,
+      label: t('menu.expenses'),
+      children: [
+        { key: '/expense-categories', label: t('menu.categories') },
+        { key: '/expenses', label: t('menu.expenseList') },
+      ],
+    },
+    {
+      key: 'accounting',
+      icon: <BankOutlined />,
+      label: t('menu.accounting'),
+      children: [
+        { key: '/chart-of-accounts', label: t('menu.chartOfAccounts') },
+        { key: '/trial-balance', label: t('menu.trialBalance') },
+        { key: '/journal-entries', label: t('menu.journalEntries') },
+        { key: '/journal-entries/ledger', label: t('menu.accountLedger') },
+        { key: '/accounting-reports', label: t('menu.accountingReports') },
+        { key: '/balance-sheet', label: t('menu.balanceSheet') },
+      ],
+    },
+    {
+      key: 'uzbekistan',
+      icon: <FileProtectOutlined />,
+      label: t('menu.uzbekistan'),
+      children: [
+        { key: '/contracts', label: t('menu.contracts') },
+        { key: '/power-of-attorney', label: t('menu.powerOfAttorney') },
+        { key: '/uzbekistan-reports', label: t('menu.uzbekistanReports') },
+        { key: '/legal-documents', label: t('menu.legalDocuments') },
+      ],
+    },
+    {
+      key: 'owner',
+      icon: <CrownOutlined />,
+      label: t('menu.ownerPanel'),
+      children: [
+        { key: '/owner/settings', label: t('menu.systemSettings') },
+        { key: '/owner/companies', label: t('menu.companyManagement') },
+        { key: '/owner/tenants', label: t('menu.tenantManagement') },
+        { key: '/owner/billing', label: t('menu.billingSettings') },
+        { key: '/owner/security', label: t('menu.securitySettings') },
+        { key: '/owner/email', label: t('menu.emailConfiguration') },
+        { key: '/owner/stats', label: t('menu.systemStats') },
+      ],
+    },
+    {
+      key: 'reports',
+      icon: <BarChartOutlined />,
+      label: t('menu.reports'),
+      children: [
+        { key: '/reports/profit-loss', label: t('menu.profitLoss') },
+        { key: '/reports/stock', label: t('menu.stockReport') },
+        { key: '/reports/fifo', label: t('menu.fifoCost') },
+        { key: '/reports/gr-balance', label: t('menu.grBalance') },
+        { key: '/reports/sales', label: t('menu.salesReports') },
+        { key: '/reports/purchase', label: t('menu.purchaseReports') },
+        { key: '/reports/financial', label: t('menu.financialReports') },
+        { key: '/reports/accounting', label: t('menu.accountingReports') },
+      ],
+    },
+    {
+      key: 'settings',
+      icon: <SettingOutlined />,
+      label: t('menu.settings'),
+      children: [
+        { key: '/settings/company', label: t('menu.companyInfo') },
+        { key: '/settings/users', label: t('menu.users') },
+        { key: '/settings/preferences', label: t('menu.preferences') },
+        { key: '/settings/email', label: t('menu.emailSettings') },
+        { key: '/settings/backup', label: t('menu.backupRestore') },
+        { key: '/settings/security', label: t('menu.securitySettings') },
+      ],
+    },
+  ];
 
   // Menü tıklama
   const handleMenuClick = ({ key }: { key: string }) => {
@@ -212,7 +238,7 @@ export const Sidebar = ({ collapsed, onCollapse }: SidebarProps) => {
             </div>
             <div>
               <div className="text-lg font-bold">AccountOS</div>
-              <div className="text-xs text-gray-500">ERP & Muhasebe</div>
+              <div className="text-xs text-gray-500">{t('menu.erpAccounting')}</div>
             </div>
           </div>
         ) : (

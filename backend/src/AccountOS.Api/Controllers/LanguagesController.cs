@@ -4,8 +4,17 @@ using AccountOS.Application.Languages.Commands.DeleteLanguage;
 using AccountOS.Application.Languages.Commands.DeleteTranslation;
 using AccountOS.Application.Languages.Commands.UpdateLanguage;
 using AccountOS.Application.Languages.Commands.UpdateTranslation;
+using AccountOS.Application.Languages.Commands.SetDefaultLanguage;
+using AccountOS.Application.Languages.Commands.ToggleLanguageActive;
+using AccountOS.Application.Languages.Commands.BulkCreateTranslations;
+using AccountOS.Application.Languages.Commands.ImportTranslations;
+using AccountOS.Application.Languages.Commands.SyncMissingTranslations;
 using AccountOS.Application.Languages.Queries.GetLanguages;
 using AccountOS.Application.Languages.Queries.GetTranslations;
+using AccountOS.Application.Languages.Queries.GetActiveLanguages;
+using AccountOS.Application.Languages.Queries.GetDefaultLanguage;
+using AccountOS.Application.Languages.Queries.GetTranslationCategories;
+using AccountOS.Application.Languages.Queries.GetTranslationsForLanguage;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
@@ -33,25 +42,87 @@ public class LanguagesController : BaseApiController
     }
 
     /// <summary>
-    /// Belirli dil için çevirileri getir
+    /// Sadece aktif dilleri getir
+    /// </summary>
+    /// <returns>Aktif dil listesi</returns>
+    [HttpGet("active")]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetActiveLanguages()
+    {
+        var result = await Mediator.Send(new GetActiveLanguagesQuery());
+        return FromResult(result);
+    }
+
+    /// <summary>
+    /// Varsayılan dili getir
+    /// </summary>
+    /// <returns>Varsayılan dil</returns>
+    [HttpGet("default")]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetDefaultLanguage()
+    {
+        var result = await Mediator.Send(new GetDefaultLanguageQuery());
+        
+        if (!result.Success)
+            return NotFound(result);
+            
+        return FromResult(result);
+    }
+
+    /// <summary>
+    /// Belirli dil için çevirileri flat key-value olarak getir (i18n için)
     /// </summary>
     /// <param name="languageCode">Dil kodu (TR, EN, RU, vb.)</param>
-    /// <param name="category">Kategori filtresi (opsiyonel)</param>
     /// <returns>Çeviri key-value dictionary</returns>
-    [HttpGet("{languageCode}/translations")]
+    [HttpGet("language/{languageCode}")]
     [AllowAnonymous] // Çeviriler herkes tarafından görülebilir
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetTranslations(string languageCode, [FromQuery] string? category = null)
+    public async Task<IActionResult> GetTranslationsForLanguage(string languageCode)
+    {
+        var result = await Mediator.Send(new GetTranslationsForLanguageQuery 
+        { 
+            LanguageCode = languageCode
+        });
+
+        if (!result.Success)
+            return NotFound(result);
+
+        return FromResult(result);
+    }
+
+    /// <summary>
+    /// Çeviri kategorilerini getir
+    /// </summary>
+    /// <returns>Kategori listesi</returns>
+    [HttpGet("translations/categories")]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetTranslationCategories()
+    {
+        var result = await Mediator.Send(new GetTranslationCategoriesQuery());
+        return FromResult(result);
+    }
+
+    /// <summary>
+    /// Tüm çevirileri listele (admin için)
+    /// </summary>
+    /// <param name="languageCode">Dil kodu filtresi</param>
+    /// <param name="category">Kategori filtresi</param>
+    /// <returns>Çeviri listesi</returns>
+    [HttpGet("translations")]
+    [Authorize(Roles = "Owner")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAllTranslations([FromQuery] string? languageCode = null, [FromQuery] string? category = null)
     {
         var result = await Mediator.Send(new GetTranslationsQuery 
         { 
             LanguageCode = languageCode,
             Category = category
         });
-
-        if (!result.Success)
-            return NotFound(result);
 
         return FromResult(result);
     }
@@ -124,6 +195,48 @@ public class LanguagesController : BaseApiController
     }
 
     /// <summary>
+    /// Dili varsayılan yap (Owner only)
+    /// </summary>
+    /// <param name="id">Dil ID</param>
+    /// <returns>Güncellenen dil</returns>
+    [HttpPost("{id:guid}/set-default")]
+    [Authorize(Roles = "Owner")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> SetDefaultLanguage(Guid id)
+    {
+        var result = await Mediator.Send(new SetDefaultLanguageCommand(id));
+
+        if (!result.Success)
+            return BadRequest(result);
+
+        return FromResult(result);
+    }
+
+    /// <summary>
+    /// Dil aktif/pasif durumunu değiştir (Owner only)
+    /// </summary>
+    /// <param name="id">Dil ID</param>
+    /// <returns>Güncellenen dil</returns>
+    [HttpPost("{id:guid}/toggle-active")]
+    [Authorize(Roles = "Owner")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> ToggleLanguageActive(Guid id)
+    {
+        var result = await Mediator.Send(new ToggleLanguageActiveCommand(id));
+
+        if (!result.Success)
+            return BadRequest(result);
+
+        return FromResult(result);
+    }
+
+    /// <summary>
     /// Çeviri oluştur veya güncelle (Owner only)
     /// </summary>
     /// <param name="command">Çeviri bilgileri</param>
@@ -141,9 +254,28 @@ public class LanguagesController : BaseApiController
         if (!result.Success)
             return BadRequest(result);
 
-        return CreatedAtAction(nameof(GetTranslations), 
-            new { languageCode = command.LanguageCode }, 
-            result);
+        return CreatedAtAction(nameof(GetAllTranslations), result);
+    }
+
+    /// <summary>
+    /// Toplu çeviri oluştur (Owner only)
+    /// </summary>
+    /// <param name="command">Toplu çeviri bilgileri</param>
+    /// <returns>Oluşturma sonucu</returns>
+    [HttpPost("translations/bulk")]
+    [Authorize(Roles = "Owner")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> BulkCreateTranslations([FromBody] BulkCreateTranslationsCommand command)
+    {
+        var result = await Mediator.Send(command);
+
+        if (!result.Success)
+            return BadRequest(result);
+
+        return FromResult(result);
     }
 
     /// <summary>
@@ -189,6 +321,111 @@ public class LanguagesController : BaseApiController
             return BadRequest(result);
 
         return FromResult(result);
+    }
+
+    /// <summary>
+    /// JSON'dan çeviri import et (Owner only)
+    /// </summary>
+    /// <param name="command">Import bilgileri</param>
+    /// <returns>Import sonucu</returns>
+    [HttpPost("translations/import")]
+    [Authorize(Roles = "Owner")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> ImportTranslations([FromBody] ImportTranslationsCommand command)
+    {
+        var result = await Mediator.Send(command);
+
+        if (!result.Success)
+            return BadRequest(result);
+
+        return FromResult(result);
+    }
+
+    /// <summary>
+    /// Eksik çevirileri varsayılan dilden senkronize et (Owner only)
+    /// </summary>
+    /// <param name="targetLanguageId">Hedef dil ID</param>
+    /// <returns>Senkronizasyon sonucu</returns>
+    [HttpPost("translations/sync-missing/{targetLanguageId:guid}")]
+    [Authorize(Roles = "Owner")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> SyncMissingTranslations(Guid targetLanguageId)
+    {
+        var result = await Mediator.Send(new SyncMissingTranslationsCommand 
+        { 
+            TargetLanguageId = targetLanguageId 
+        });
+
+        if (!result.Success)
+            return BadRequest(result);
+
+        return FromResult(result);
+    }
+
+    /// <summary>
+    /// Çevirileri JSON olarak export et (Owner only)
+    /// </summary>
+    /// <param name="languageId">Dil ID (opsiyonel - tüm diller)</param>
+    /// <returns>JSON dosyası</returns>
+    [HttpGet("translations/export/json")]
+    [Authorize(Roles = "Owner")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> ExportTranslationsJson([FromQuery] Guid? languageId = null)
+    {
+        Dictionary<string, Dictionary<string, string>> exportData = new();
+
+        if (languageId.HasValue)
+        {
+            // Tek dil export
+            var language = await Mediator.Send(new GetLanguagesQuery { ActiveOnly = false });
+            var lang = language.Data?.FirstOrDefault(l => l.Id == languageId.Value);
+            
+            if (lang == null)
+                return NotFound("Dil bulunamadı");
+
+            var translations = await Mediator.Send(new GetTranslationsForLanguageQuery 
+            { 
+                LanguageCode = lang.Code 
+            });
+
+            if (translations.Success && translations.Data != null)
+            {
+                exportData[lang.Code] = translations.Data;
+            }
+        }
+        else
+        {
+            // Tüm dilleri export
+            var languages = await Mediator.Send(new GetLanguagesQuery { ActiveOnly = false });
+            
+            foreach (var lang in languages.Data ?? Enumerable.Empty<AccountOS.Application.Languages.Common.LanguageDto>())
+            {
+                var translations = await Mediator.Send(new GetTranslationsForLanguageQuery 
+                { 
+                    LanguageCode = lang.Code 
+                });
+
+                if (translations.Success && translations.Data != null)
+                {
+                    exportData[lang.Code] = translations.Data;
+                }
+            }
+        }
+
+        var json = System.Text.Json.JsonSerializer.Serialize(exportData, new System.Text.Json.JsonSerializerOptions 
+        { 
+            WriteIndented = true 
+        });
+
+        return File(System.Text.Encoding.UTF8.GetBytes(json), "application/json", "translations.json");
     }
 
     /// <summary>

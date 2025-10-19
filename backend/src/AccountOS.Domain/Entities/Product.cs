@@ -63,6 +63,13 @@ public class Product : TenantEntity
     /// <summary>Ürün resmi URL</summary>
     public string? ImageUrl { get; set; }
     
+    // Kategori İlişkisi
+    /// <summary>Kategori ID - Ürünün ait olduğu kategori</summary>
+    public Guid? CategoryId { get; set; }
+    
+    /// <summary>Ürün kategorisi - Navigation property</summary>
+    public virtual ProductCategory? Category { get; set; }
+    
     // Navigation Properties
     /// <summary>Çoklu dil çevirileri</summary>
     public ICollection<ProductTranslation> Translations { get; set; } = new List<ProductTranslation>();

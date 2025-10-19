@@ -84,3 +84,42 @@ export const paymentsApi = {
   delete: (id: string) =>
     apiClient.delete<boolean>(`/payments/${id}`),
 };
+
+// Bank Accounts API - TODO: Backend implementation needed
+export interface BankAccount {
+  id: string;
+  accountName: string;
+  accountNumber: string;
+  iban: string;
+  bankName: string;
+  branch: string;
+  currency: string;
+  balance: number;
+  isActive: boolean;
+}
+
+export const bankAccountsApi = {
+  getAll: () => Promise.resolve({ success: true, data: [] as BankAccount[] }),
+  getById: (id: string) => Promise.resolve({ success: true, data: {} as BankAccount }),
+  create: (data: any) => Promise.resolve({ success: true, data: {} as BankAccount }),
+  update: (id: string, data: any) => Promise.resolve({ success: true, data: {} as BankAccount }),
+  delete: (id: string) => Promise.resolve({ success: true, data: true }),
+};
+
+// Cash Accounts API - TODO: Backend implementation needed
+export interface CashAccount {
+  id: string;
+  accountName: string;
+  currency: string;
+  balance: number;
+  location: string;
+  isActive: boolean;
+}
+
+export const cashAccountsApi = {
+  getAll: () => Promise.resolve({ success: true, data: [] as CashAccount[] }),
+  getById: (id: string) => Promise.resolve({ success: true, data: {} as CashAccount }),
+  create: (data: any) => Promise.resolve({ success: true, data: {} as CashAccount }),
+  update: (id: string, data: any) => Promise.resolve({ success: true, data: {} as CashAccount }),
+  delete: (id: string) => Promise.resolve({ success: true, data: true }),
+};

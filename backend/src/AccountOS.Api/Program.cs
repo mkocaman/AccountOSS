@@ -78,6 +78,9 @@ builder.Services.AddSwaggerGen(options =>
             Array.Empty<string>()
         }
     });
+    
+    // Ignore problematic controllers for now
+    options.IgnoreObsoleteActions();
 });
 
 // CORS - Frontend bağlantısı için
@@ -87,9 +90,15 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(
                 "http://localhost:3000",      // Vite dev server
-                "http://localhost:3001",      // Alternative port
-                "http://localhost:3005",      // Current frontend port
-                "https://localhost:3005",     // HTTPS frontend port
+                "http://localhost:3001",      // Current frontend port
+                "http://localhost:3002",      // Alternative port
+                "http://localhost:3003",      // Alternative port
+                "http://localhost:3005",      // Alternative port
+                "https://localhost:3000",     // HTTPS Vite dev server
+                "https://localhost:3001",     // HTTPS Current frontend port
+                "https://localhost:3002",     // HTTPS Alternative port
+                "https://localhost:3003",     // HTTPS Alternative port
+                "https://localhost:3005",     // HTTPS Alternative port
                 "https://accountos.com",      // Production (future)
                 "https://www.accountos.com"   // Production www
             )

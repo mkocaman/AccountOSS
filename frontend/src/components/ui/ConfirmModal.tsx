@@ -1,4 +1,5 @@
 import { Modal } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 interface ConfirmModalProps {
   title: string;
@@ -13,17 +14,19 @@ interface ConfirmModalProps {
 export const showConfirm = ({
   title,
   content,
-  okText = 'Tamam',
-  cancelText = 'İptal',
+  okText,
+  cancelText,
   okType = 'primary',
   onOk,
   onCancel
 }: ConfirmModalProps) => {
+  const { t } = useTranslation();
+  
   Modal.confirm({
     title,
     content,
-    okText,
-    cancelText,
+    okText: okText || t('common.ok'),
+    cancelText: cancelText || t('common.cancel'),
     okType,
     onOk,
     onCancel

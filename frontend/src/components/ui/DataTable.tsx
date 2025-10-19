@@ -1,4 +1,5 @@
 import { Table } from 'antd';
+import { useTranslation } from 'react-i18next';
 import type { TableProps, ColumnsType } from 'antd/es/table';
 
 // Genel amaçlı DataTable bileşeni
@@ -16,6 +17,8 @@ export function DataTable<T extends { id: string }>({
   onRowClick,
   ...tableProps
 }: DataTableProps<T>) {
+  const { t } = useTranslation();
+  
   return (
     <Table
       columns={columns}
@@ -25,7 +28,7 @@ export function DataTable<T extends { id: string }>({
       pagination={{
         pageSize: 50,
         showSizeChanger: true,
-        showTotal: (total) => `Toplam ${total} kayıt`,
+        showTotal: (total) => t('common.totalRecords', { total }),
         pageSizeOptions: ['10', '20', '50', '100'],
         ...tableProps.pagination,
       }}

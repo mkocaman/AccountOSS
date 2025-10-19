@@ -32,6 +32,39 @@ public class AuthController : BaseApiController
     }
 
     /// <summary>
+    /// Kullanıcı bilgilerini getir
+    /// </summary>
+    [HttpGet("me")]
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public IActionResult GetMe()
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var email = User.FindFirst(ClaimTypes.Email)?.Value;
+        var firstName = User.FindFirst(ClaimTypes.GivenName)?.Value;
+        var lastName = User.FindFirst(ClaimTypes.Surname)?.Value;
+        var companyId = User.FindFirst("CompanyId")?.Value;
+        var roles = User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToList();
+        
+        return Ok(new
+        {
+            Success = true,
+            Data = new
+            {
+                Id = userId,
+                Email = email,
+                FirstName = firstName,
+                LastName = lastName,
+                Name = $"{firstName} {lastName}".Trim(),
+                CompanyId = companyId,
+                Roles = roles,
+                Avatar = User.FindFirst("Avatar")?.Value
+            }
+        });
+    }
+
+    /// <summary>
     /// Test endpoint: JWT claims doğrulaması (Prompt 1.12 Verification)
     /// </summary>
     /// <returns>JWT claim bilgileri</returns>
