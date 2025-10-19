@@ -30,10 +30,13 @@ export const InvoiceItems = ({ value = [], onChange, currency }: InvoiceItemsPro
     try {
       const response = await productsApi.getAll({ pageSize: 1000 });
       if (response.success) {
-        setProducts(response.data.items);
+        setProducts(response.data.items || []);
+      } else {
+        setProducts([]);
       }
     } catch (error) {
       console.error('Ürünler yüklenemedi');
+      setProducts([]);
     }
   };
 
@@ -157,10 +160,10 @@ export const InvoiceItems = ({ value = [], onChange, currency }: InvoiceItemsPro
           filterOption={(input, option) =>
             (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
           }
-          options={products.map((p) => ({
+          options={products?.map((p) => ({
             label: `${p.name} (${p.code})`,
             value: p.id,
-          }))}
+          })) || []}
         />
       ),
     },
