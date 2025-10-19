@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Form, Input, Button, message, Checkbox } from 'antd';
+import { Form, Input, Button, Checkbox, App } from 'antd';
 import { 
   UserOutlined, 
   LockOutlined, 
@@ -18,6 +18,7 @@ export const Login = () => {
   const [initialEmail, setInitialEmail] = useState('');
   const navigate = useNavigate();
   const setAuth = useAuthStore((state) => state.setAuth);
+  const { message } = App.useApp();
 
   // Sayfa yüklendiğinde kayıtlı bilgileri kontrol et
   useEffect(() => {
