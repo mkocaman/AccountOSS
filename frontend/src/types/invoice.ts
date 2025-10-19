@@ -125,3 +125,21 @@ export const invoiceTypeLabels = {
   [InvoiceType.Sales]: 'Satış',
   [InvoiceType.Purchase]: 'Alış'
 };
+
+// Uppercase exports for backward compatibility
+export const INVOICE_STATUS_LABELS = invoiceStatusLabels;
+export const INVOICE_TYPE_LABELS = invoiceTypeLabels;
+export const PAYMENT_STATUS_LABELS = {
+  Pending: 'Bekliyor',
+  Paid: 'Ödendi',
+  PartiallyPaid: 'Kısmi Ödendi',
+  Overdue: 'Vadesi Geçti',
+};
+
+// Enum types for backward compatibility
+export enum PaymentStatus {
+  Pending = 'Pending',
+  Paid = 'Paid',
+  PartiallyPaid = 'PartiallyPaid',
+  Overdue = 'Overdue',
+}
