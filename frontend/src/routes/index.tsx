@@ -37,6 +37,10 @@ import ContractForm from '@/features/contracts/ContractForm';
 import ContractDetail from '@/features/contracts/ContractDetail';
 import PowerOfAttorneyList from '@/features/powerOfAttorney/PowerOfAttorneyList';
 import OwnerSettingsPage from '@/features/ownerSettings/OwnerSettingsPage';
+import ExpenseCategoryList from '@/features/expenses/ExpenseCategoryList';
+import ExpenseList from '@/features/expenses/ExpenseList';
+import ExpenseForm from '@/features/expenses/ExpenseForm';
+import ExpenseDetail from '@/features/expenses/ExpenseDetail';
 import { useAuthStore } from '@/store/authStore';
 
 // Protected Route komponenti
@@ -274,6 +278,31 @@ export const router = createBrowserRouter([
                   {
                     path: 'settings',
                     element: <OwnerSettingsPage />,
+                  },
+                ],
+              },
+              {
+                path: 'expense-categories',
+                element: <ExpenseCategoryList />,
+              },
+              {
+                path: 'expenses',
+                children: [
+                  {
+                    index: true,
+                    element: <ExpenseList />,
+                  },
+                  {
+                    path: 'new',
+                    element: <ExpenseForm />,
+                  },
+                  {
+                    path: 'edit/:id',
+                    element: <ExpenseForm />,
+                  },
+                  {
+                    path: ':id',
+                    element: <ExpenseDetail />,
                   },
                 ],
               },

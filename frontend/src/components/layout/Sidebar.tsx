@@ -14,6 +14,8 @@ import {
   SolutionOutlined,
   FileProtectOutlined,
   CrownOutlined,
+  WalletOutlined,
+  FolderOutlined,
 } from '@ant-design/icons';
 
 const { Sider } = Layout;
@@ -95,6 +97,14 @@ const menuItems = [
       { key: '/payments', label: 'Tahsilat/Ödeme' },
       { key: '/cash-accounts', label: 'Kasa' },
       { key: '/bank-accounts', label: 'Banka' },
+    ],
+  },
+  {
+    key: 'expenses',
+    icon: <WalletOutlined />,
+    label: 'Masraflar',
+    children: [
+      { key: '/expense-categories', label: 'Kategoriler' },
       { key: '/expenses', label: 'Masraflar' },
     ],
   },
