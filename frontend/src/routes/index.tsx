@@ -6,6 +6,7 @@ import { CompanyList } from '@/features/companies/CompanyList';
 import { CompanyForm } from '@/features/companies/CompanyForm';
 import { CustomerList } from '@/features/customers/CustomerList';
 import { CustomerForm } from '@/features/customers/CustomerForm';
+import CustomerDetail from '@/features/customers/CustomerDetail';
 import { ProductList } from '@/features/products/ProductList';
 import { ProductForm } from '@/features/products/ProductForm';
 import { InvoiceList } from '@/features/invoices/InvoiceList';
@@ -156,7 +157,7 @@ export const router = createBrowserRouter([
           },
           {
             path: ':id',
-            element: <div className="text-2xl">Müşteri Detay (TODO)</div>,
+            element: <CustomerDetail />,
           },
         ],
       },

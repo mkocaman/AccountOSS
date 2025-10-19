@@ -154,7 +154,7 @@ export default function StockReport({ filters }: Props) {
     }
   ];
 
-  if (!data || data.items.length === 0) {
+  if (!data || !data.items || data.items.length === 0) {
     return <Empty description="Stok raporu verisi bulunamadı" />;
   }
 

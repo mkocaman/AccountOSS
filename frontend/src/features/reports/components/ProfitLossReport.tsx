@@ -236,7 +236,7 @@ export default function ProfitLossReport({ filters }: Props) {
     ]
   };
 
-  if (!data || data.items.length === 0) {
+  if (!data || !data.items || data.items.length === 0) {
     return <Empty description="Kâr/Zarar raporu verisi bulunamadı" />;
   }
 

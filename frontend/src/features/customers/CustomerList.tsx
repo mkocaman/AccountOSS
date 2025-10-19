@@ -257,6 +257,10 @@ export const CustomerList = () => {
           columns={columns}
           data={customers}
           loading={loading}
+          onRow={(record) => ({
+            onClick: () => navigate(`/customers/${record.id}`),
+            style: { cursor: 'pointer' }
+          })}
         />
       </Card>
     </div>
