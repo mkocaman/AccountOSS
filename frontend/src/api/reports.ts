@@ -1,68 +1,49 @@
 import { apiClient } from './client';
-import type {
-  SalesReportItem,
-  SalesReportSummary,
-  PaymentReportItem,
-  PaymentReportSummary,
-  StockReportItem,
-  StockReportSummary,
-  GrBalanceReportItem,
-  GrBalanceReportSummary,
-  ProfitLossReportItem,
-  ProfitLossReportSummary,
-  ReportFilters,
-  ExportReportRequest
+import type { 
+  IncomeStatement,
+  BalanceSheet,
+  InventoryReport,
+  SalesReport,
+  AgingReport,
+  PurchaseReport,
+  StockMovementReport
 } from '@/types/report';
 
 export const reportsApi = {
-  // Sales report
-  getSalesReport: (filters: ReportFilters) =>
-    apiClient.get<{
-      items: SalesReportItem[];
-      summary: SalesReportSummary;
-    }>('/reports/sales', { params: filters }),
-
-  // Payment report
-  getPaymentReport: (filters: ReportFilters) =>
-    apiClient.get<{
-      items: PaymentReportItem[];
-      summary: PaymentReportSummary;
-    }>('/reports/payments', { params: filters }),
-
-  // Stock report
-  getStockReport: (filters?: ReportFilters) =>
-    apiClient.get<{
-      items: StockReportItem[];
-      summary: StockReportSummary;
-    }>('/reports/stock', { params: filters }),
-
-  // GR Balance report
-  getGrBalanceReport: (filters?: ReportFilters) =>
-    apiClient.get<{
-      items: GrBalanceReportItem[];
-      summary: GrBalanceReportSummary;
-    }>('/reports/gr-balance', { params: filters }),
-
-  // Profit/Loss report
-  getProfitLossReport: (filters: ReportFilters) =>
-    apiClient.get<{
-      items: ProfitLossReportItem[];
-      summary: ProfitLossReportSummary;
-    }>('/reports/profit-loss', { params: filters }),
-
+  // Financial Reports
+  getIncomeStatement: (params: { startDate: string; endDate: string }) =>
+    apiClient.get<IncomeStatement>('/reports/income-statement', { params }),
+  
+  getBalanceSheet: (params: { date: string }) =>
+    apiClient.get<BalanceSheet>('/reports/balance-sheet', { params }),
+  
+  // Inventory Reports
+  getInventoryReport: (params?: { categoryId?: string; asOfDate?: string }) =>
+    apiClient.get<InventoryReport>('/reports/inventory', { params }),
+  
+  getStockMovementReport: (params: { startDate: string; endDate: string; productId?: string }) =>
+    apiClient.get<StockMovementReport>('/reports/stock-movements', { params }),
+  
+  // Sales Reports
+  getSalesReport: (params: { startDate: string; endDate: string; customerId?: string }) =>
+    apiClient.get<SalesReport>('/reports/sales', { params }),
+  
+  // Purchase Reports
+  getPurchaseReport: (params: { startDate: string; endDate: string; supplierId?: string }) =>
+    apiClient.get<PurchaseReport>('/reports/purchases', { params }),
+  
+  // Aging Reports
+  getReceivablesAging: (params: { asOfDate: string }) =>
+    apiClient.get<AgingReport>('/reports/receivables-aging', { params }),
+  
+  getPayablesAging: (params: { asOfDate: string }) =>
+    apiClient.get<AgingReport>('/reports/payables-aging', { params }),
+  
+  // Export to PDF
+  exportPdf: (reportType: string, params: any) =>
+    apiClient.get(`/reports/${reportType}/pdf`, { params, responseType: 'blob' }),
+  
   // Export to Excel
-  exportReport: async (data: ExportReportRequest) => {
-    const response = await apiClient.post('/reports/export', data, {
-      responseType: 'blob'
-    });
-    
-    // Create download link
-    const url = window.URL.createObjectURL(new Blob([response.data]));
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `${data.reportType}-${Date.now()}.xlsx`);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-  }
+  exportExcel: (reportType: string, params: any) =>
+    apiClient.get(`/reports/${reportType}/excel`, { params, responseType: 'blob' })
 };

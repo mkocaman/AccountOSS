@@ -1,149 +1,252 @@
-// Report types
-export enum ReportType {
+// Report Categories
+export enum ReportCategory {
+  Financial = 'financial',
+  Inventory = 'inventory',
   Sales = 'sales',
-  Payment = 'payment',
-  Stock = 'stock',
-  GrBalance = 'gr-balance',
-  ProfitLoss = 'profit-loss'
+  Purchase = 'purchase',
+  Accounting = 'accounting',
+  Custom = 'custom'
 }
 
-export const reportTypeLabels: Record<ReportType, string> = {
-  [ReportType.Sales]: 'Satış Raporu',
-  [ReportType.Payment]: 'Tahsilat/Ödeme Raporu',
-  [ReportType.Stock]: 'Stok Durum Raporu',
-  [ReportType.GrBalance]: 'GR Kuyruk Bakiye Raporu',
-  [ReportType.ProfitLoss]: 'Kâr/Zarar Raporu'
+export const reportCategoryLabels: Record<ReportCategory, string> = {
+  [ReportCategory.Financial]: 'Mali Raporlar',
+  [ReportCategory.Inventory]: 'Stok Raporları',
+  [ReportCategory.Sales]: 'Satış Raporları',
+  [ReportCategory.Purchase]: 'Satın Alma Raporları',
+  [ReportCategory.Accounting]: 'Muhasebe Raporları',
+  [ReportCategory.Custom]: 'Özel Raporlar'
 };
 
-// Sales report
-export interface SalesReportItem {
-  invoiceNumber: string;
-  invoiceDate: string;
-  customerName: string;
-  customerCode: string;
-  type: 'Sales' | 'Purchase';
-  isOfficial: boolean;
-  currency: string;
-  subTotal: number;
-  totalVat: number;
-  totalDiscount: number;
-  grandTotal: number;
-  profitAmount?: number;
-  profitMargin?: number;
+// Report Definitions
+export interface ReportDefinition {
+  id: string;
+  name: string;
+  description: string;
+  category: ReportCategory;
+  icon?: string;
+  path: string;
+  requiredParams?: string[];
 }
 
-export interface SalesReportSummary {
-  totalInvoices: number;
-  totalSales: number;
-  totalPurchases: number;
-  totalVat: number;
-  totalDiscount: number;
-  netSales: number;
-  averageInvoiceValue: number;
+// Common Report Filters
+export interface ReportFilters {
+  startDate?: string;
+  endDate?: string;
+  customerId?: string;
+  supplierId?: string;
+  productId?: string;
+  categoryId?: string;
+  currency?: string;
 }
 
-// Payment report
-export interface PaymentReportItem {
-  paymentNumber: string;
-  paymentDate: string;
-  customerName: string;
-  type: 'Receipt' | 'Payment';
-  method: string;
-  invoiceNumber?: string;
-  amount: number;
-  currency: string;
-  accountName: string;
-  accountType: 'Cash' | 'Bank';
+// Income Statement (Gelir Tablosu)
+export interface IncomeStatement {
+  period: {
+    startDate: string;
+    endDate: string;
+  };
+  revenue: {
+    salesRevenue: number;
+    serviceRevenue: number;
+    otherRevenue: number;
+    total: number;
+  };
+  costOfSales: {
+    costOfGoods: number;
+    costOfServices: number;
+    total: number;
+  };
+  grossProfit: number;
+  expenses: {
+    operating: number;
+    administrative: number;
+    marketing: number;
+    financial: number;
+    other: number;
+    total: number;
+  };
+  netProfit: number;
+  profitMargin: number;
 }
 
-export interface PaymentReportSummary {
-  totalReceipts: number;
-  totalPayments: number;
-  netCashFlow: number;
-  receiptsByMethod: { method: string; amount: number }[];
-  paymentsByMethod: { method: string; amount: number }[];
+// Balance Sheet (Bilanço)
+export interface BalanceSheet {
+  date: string;
+  assets: {
+    current: {
+      cash: number;
+      bank: number;
+      accountsReceivable: number;
+      inventory: number;
+      other: number;
+      total: number;
+    };
+    fixed: {
+      property: number;
+      equipment: number;
+      other: number;
+      total: number;
+    };
+    total: number;
+  };
+  liabilities: {
+    current: {
+      accountsPayable: number;
+      shortTermDebt: number;
+      other: number;
+      total: number;
+    };
+    longTerm: {
+      longTermDebt: number;
+      other: number;
+      total: number;
+    };
+    total: number;
+  };
+  equity: {
+    capital: number;
+    retainedEarnings: number;
+    currentYearProfit: number;
+    total: number;
+  };
+  totalLiabilitiesEquity: number;
 }
 
-// Stock report
-export interface StockReportItem {
+// Inventory Report
+export interface InventoryReport {
+  products: InventoryReportItem[];
+  summary: {
+    totalProducts: number;
+    totalQuantity: number;
+    totalValue: number;
+    averageValue: number;
+  };
+}
+
+export interface InventoryReportItem {
+  productId: string;
   productCode: string;
   productName: string;
-  category?: string;
-  currentStock: number;
-  minStockLevel: number;
+  category: string;
+  quantity: number;
   unit: string;
-  averageCost: number;
+  unitCost: number;
   totalValue: number;
-  status: 'Normal' | 'Low' | 'OutOfStock';
   lastMovementDate?: string;
 }
 
-export interface StockReportSummary {
-  totalProducts: number;
-  lowStockCount: number;
-  outOfStockCount: number;
-  totalStockValue: number;
+// Sales Report
+export interface SalesReport {
+  period: {
+    startDate: string;
+    endDate: string;
+  };
+  summary: {
+    totalSales: number;
+    totalInvoices: number;
+    averageInvoiceValue: number;
+    topProducts: TopProductItem[];
+    topCustomers: TopCustomerItem[];
+  };
+  monthlySales?: MonthlySalesItem[];
+  salesByCategory?: CategorySalesItem[];
 }
 
-// GR Balance report
-export interface GrBalanceReportItem {
-  entryDate: string;
-  unofficialInvoiceNumber: string;
+export interface TopProductItem {
+  productName: string;
+  quantity: number;
+  revenue: number;
+}
+
+export interface TopCustomerItem {
   customerName: string;
-  currency: string;
-  originalAmount: number;
-  clearedAmount: number;
-  remainingAmount: number;
-  status: 'Waiting' | 'Partial' | 'Cleared';
-  clearanceCount: number;
+  invoiceCount: number;
+  totalRevenue: number;
 }
 
-export interface GrBalanceReportSummary {
-  totalEntries: number;
-  waitingCount: number;
-  partialCount: number;
-  clearedCount: number;
-  totalOriginalAmount: number;
-  totalClearedAmount: number;
-  totalRemainingAmount: number;
-}
-
-// Profit/Loss report
-export interface ProfitLossReportItem {
-  period: string; // "2025-01"
+export interface MonthlySalesItem {
+  month: string;
   sales: number;
-  salesCost: number;
-  grossProfit: number;
-  grossProfitMargin: number;
-  expenses: number;
-  netProfit: number;
-  netProfitMargin: number;
+  invoiceCount: number;
 }
 
-export interface ProfitLossReportSummary {
-  totalSales: number;
-  totalCost: number;
-  totalGrossProfit: number;
-  avgGrossProfitMargin: number;
-  totalExpenses: number;
-  totalNetProfit: number;
-  avgNetProfitMargin: number;
+export interface CategorySalesItem {
+  category: string;
+  sales: number;
+  percentage: number;
 }
 
-// Common filters
-export interface ReportFilters {
-  dateFrom?: string;
-  dateTo?: string;
-  customerId?: string;
-  productId?: string;
-  currency?: string;
-  type?: string;
-  status?: string;
+// Aging Report (Yaşlandırma)
+export interface AgingReport {
+  type: 'receivable' | 'payable';
+  asOfDate: string;
+  items: AgingReportItem[];
+  summary: {
+    current: number;         // 0-30 gün
+    days30to60: number;      // 30-60 gün
+    days60to90: number;      // 60-90 gün
+    over90: number;          // 90+ gün
+    total: number;
+  };
 }
 
-// Export request
-export interface ExportReportRequest {
-  reportType: ReportType;
-  filters: ReportFilters;
-  format: 'excel' | 'pdf' | 'csv';
+export interface AgingReportItem {
+  partnerId: string;
+  partnerCode: string;
+  partnerName: string;
+  current: number;
+  days30to60: number;
+  days60to90: number;
+  over90: number;
+  total: number;
+}
+
+// Purchase Report
+export interface PurchaseReport {
+  period: {
+    startDate: string;
+    endDate: string;
+  };
+  summary: {
+    totalPurchases: number;
+    totalOrders: number;
+    averageOrderValue: number;
+    topSuppliers: TopSupplierItem[];
+  };
+  monthlyPurchases?: MonthlyPurchaseItem[];
+}
+
+export interface TopSupplierItem {
+  supplierName: string;
+  orderCount: number;
+  totalSpent: number;
+}
+
+export interface MonthlyPurchaseItem {
+  month: string;
+  purchases: number;
+  orderCount: number;
+}
+
+// Stock Movement Report
+export interface StockMovementReport {
+  period: {
+    startDate: string;
+    endDate: string;
+  };
+  movements: StockMovementItem[];
+  summary: {
+    totalIn: number;
+    totalOut: number;
+    netChange: number;
+  };
+}
+
+export interface StockMovementItem {
+  date: string;
+  productName: string;
+  movementType: string;
+  quantityIn: number;
+  quantityOut: number;
+  balance: number;
 }

@@ -47,6 +47,11 @@ import JournalEntryList from '@/features/journalEntries/JournalEntryList';
 import JournalEntryForm from '@/features/journalEntries/JournalEntryForm';
 import JournalEntryDetail from '@/features/journalEntries/JournalEntryDetail';
 import LedgerView from '@/features/journalEntries/LedgerView';
+import ReportsDashboard from '@/features/reports/ReportsDashboard';
+import IncomeStatementReport from '@/features/reports/IncomeStatementReport';
+import SalesReport from '@/features/reports/SalesReport';
+import InventoryReport from '@/features/reports/InventoryReport';
+import AgingReport from '@/features/reports/AgingReport';
 import { useAuthStore } from '@/store/authStore';
 
 // Protected Route komponenti
@@ -342,6 +347,35 @@ export const router = createBrowserRouter([
                   {
                     path: 'ledger',
                     element: <LedgerView />,
+                  },
+                ],
+              },
+              {
+                path: 'reports',
+                children: [
+                  {
+                    index: true,
+                    element: <ReportsDashboard />,
+                  },
+                  {
+                    path: 'income-statement',
+                    element: <IncomeStatementReport />,
+                  },
+                  {
+                    path: 'sales',
+                    element: <SalesReport />,
+                  },
+                  {
+                    path: 'inventory',
+                    element: <InventoryReport />,
+                  },
+                  {
+                    path: 'receivables-aging',
+                    element: <AgingReport />,
+                  },
+                  {
+                    path: 'payables-aging',
+                    element: <AgingReport />,
                   },
                 ],
               },
