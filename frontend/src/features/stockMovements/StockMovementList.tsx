@@ -63,10 +63,12 @@ export default function StockMovementList() {
   });
 
   // Fetch products for filter
-  const { data: products } = useQuery({
+  const { data: productsResponse } = useQuery({
     queryKey: ['products-all'],
     queryFn: () => productsApi.getAll({ pageSize: 1000 })
   });
+
+  const products = productsResponse?.data;
 
   // Table columns
   const columns: ColumnsType<StockMovement> = [
@@ -318,7 +320,7 @@ export default function StockMovementList() {
               optionFilterProp="label"
               value={filters.productId}
               onChange={(value) => setFilters({ ...filters, productId: value })}
-              options={products?.items?.map(p => ({
+              options={products?.items?.map((p: any) => ({
                 label: `${p.code} - ${p.name}`,
                 value: p.id
               }))}

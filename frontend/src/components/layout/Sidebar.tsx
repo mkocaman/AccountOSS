@@ -71,7 +71,7 @@ const menuItems = [
     icon: <ShoppingCartOutlined />,
     label: 'Satın Alma',
     children: [
-      { key: '/purchase-orders', label: 'Sipariş Listesi' },
+      { key: '/purchase-orders', label: 'Satın Alma Siparişleri' },
       { key: '/goods-receipts', label: 'Mal Kabul' },
     ],
   },

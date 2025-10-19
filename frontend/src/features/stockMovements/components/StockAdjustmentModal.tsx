@@ -18,11 +18,13 @@ export default function StockAdjustmentModal({ open, onCancel, onSuccess }: Prop
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
   // Fetch products
-  const { data: products } = useQuery({
+  const { data: productsResponse } = useQuery({
     queryKey: ['products-all'],
     queryFn: () => productsApi.getAll({ pageSize: 1000 }),
     enabled: open
   });
+
+  const products = productsResponse?.data;
 
   // Adjust mutation
   const adjustMutation = useMutation({
@@ -41,7 +43,7 @@ export default function StockAdjustmentModal({ open, onCancel, onSuccess }: Prop
   });
 
   const handleProductChange = (productId: string) => {
-    const product = products?.items?.find(p => p.id === productId);
+    const product = products?.items?.find((p: any) => p.id === productId);
     setSelectedProduct(product);
   };
 
@@ -82,7 +84,7 @@ export default function StockAdjustmentModal({ open, onCancel, onSuccess }: Prop
             placeholder="Ürün seçin"
             optionFilterProp="label"
             onChange={handleProductChange}
-            options={products?.items?.map(p => ({
+            options={products?.items?.map((p: any) => ({
               label: `${p.code} - ${p.name}`,
               value: p.id
             }))}

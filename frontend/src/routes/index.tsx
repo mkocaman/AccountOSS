@@ -20,6 +20,9 @@ import { GrQueueList } from '@/features/grQueue/GrQueueList';
 import ReportsPage from '@/features/reports/ReportsPage';
 import SettingsPage from '@/features/settings/SettingsPage';
 import StockMovementList from '@/features/stockMovements/StockMovementList';
+import PurchaseOrderList from '@/features/purchaseOrders/PurchaseOrderList';
+import PurchaseOrderForm from '@/features/purchaseOrders/PurchaseOrderForm';
+import PurchaseOrderDetail from '@/features/purchaseOrders/PurchaseOrderDetail';
 import { useAuthStore } from '@/store/authStore';
 
 // Protected Route komponenti
@@ -185,7 +188,24 @@ export const router = createBrowserRouter([
       },
       {
         path: 'purchase-orders',
-        element: <div className="text-2xl">Sipariş Listesi (TODO)</div>,
+        children: [
+          {
+            index: true,
+            element: <PurchaseOrderList />,
+          },
+          {
+            path: 'new',
+            element: <PurchaseOrderForm />,
+          },
+          {
+            path: 'edit/:id',
+            element: <PurchaseOrderForm />,
+          },
+          {
+            path: ':id',
+            element: <PurchaseOrderDetail />,
+          },
+        ],
       },
       {
         path: 'goods-receipts',
