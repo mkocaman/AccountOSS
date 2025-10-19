@@ -37,3 +37,19 @@ export const formatNumber = (number: number, decimals: number = 2): string => {
 export const formatPercentage = (value: number, decimals: number = 1): string => {
   return `${value.toFixed(decimals)}%`;
 };
+
+// Get initials from name
+export const getInitials = (name: string): string => {
+  if (!name) return '';
+  
+  const words = name.trim().split(' ');
+  if (words.length === 1) {
+    return words[0].substring(0, 2).toUpperCase();
+  }
+  
+  return words
+    .slice(0, 2)
+    .map(word => word.charAt(0))
+    .join('')
+    .toUpperCase();
+};

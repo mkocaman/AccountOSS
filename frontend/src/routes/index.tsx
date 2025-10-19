@@ -7,6 +7,8 @@ import { CompanyForm } from '@/features/companies/CompanyForm';
 import { CustomerList } from '@/features/customers/CustomerList';
 import { CustomerForm } from '@/features/customers/CustomerForm';
 import CustomerDetail from '@/features/customers/CustomerDetail';
+import SupplierList from '@/features/suppliers/SupplierList';
+import SupplierDetail from '@/features/suppliers/SupplierDetail';
 import { ProductList } from '@/features/products/ProductList';
 import { ProductForm } from '@/features/products/ProductForm';
 import { InvoiceList } from '@/features/invoices/InvoiceList';
@@ -163,7 +165,16 @@ export const router = createBrowserRouter([
       },
       {
         path: 'suppliers',
-        element: <div className="text-2xl">Tedarikçi Listesi (TODO)</div>,
+        children: [
+          {
+            index: true,
+            element: <SupplierList />,
+          },
+          {
+            path: ':id',
+            element: <SupplierDetail />,
+          },
+        ],
       },
       {
         path: 'products',
