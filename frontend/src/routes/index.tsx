@@ -17,6 +17,7 @@ import { CashAccountList } from '@/features/payments/CashAccountList';
 import { BankAccountList } from '@/features/payments/BankAccountList';
 import { GrQueueList } from '@/features/grQueue/GrQueueList';
 import ReportsPage from '@/features/reports/ReportsPage';
+import SettingsPage from '@/features/settings/SettingsPage';
 import { useAuthStore } from '@/store/authStore';
 
 // Protected Route komponenti
@@ -133,6 +134,10 @@ export const router = createBrowserRouter([
       {
         path: 'reports',
         element: <ReportsPage />,
+      },
+      {
+        path: 'settings',
+        element: <SettingsPage />,
       },
       {
         path: 'customers',

@@ -47,6 +47,11 @@ const menuItems = [
     label: 'Raporlar',
   },
   {
+    key: '/settings',
+    icon: <SettingOutlined />,
+    label: 'Ayarlar',
+  },
+  {
     key: 'customers',
     icon: <UserOutlined />,
     label: 'Cari Hesap',
