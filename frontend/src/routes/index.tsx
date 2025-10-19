@@ -6,6 +6,8 @@ import { CompanyList } from '@/features/companies/CompanyList';
 import { CompanyForm } from '@/features/companies/CompanyForm';
 import { CustomerList } from '@/features/customers/CustomerList';
 import { CustomerForm } from '@/features/customers/CustomerForm';
+import { ProductList } from '@/features/products/ProductList';
+import { ProductForm } from '@/features/products/ProductForm';
 import { useAuthStore } from '@/store/authStore';
 
 // Protected Route komponenti
@@ -104,7 +106,24 @@ export const router = createBrowserRouter([
       },
       {
         path: 'products',
-        element: <div className="text-2xl">Ürün Listesi (TODO)</div>,
+        children: [
+          {
+            index: true,
+            element: <ProductList />,
+          },
+          {
+            path: 'create',
+            element: <ProductForm />,
+          },
+          {
+            path: 'edit/:id',
+            element: <ProductForm />,
+          },
+          {
+            path: ':id',
+            element: <div className="text-2xl">Ürün Detay (TODO)</div>,
+          },
+        ],
       },
       {
         path: 'categories',
