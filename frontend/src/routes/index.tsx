@@ -29,6 +29,9 @@ import GoodsReceiptDetail from '@/features/goodsReceipts/GoodsReceiptDetail';
 import QuotationList from '@/features/quotations/QuotationList';
 import QuotationForm from '@/features/quotations/QuotationForm';
 import QuotationDetail from '@/features/quotations/QuotationDetail';
+import SalesOrderList from '@/features/salesOrders/SalesOrderList';
+import SalesOrderForm from '@/features/salesOrders/SalesOrderForm';
+import SalesOrderDetail from '@/features/salesOrders/SalesOrderDetail';
 import { useAuthStore } from '@/store/authStore';
 
 // Protected Route komponenti
@@ -188,27 +191,48 @@ export const router = createBrowserRouter([
           },
         ],
       },
-      {
-        path: 'quotations',
-        children: [
-          {
-            index: true,
-            element: <QuotationList />,
-          },
-          {
-            path: 'new',
-            element: <QuotationForm />,
-          },
-          {
-            path: 'edit/:id',
-            element: <QuotationForm />,
-          },
-          {
-            path: ':id',
-            element: <QuotationDetail />,
-          },
-        ],
-      },
+              {
+                path: 'quotations',
+                children: [
+                  {
+                    index: true,
+                    element: <QuotationList />,
+                  },
+                  {
+                    path: 'new',
+                    element: <QuotationForm />,
+                  },
+                  {
+                    path: 'edit/:id',
+                    element: <QuotationForm />,
+                  },
+                  {
+                    path: ':id',
+                    element: <QuotationDetail />,
+                  },
+                ],
+              },
+              {
+                path: 'sales-orders',
+                children: [
+                  {
+                    index: true,
+                    element: <SalesOrderList />,
+                  },
+                  {
+                    path: 'new',
+                    element: <SalesOrderForm />,
+                  },
+                  {
+                    path: 'edit/:id',
+                    element: <SalesOrderForm />,
+                  },
+                  {
+                    path: ':id',
+                    element: <SalesOrderDetail />,
+                  },
+                ],
+              },
       {
         path: 'stock-movements',
         element: <StockMovementList />,
