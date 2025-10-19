@@ -327,11 +327,17 @@ export const MainLayout = () => {
       <div 
         style={{ 
           minHeight: 'calc(100vh - 56px - 64px)',
-          backgroundColor: themeMode === 'semi-dark' ? '#ffffff' : 'transparent',
-          color: themeMode === 'semi-dark' ? '#000000' : 'inherit'
         }}
       >
-        <Outlet />
+        {themeMode === 'semi-dark' ? (
+          <ConfigProvider theme={{ algorithm: theme.defaultAlgorithm }}>
+            <div style={{ backgroundColor: '#ffffff', color: '#000000', padding: 24, borderRadius: 8 }}>
+              <Outlet />
+            </div>
+          </ConfigProvider>
+        ) : (
+          <Outlet />
+        )}
       </div>
       </ProLayout>
     </ConfigProvider>
