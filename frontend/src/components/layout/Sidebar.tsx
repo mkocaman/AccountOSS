@@ -52,9 +52,9 @@ const menuItems = [
     label: 'Ayarlar',
   },
   {
-    key: 'partners',
+    key: '/partners',
     icon: <UserOutlined />,
-    label: <Link to="/partners">Cari Hesaplar</Link>,
+    label: 'Cari Hesaplar',
   },
   {
     key: 'products',
