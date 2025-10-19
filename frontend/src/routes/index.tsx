@@ -23,6 +23,9 @@ import StockMovementList from '@/features/stockMovements/StockMovementList';
 import PurchaseOrderList from '@/features/purchaseOrders/PurchaseOrderList';
 import PurchaseOrderForm from '@/features/purchaseOrders/PurchaseOrderForm';
 import PurchaseOrderDetail from '@/features/purchaseOrders/PurchaseOrderDetail';
+import GoodsReceiptList from '@/features/goodsReceipts/GoodsReceiptList';
+import GoodsReceiptForm from '@/features/goodsReceipts/GoodsReceiptForm';
+import GoodsReceiptDetail from '@/features/goodsReceipts/GoodsReceiptDetail';
 import { useAuthStore } from '@/store/authStore';
 
 // Protected Route komponenti
@@ -209,7 +212,24 @@ export const router = createBrowserRouter([
       },
       {
         path: 'goods-receipts',
-        element: <div className="text-2xl">Mal Kabul (TODO)</div>,
+        children: [
+          {
+            index: true,
+            element: <GoodsReceiptList />,
+          },
+          {
+            path: 'new',
+            element: <GoodsReceiptForm />,
+          },
+          {
+            path: 'edit/:id',
+            element: <GoodsReceiptForm />,
+          },
+          {
+            path: ':id',
+            element: <GoodsReceiptDetail />,
+          },
+        ],
       },
       {
         path: 'payments',
