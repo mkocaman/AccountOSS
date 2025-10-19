@@ -35,7 +35,7 @@ interface Props {
 }
 
 // GR Aklama Modal
-export const GrClearanceModal = ({ open, grQueueEntry, onCancel, onSuccess }: Props) => {
+const GrClearanceModal = ({ open, grQueueEntry, onCancel, onSuccess }: Props) => {
   const [form] = Form.useForm();
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<string>();
   const [suggestions, setSuggestions] = useState<any>(null);
@@ -331,3 +331,5 @@ export const GrClearanceModal = ({ open, grQueueEntry, onCancel, onSuccess }: Pr
     </Modal>
   );
 };
+
+export default GrClearanceModal;
