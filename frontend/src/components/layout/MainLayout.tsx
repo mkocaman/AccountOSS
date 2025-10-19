@@ -22,7 +22,7 @@ import {
 import { useAuthStore } from '@/store/authStore';
 import { useCompanyStore } from '@/store/companyStore';
 import { Dropdown, Space, Avatar } from 'antd';
-import LanguageSwitcher from '../LanguageSwitcher';
+// import LanguageSwitcher from '../LanguageSwitcher';
 
 // Ana layout bileşeni - Ant Design Pro Layout ile
 export const MainLayout = () => {
@@ -247,7 +247,7 @@ export const MainLayout = () => {
         ),
       }}
       actionsRender={() => [
-        <LanguageSwitcher key="lang" />,
+        // <LanguageSwitcher key="lang" />,
       ]}
       footerRender={() => (
         <div style={{ textAlign: 'center', color: '#999' }}>
