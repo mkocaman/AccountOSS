@@ -4,6 +4,15 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from './App.tsx'
 import './index.css'
 
+// Ant Design React 19 uyumluluk uyarısını suppress et
+const originalWarn = console.warn
+console.warn = (...args) => {
+  if (args[0]?.includes?.('antd v5 support React is 16 ~ 18')) {
+    return // Bu uyarıyı gösterme
+  }
+  originalWarn(...args)
+}
+
 // React Query client oluştur
 const queryClient = new QueryClient({
   defaultOptions: {
