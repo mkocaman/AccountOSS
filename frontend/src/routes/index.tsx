@@ -94,10 +94,6 @@ export const router = createBrowserRouter([
             path: ':id',
             element: <InvoiceDetail />,
           },
-          {
-            path: 'gr-queue',
-            element: <div className="text-2xl">GR Kuyruğu (TODO - Later)</div>,
-          },
         ],
       },
       {
