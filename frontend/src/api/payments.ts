@@ -1,81 +1,86 @@
 import { apiClient } from './client';
-import type {
-  Payment,
-  CashAccount,
-  BankAccount,
-  CreatePaymentRequest,
-  UpdatePaymentRequest,
-} from '@/types/payment';
-import type { ApiResponse, PagedResponse } from '@/types';
 
-// Payment API
-export const paymentsApi = {
-  // Ödeme listesi
-  getAll: (params?: PaymentListParams) =>
-    apiClient.get<ApiResponse<PagedResponse<Payment>>>('/payments', { params }),
+// Payment types matching backend
+export interface Payment {
+  id: string;
+  paymentNumber: string;
+  type: PaymentType; // 0 = Income, 1 = Expense
+  customerId: string;
+  customerName: string;
+  invoiceId?: string;
+  invoiceNumber?: string;
+  paymentDate: string;
+  amount: number;
+  currency: string;
+  method: PaymentMethod;
+  reference?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
-  // Ödeme detayı
-  getById: (id: string) =>
-    apiClient.get<ApiResponse<Payment>>(`/payments/${id}`),
+export enum PaymentType {
+  Income = 0,
+  Expense = 1
+}
 
-  // Yeni ödeme
-  create: (data: CreatePaymentRequest) =>
-    apiClient.post<ApiResponse<Payment>>('/payments', data),
+export enum PaymentMethod {
+  Cash = 0,
+  BankTransfer = 1,
+  CreditCard = 2,
+  Check = 3,
+  Other = 4
+}
 
-  // Ödeme güncelle
-  update: (id: string, data: UpdatePaymentRequest) =>
-    apiClient.put<ApiResponse<Payment>>(`/payments/${id}`, data),
+export interface CreatePaymentRequest {
+  type: PaymentType;
+  customerId: string;
+  invoiceId?: string;
+  paymentDate: string;
+  amount: number;
+  currency: string;
+  method: PaymentMethod;
+  reference?: string;
+  notes?: string;
+}
 
-  // Ödeme sil
-  delete: (id: string) =>
-    apiClient.delete<ApiResponse<void>>(`/payments/${id}`),
-};
-
-// Cash Account API
-export const cashAccountsApi = {
-  getAll: () =>
-    apiClient.get<ApiResponse<CashAccount[]>>('/cash-accounts'),
-
-  getById: (id: string) =>
-    apiClient.get<ApiResponse<CashAccount>>(`/cash-accounts/${id}`),
-
-  create: (data: { name: string; currency: string }) =>
-    apiClient.post<ApiResponse<CashAccount>>('/cash-accounts', data),
-
-  update: (id: string, data: { name: string; isActive: boolean }) =>
-    apiClient.put<ApiResponse<CashAccount>>(`/cash-accounts/${id}`, data),
-};
-
-// Bank Account API
-export const bankAccountsApi = {
-  getAll: () =>
-    apiClient.get<ApiResponse<BankAccount[]>>('/bank-accounts'),
-
-  getById: (id: string) =>
-    apiClient.get<ApiResponse<BankAccount>>(`/bank-accounts/${id}`),
-
-  create: (data: {
-    bankName: string;
-    accountNumber: string;
-    iban?: string;
-    currency: string;
-  }) =>
-    apiClient.post<ApiResponse<BankAccount>>('/bank-accounts', data),
-
-  update: (id: string, data: { bankName: string; isActive: boolean }) =>
-    apiClient.put<ApiResponse<BankAccount>>(`/bank-accounts/${id}`, data),
-};
-
-export interface PaymentListParams {
-  pageNumber?: number;
-  pageSize?: number;
-  searchText?: string;
+export interface PaymentFilters {
+  type?: PaymentType;
   customerId?: string;
   invoiceId?: string;
-  type?: number;
-  method?: number;
-  status?: number;
+  method?: PaymentMethod;
   startDate?: string;
   endDate?: string;
-  currency?: string;
+  searchTerm?: string;
 }
+
+export const paymentTypeLabels = {
+  [PaymentType.Income]: 'Tahsilat',
+  [PaymentType.Expense]: 'Ödeme'
+};
+
+export const paymentMethodLabels = {
+  [PaymentMethod.Cash]: 'Nakit',
+  [PaymentMethod.BankTransfer]: 'Banka Transferi',
+  [PaymentMethod.CreditCard]: 'Kredi Kartı',
+  [PaymentMethod.Check]: 'Çek',
+  [PaymentMethod.Other]: 'Diğer'
+};
+
+export const paymentsApi = {
+  // Ödeme listesi getir
+  getAll: (filters?: PaymentFilters) =>
+    apiClient.get<Payment[]>('/payments', { params: filters }),
+
+  // Ödeme detayı getir
+  getById: (id: string) =>
+    apiClient.get<Payment>(`/payments/${id}`),
+
+  // Yeni ödeme kaydet
+  create: (data: CreatePaymentRequest) =>
+    apiClient.post<Payment>('/payments', data),
+
+  // Ödeme sil (soft delete)
+  delete: (id: string) =>
+    apiClient.delete<boolean>(`/payments/${id}`),
+};
