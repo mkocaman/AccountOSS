@@ -16,9 +16,9 @@ import {
 import { useNavigate, useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { paymentsApi, cashAccountsApi, bankAccountsApi } from '@/api/payments';
-import { customersApi } from '@/api/customers';
+import { partnersApi } from '@/api/partners';
 import { invoicesApi } from '@/api/invoices';
-import type { Customer } from '@/types/customer';
+import type { Partner } from '@/types/partner';
 import type { Invoice } from '@/types/invoice';
 import type { CashAccount, BankAccount, CreatePaymentRequest } from '@/types/payment';
 import { PaymentType, PaymentMethod } from '@/types/payment';
@@ -31,12 +31,12 @@ export const PaymentForm = () => {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [partners, setPartners] = useState<Partner[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [cashAccounts, setCashAccounts] = useState<CashAccount[]>([]);
   const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([]);
   
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PaymentMethod.Cash);
 
@@ -51,13 +51,13 @@ export const PaymentForm = () => {
 
   const loadData = async () => {
     try {
-      const [customersRes, cashRes, bankRes] = await Promise.all([
-        customersApi.getAll({ pageSize: 1000 }),
+      const [partnersRes, cashRes, bankRes] = await Promise.all([
+        partnersApi.getAll({ pageSize: 1000 }),
         cashAccountsApi.getAll(),
         bankAccountsApi.getAll(),
       ]);
 
-      if (customersRes.success) setCustomers(customersRes.data.items);
+      if (partnersRes.success) setPartners(partnersRes.data.items || partnersRes.data);
       if (cashRes.success) setCashAccounts(cashRes.data);
       if (bankRes.success) setBankAccounts(bankRes.data);
     } catch (error) {
@@ -76,9 +76,9 @@ export const PaymentForm = () => {
           paymentDate: dayjs(payment.paymentDate),
         });
 
-        const customer = customers.find((c) => c.id === payment.customerId);
-        if (customer) {
-          setSelectedCustomer(customer);
+        const partner = partners.find((c) => c.id === payment.customerId);
+        if (partner) {
+          setSelectedPartner(partner);
         }
 
         setPaymentMethod(payment.method);
@@ -91,16 +91,16 @@ export const PaymentForm = () => {
     }
   };
 
-  const handleCustomerChange = async (customerId: string) => {
-    const customer = customers.find((c) => c.id === customerId);
-    if (customer) {
-      setSelectedCustomer(customer);
-      form.setFieldValue('currency', customer.currency);
+  const handlePartnerChange = async (partnerId: string) => {
+    const partner = partners.find((c) => c.id === partnerId);
+    if (partner) {
+      setSelectedPartner(partner);
+      form.setFieldValue('currency', partner.currency);
 
-      // Müşterinin faturalarını yükle
+      // Cari hesabın faturalarını yükle
       try {
         const response = await invoicesApi.getAll({
-          customerId,
+          customerId: partnerId,
           paymentStatus: 0, // Ödenmemiş
           pageSize: 100,
         });
@@ -182,44 +182,44 @@ export const PaymentForm = () => {
       >
         <Card title="Ödeme Bilgileri" className="mb-4">
           <Row gutter={16}>
-            {/* Müşteri */}
+            {/* Cari Hesap */}
             <Col span={12}>
               <Form.Item
                 name="customerId"
-                label="Müşteri"
-                rules={[{ required: true, message: 'Müşteri seçin!' }]}
+                label="Cari Hesap"
+                rules={[{ required: true, message: 'Cari hesap seçin!' }]}
               >
                 <Select
                   showSearch
-                  placeholder="Müşteri seçin"
+                  placeholder="Cari hesap seçin"
                   size="large"
                   optionFilterProp="children"
-                  onChange={handleCustomerChange}
+                  onChange={handlePartnerChange}
                   filterOption={(input, option) =>
                     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
                   }
-                  options={customers.map((c) => ({
+                  options={partners.map((c) => ({
                     label: `${c.name} (${c.code})`,
                     value: c.id,
                   }))}
                 />
               </Form.Item>
 
-              {/* Müşteri bakiyesi */}
-              {selectedCustomer && (
+              {/* Cari hesap bakiyesi */}
+              {selectedPartner && (
                 <Alert
                   message={
                     <div>
-                      <strong>Müşteri Bakiyesi:</strong>{' '}
+                      <strong>Cari Hesap Bakiyesi:</strong>{' '}
                       <span
                         className={
-                          selectedCustomer.currentBalance > 0
+                          selectedPartner.currentBalance > 0
                             ? 'text-green-600'
                             : 'text-red-600'
                         }
                       >
-                        {selectedCustomer.currentBalance.toFixed(2)}{' '}
-                        {selectedCustomer.currency}
+                        {selectedPartner.currentBalance.toFixed(2)}{' '}
+                        {selectedPartner.currency}
                       </span>
                     </div>
                   }

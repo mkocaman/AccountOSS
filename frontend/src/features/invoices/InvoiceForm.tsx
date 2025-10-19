@@ -15,8 +15,8 @@ import {
 import { useNavigate, useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { invoicesApi } from '@/api/invoices';
-import { customersApi } from '@/api/customers';
-import type { Customer } from '@/types/customer';
+import { partnersApi } from '@/api/partners';
+import type { Partner } from '@/types/partner';
 import type { CreateInvoiceRequest, InvoiceItem } from '@/types/invoice';
 import { InvoiceType } from '@/types/invoice';
 import { InvoiceItems } from './components/InvoiceItems';
@@ -29,25 +29,25 @@ export const InvoiceForm = () => {
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [partners, setPartners] = useState<Partner[]>([]);
+  const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
   const [items, setItems] = useState<InvoiceItem[]>([]);
   const [currency, setCurrency] = useState('TRY');
 
   const isEditMode = !!id;
 
   useEffect(() => {
-    loadCustomers();
+    loadPartners();
     if (isEditMode) {
       loadInvoice();
     }
   }, [id]);
 
-  const loadCustomers = async () => {
+  const loadPartners = async () => {
     try {
-      const response = await customersApi.getAll({ isActive: true });
+      const response = await partnersApi.getAll({ isActive: true });
       if (response.success) {
-        setCustomers(response.data);
+        setPartners(response.data.items || response.data);
       }
     } catch (error) {
       console.error('Müşteriler yüklenemedi');
@@ -66,9 +66,9 @@ export const InvoiceForm = () => {
           dueDate: invoice.dueDate ? dayjs(invoice.dueDate) : null,
         });
 
-        const customer = customers.find((c) => c.id === invoice.customerId);
-        if (customer) {
-          setSelectedCustomer(customer);
+        const partner = partners.find((c) => c.id === invoice.customerId);
+        if (partner) {
+          setSelectedPartner(partner);
         }
 
         setItems(invoice.items || []);
@@ -82,17 +82,17 @@ export const InvoiceForm = () => {
     }
   };
 
-  const handleCustomerChange = (customerId: string) => {
-    const customer = customers.find((c) => c.id === customerId);
-    if (customer) {
-      setSelectedCustomer(customer);
-      const newCurrency = customer.currency;
+  const handlePartnerChange = (partnerId: string) => {
+    const partner = partners.find((c) => c.id === partnerId);
+    if (partner) {
+      setSelectedPartner(partner);
+      const newCurrency = partner.currency;
       form.setFieldValue('currency', newCurrency);
       setCurrency(newCurrency);
 
       const invoiceDate = form.getFieldValue('invoiceDate');
-      if (invoiceDate && customer.paymentTermDays) {
-        const dueDate = invoiceDate.add(customer.paymentTermDays, 'day');
+      if (invoiceDate && partner.paymentTermDays) {
+        const dueDate = invoiceDate.add(partner.paymentTermDays, 'day');
         form.setFieldValue('dueDate', dueDate);
       }
     }
@@ -190,48 +190,48 @@ export const InvoiceForm = () => {
             <Col span={12}>
               <Form.Item
                 name="customerId"
-                label="Müşteri"
-                rules={[{ required: true, message: 'Müşteri seçin!' }]}
+                label="Cari Hesap"
+                rules={[{ required: true, message: 'Cari hesap seçin!' }]}
               >
                 <Select
                   showSearch
-                  placeholder="Müşteri seçin"
+                  placeholder="Cari hesap seçin"
                   size="large"
                   optionFilterProp="children"
-                  onChange={handleCustomerChange}
+                  onChange={handlePartnerChange}
                   filterOption={(input, option) =>
                     (option?.label ?? '')
                       .toLowerCase()
                       .includes(input.toLowerCase())
                   }
-                  options={customers.map((c) => ({
+                  options={partners.map((c) => ({
                     label: `${c.name} (${c.code})`,
                     value: c.id,
                   }))}
                 />
               </Form.Item>
 
-              {/* Müşteri bilgileri göster */}
-              {selectedCustomer && (
+              {/* Cari hesap bilgileri göster */}
+              {selectedPartner && (
                 <div className="bg-gray-50 p-3 rounded mb-4">
                   <div className="text-sm space-y-1">
                     <div>
-                      <strong>Email:</strong> {selectedCustomer.email || '-'}
+                      <strong>Email:</strong> {selectedPartner.email || '-'}
                     </div>
                     <div>
-                      <strong>Telefon:</strong> {selectedCustomer.phone || '-'}
+                      <strong>Telefon:</strong> {selectedPartner.phone || '-'}
                     </div>
                     <div>
                       <strong>Bakiye:</strong>{' '}
                       <span
                         className={
-                          selectedCustomer.currentBalance > 0
+                          selectedPartner.currentBalance > 0
                             ? 'text-green-600'
                             : 'text-red-600'
                         }
                       >
-                        {selectedCustomer.currentBalance.toFixed(2)}{' '}
-                        {selectedCustomer.currency}
+                        {selectedPartner.currentBalance.toFixed(2)}{' '}
+                        {selectedPartner.currency}
                       </span>
                     </div>
                   </div>
