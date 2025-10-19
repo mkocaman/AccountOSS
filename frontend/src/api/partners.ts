@@ -11,54 +11,54 @@ import type {
 import type { PagedResponse } from '@/types/common';
 
 export const partnersApi = {
-  // List partners
+  // List partners (using customers endpoint)
   getAll: (params?: PartnerFilters & { page?: number; pageSize?: number }) =>
-    apiClient.get<PagedResponse<Partner>>('/partners', { params }),
+    apiClient.get<PagedResponse<Partner>>('/customers', { params }),
   
   // Get by ID
   getById: (id: string) =>
-    apiClient.get<Partner>(`/partners/${id}`),
+    apiClient.get<Partner>(`/customers/${id}`),
   
   // Get detail
   getDetail: (id: string) =>
-    apiClient.get<PartnerDetail>(`/partners/${id}/detail`),
+    apiClient.get<PartnerDetail>(`/customers/${id}`),
   
   // Create
   create: (data: CreatePartnerRequest) =>
-    apiClient.post<Partner>('/partners', data),
+    apiClient.post<Partner>('/customers', data),
   
   // Update
   update: (id: string, data: UpdatePartnerRequest) =>
-    apiClient.put<Partner>(`/partners/${id}`, data),
+    apiClient.put<Partner>(`/customers/${id}`, data),
   
   // Delete
   delete: (id: string) =>
-    apiClient.delete(`/partners/${id}`),
+    apiClient.delete(`/customers/${id}`),
   
   // Block/Unblock
   block: (id: string, reason: string) =>
-    apiClient.post(`/partners/${id}/block`, { reason }),
+    apiClient.post(`/customers/${id}/block`, { reason }),
   
   unblock: (id: string) =>
-    apiClient.post(`/partners/${id}/unblock`),
+    apiClient.post(`/customers/${id}/unblock`),
   
   // Get balance history
   getBalanceHistory: (id: string, params?: { dateFrom?: string; dateTo?: string }) =>
-    apiClient.get<BalanceHistoryItem[]>(`/partners/${id}/balance-history`, { params }),
+    apiClient.get<BalanceHistoryItem[]>(`/customers/${id}/balance-history`, { params }),
   
   // Addresses
   getAddresses: (id: string) =>
-    apiClient.get<PartnerAddress[]>(`/partners/${id}/addresses`),
+    apiClient.get<PartnerAddress[]>(`/customers/${id}/addresses`),
   
   addAddress: (partnerId: string, data: Omit<PartnerAddress, 'id'>) =>
-    apiClient.post<PartnerAddress>(`/partners/${partnerId}/addresses`, data),
+    apiClient.post<PartnerAddress>(`/customers/${partnerId}/addresses`, data),
   
   updateAddress: (partnerId: string, addressId: string, data: Partial<PartnerAddress>) =>
-    apiClient.put<PartnerAddress>(`/partners/${partnerId}/addresses/${addressId}`, data),
+    apiClient.put<PartnerAddress>(`/customers/${partnerId}/addresses/${addressId}`, data),
   
   deleteAddress: (partnerId: string, addressId: string) =>
-    apiClient.delete(`/partners/${partnerId}/addresses/${addressId}`),
+    apiClient.delete(`/customers/${partnerId}/addresses/${addressId}`),
   
   setDefaultAddress: (partnerId: string, addressId: string) =>
-    apiClient.post(`/partners/${partnerId}/addresses/${addressId}/set-default`)
+    apiClient.post(`/customers/${partnerId}/addresses/${addressId}/set-default`)
 };
