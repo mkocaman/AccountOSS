@@ -41,6 +41,8 @@ import ExpenseCategoryList from '@/features/expenses/ExpenseCategoryList';
 import ExpenseList from '@/features/expenses/ExpenseList';
 import ExpenseForm from '@/features/expenses/ExpenseForm';
 import ExpenseDetail from '@/features/expenses/ExpenseDetail';
+import ChartOfAccountsList from '@/features/chartOfAccounts/ChartOfAccountsList';
+import TrialBalance from '@/features/chartOfAccounts/TrialBalance';
 import { useAuthStore } from '@/store/authStore';
 
 // Protected Route komponenti
@@ -305,6 +307,14 @@ export const router = createBrowserRouter([
                     element: <ExpenseDetail />,
                   },
                 ],
+              },
+              {
+                path: 'chart-of-accounts',
+                element: <ChartOfAccountsList />,
+              },
+              {
+                path: 'trial-balance',
+                element: <TrialBalance />,
               },
       {
         path: 'stock-movements',
