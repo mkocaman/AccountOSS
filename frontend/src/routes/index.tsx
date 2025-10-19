@@ -9,6 +9,7 @@ import { CustomerForm } from '@/features/customers/CustomerForm';
 import CustomerDetail from '@/features/customers/CustomerDetail';
 import SupplierList from '@/features/suppliers/SupplierList';
 import SupplierDetail from '@/features/suppliers/SupplierDetail';
+import CategoryList from '@/features/categories/CategoryList';
 import { ProductList } from '@/features/products/ProductList';
 import { ProductForm } from '@/features/products/ProductForm';
 import { InvoiceList } from '@/features/invoices/InvoiceList';
@@ -177,6 +178,10 @@ export const router = createBrowserRouter([
         ],
       },
       {
+        path: 'categories',
+        element: <CategoryList />,
+      },
+      {
         path: 'products',
         children: [
           {
@@ -196,10 +201,6 @@ export const router = createBrowserRouter([
             element: <div className="text-2xl">Ürün Detay (TODO)</div>,
           },
         ],
-      },
-      {
-        path: 'categories',
-        element: <div className="text-2xl">Kategoriler (TODO)</div>,
       },
       {
         path: 'stock',
