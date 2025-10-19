@@ -8,4 +8,5 @@ export * from './invoices';
 export * from './payments';
 export * from './grQueue';
 export * from './dashboard';
+export * from './reports';
 

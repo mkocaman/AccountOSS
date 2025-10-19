@@ -42,6 +42,11 @@ const menuItems = [
     label: 'GR Kuyruğu',
   },
   {
+    key: '/reports',
+    icon: <BarChartOutlined />,
+    label: 'Raporlar',
+  },
+  {
     key: 'customers',
     icon: <UserOutlined />,
     label: 'Cari Hesap',

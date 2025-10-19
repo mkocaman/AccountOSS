@@ -16,6 +16,7 @@ import { PaymentForm } from '@/features/payments/PaymentForm';
 import { CashAccountList } from '@/features/payments/CashAccountList';
 import { BankAccountList } from '@/features/payments/BankAccountList';
 import { GrQueueList } from '@/features/grQueue/GrQueueList';
+import ReportsPage from '@/features/reports/ReportsPage';
 import { useAuthStore } from '@/store/authStore';
 
 // Protected Route komponenti
@@ -128,6 +129,10 @@ export const router = createBrowserRouter([
       {
         path: 'gr-queue',
         element: <GrQueueList />,
+      },
+      {
+        path: 'reports',
+        element: <ReportsPage />,
       },
       {
         path: 'customers',
