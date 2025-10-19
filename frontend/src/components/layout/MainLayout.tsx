@@ -21,8 +21,8 @@ import {
 } from '@ant-design/icons';
 import { useAuthStore } from '@/store/authStore';
 import { useCompanyStore } from '@/store/companyStore';
-import { Dropdown, Space, Avatar } from 'antd';
-// import LanguageSwitcher from '../LanguageSwitcher';
+import { Dropdown, Space, Avatar, Select, Switch, Button } from 'antd';
+import { GlobalOutlined, SunOutlined, MoonOutlined, DesktopOutlined } from '@ant-design/icons';
 
 // Ana layout bileşeni - Ant Design Pro Layout ile
 export const MainLayout = () => {
@@ -31,6 +31,7 @@ export const MainLayout = () => {
   const { user, logout } = useAuthStore();
   const { currentCompany } = useCompanyStore();
   const [pathname, setPathname] = useState(location.pathname);
+  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
 
   // Menü yapısı - ProLayout formatında
   const route = {
@@ -247,7 +248,56 @@ export const MainLayout = () => {
         ),
       }}
       actionsRender={() => [
-        // <LanguageSwitcher key="lang" />,
+        // Dil Değiştirici
+        <Select
+          key="language"
+          defaultValue="tr"
+          style={{ width: 120 }}
+          size="small"
+          suffixIcon={<GlobalOutlined />}
+          options={[
+            { value: 'tr', label: '🇹🇷 Türkçe' },
+            { value: 'en', label: '🇺🇸 English' },
+          ]}
+        />,
+        
+        // Tema Değiştirici
+        <Select
+          key="theme"
+          value={theme}
+          onChange={setTheme}
+          style={{ width: 120 }}
+          size="small"
+          options={[
+            { 
+              value: 'light', 
+              label: (
+                <Space>
+                  <SunOutlined />
+                  Açık
+                </Space>
+              )
+            },
+            { 
+              value: 'dark', 
+              label: (
+                <Space>
+                  <MoonOutlined />
+                  Koyu
+                </Space>
+              )
+            },
+            { 
+              value: 'system', 
+              label: (
+                <Space>
+                  <DesktopOutlined />
+                  Sistem
+                </Space>
+              )
+            },
+          ]}
+        />,
       ]}
       footerRender={() => (
         <div style={{ textAlign: 'center', color: '#999' }}>
