@@ -17,11 +17,12 @@ import dayjs from 'dayjs';
 import { invoicesApi } from '@/api/invoices';
 import { customersApi } from '@/api/customers';
 import type { Customer } from '@/types/customer';
-import type { CreateInvoiceRequest } from '@/types/invoice';
+import type { CreateInvoiceRequest, InvoiceItem } from '@/types/invoice';
 import { InvoiceType } from '@/types/invoice';
+import { InvoiceItems } from './components/InvoiceItems';
+import { InvoiceSummary } from './components/InvoiceSummary';
 
-// Fatura formu (Part 1 - Temel yapı)
-// Part 2'de Invoice Items eklenecek
+// Fatura formu - FULL VERSION (Part 2)
 export const InvoiceForm = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
@@ -30,6 +31,8 @@ export const InvoiceForm = () => {
   const [saving, setSaving] = useState(false);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [items, setItems] = useState<InvoiceItem[]>([]);
+  const [currency, setCurrency] = useState('TRY');
 
   const isEditMode = !!id;
 
@@ -62,12 +65,14 @@ export const InvoiceForm = () => {
           invoiceDate: dayjs(invoice.invoiceDate),
           dueDate: invoice.dueDate ? dayjs(invoice.dueDate) : null,
         });
-        
-        // Müşteriyi seç
+
         const customer = customers.find((c) => c.id === invoice.customerId);
         if (customer) {
           setSelectedCustomer(customer);
         }
+
+        setItems(invoice.items || []);
+        setCurrency(invoice.currency);
       }
     } catch (error) {
       message.error('Fatura yüklenemedi');
@@ -81,11 +86,10 @@ export const InvoiceForm = () => {
     const customer = customers.find((c) => c.id === customerId);
     if (customer) {
       setSelectedCustomer(customer);
-      
-      // Müşteri para birimini form'a aktar
-      form.setFieldValue('currency', customer.currency);
-      
-      // Vade gün sayısına göre vade tarihi hesapla
+      const newCurrency = customer.currency;
+      form.setFieldValue('currency', newCurrency);
+      setCurrency(newCurrency);
+
       const invoiceDate = form.getFieldValue('invoiceDate');
       if (invoiceDate && customer.paymentTermDays) {
         const dueDate = invoiceDate.add(customer.paymentTermDays, 'day');
@@ -94,14 +98,38 @@ export const InvoiceForm = () => {
     }
   };
 
+  const handleCurrencyChange = (value: string) => {
+    setCurrency(value);
+  };
+
   const handleSubmit = async (values: any) => {
+    // Validasyon
+    if (items.length === 0) {
+      message.error('En az bir fatura kalemi ekleyin!');
+      return;
+    }
+
+    // Tüm satırlarda ürün seçilmiş mi?
+    const hasEmptyProduct = items.some((item) => !item.productId);
+    if (hasEmptyProduct) {
+      message.error('Tüm satırlarda ürün seçili olmalı!');
+      return;
+    }
+
     setSaving(true);
     try {
       const data: CreateInvoiceRequest = {
         ...values,
         invoiceDate: values.invoiceDate.format('YYYY-MM-DD'),
         dueDate: values.dueDate?.format('YYYY-MM-DD'),
-        items: [], // Part 2'de eklenecek
+        items: items.map((item) => ({
+          productId: item.productId,
+          description: item.description,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          discountRate: item.discountRate,
+          vatRate: item.vatRate,
+        })),
       };
 
       if (isEditMode) {
@@ -111,6 +139,7 @@ export const InvoiceForm = () => {
         await invoicesApi.create(data);
         message.success('Fatura oluşturuldu');
       }
+
       navigate('/invoices');
     } catch (error: any) {
       message.error(
@@ -267,7 +296,7 @@ export const InvoiceForm = () => {
                 label="Para Birimi"
                 rules={[{ required: true, message: 'Para birimi gerekli!' }]}
               >
-                <Select size="large">
+                <Select size="large" onChange={handleCurrencyChange}>
                   <Select.Option value="TRY">🇹🇷 TRY</Select.Option>
                   <Select.Option value="USD">🇺🇸 USD</Select.Option>
                   <Select.Option value="EUR">🇪🇺 EUR</Select.Option>
@@ -320,26 +349,26 @@ export const InvoiceForm = () => {
           </Row>
         </Card>
 
-        {/* Fatura Kalemleri - Part 2'de eklenecek */}
+        {/* Fatura Kalemleri */}
         <Card title="Fatura Kalemleri" className="mb-4">
-          <div className="text-center py-8 text-gray-400">
-            <p className="text-lg">⚠️ Fatura kalemleri Part 2'de eklenecek</p>
-            <p className="text-sm mt-2">
-              Dinamik satır ekleme, otomatik hesaplamalar, ürün seçimi
-            </p>
-          </div>
+          <InvoiceItems value={items} onChange={setItems} currency={currency} />
         </Card>
 
+        {/* Fatura Özeti */}
+        {items.length > 0 && (
+          <InvoiceSummary items={items} currency={currency} />
+        )}
+
         {/* Buttons */}
-        <div className="flex gap-4">
+        <div className="mt-6 flex gap-4">
           <Button
             type="primary"
             htmlType="submit"
             loading={saving}
             size="large"
-            disabled
+            disabled={items.length === 0}
           >
-            {isEditMode ? 'Güncelle' : 'Oluştur'} (Part 2'de aktif olacak)
+            {isEditMode ? 'Güncelle' : 'Oluştur'}
           </Button>
           <Button size="large" onClick={() => navigate('/invoices')}>
             İptal

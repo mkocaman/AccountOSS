@@ -10,6 +10,7 @@ import { ProductList } from '@/features/products/ProductList';
 import { ProductForm } from '@/features/products/ProductForm';
 import { InvoiceList } from '@/features/invoices/InvoiceList';
 import { InvoiceForm } from '@/features/invoices/InvoiceForm';
+import { InvoiceDetail } from '@/features/invoices/InvoiceDetail';
 import { useAuthStore } from '@/store/authStore';
 
 // Protected Route komponenti
@@ -86,7 +87,7 @@ export const router = createBrowserRouter([
           },
           {
             path: ':id',
-            element: <div className="text-2xl">Fatura Detay (TODO - Part 2)</div>,
+            element: <InvoiceDetail />,
           },
           {
             path: 'gr-queue',
