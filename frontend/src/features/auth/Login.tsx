@@ -36,36 +36,6 @@ export const Login = () => {
     try {
       console.log('🔐 Login attempt:', { email: values.email });
       
-      // Test için mock login (backend hazır olana kadar)
-      if (values.email === 'test@test.com' && values.password === '123456') {
-        const mockUser = {
-          id: '1',
-          email: 'test@test.com',
-          firstName: 'Test',
-          lastName: 'User'
-        };
-        
-        const mockTokens = {
-          accessToken: 'mock-access-token',
-          refreshToken: 'mock-refresh-token'
-        };
-        
-        setAuth(mockUser, mockTokens.accessToken, mockTokens.refreshToken);
-        
-        // Beni hatırla seçiliyse bilgileri kaydet
-        if (values.rememberMe) {
-          localStorage.setItem('rememberedEmail', values.email);
-          localStorage.setItem('rememberMe', 'true');
-        } else {
-          localStorage.removeItem('rememberedEmail');
-          localStorage.removeItem('rememberMe');
-        }
-        
-        message.success('Giriş başarılı! (Test modu)');
-        navigate('/dashboard');
-        return;
-      }
-      
       const response = await authApi.login({
         email: values.email,
         password: values.password,
@@ -149,7 +119,7 @@ export const Login = () => {
           >
             <Input
               prefix={<UserOutlined className="text-gray-400" />}
-              placeholder="test@test.com"
+              placeholder="ornek@email.com"
               size="large"
               className="rounded-lg border-gray-300 hover:border-blue-400 focus:border-blue-500"
               style={{ height: '48px' }}
