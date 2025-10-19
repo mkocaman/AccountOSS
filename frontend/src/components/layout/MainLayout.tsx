@@ -31,10 +31,10 @@ export const MainLayout = () => {
   const { user, clearAuth } = useAuthStore();
   const { currentCompany } = useCompanyStore();
   const [pathname, setPathname] = useState(location.pathname);
-  const [themeMode, setThemeMode] = useState<'light' | 'dark' | 'system'>('system');
+  const [themeMode, setThemeMode] = useState<'light' | 'dark' | 'semi-dark' | 'system'>('system');
   
   // Tema değiştirici fonksiyonu
-  const handleThemeChange = (newTheme: 'light' | 'dark' | 'system') => {
+  const handleThemeChange = (newTheme: 'light' | 'dark' | 'semi-dark' | 'system') => {
     setThemeMode(newTheme);
     
     if (newTheme === 'system') {
@@ -226,7 +226,7 @@ export const MainLayout = () => {
       title="AccountOS"
       logo="/logo.svg"
       layout="mix"
-      navTheme="light"
+      navTheme={themeMode === 'semi-dark' ? 'dark' : 'light'}
       primaryColor="#1890ff"
       fixedHeader
       fixSiderbar
@@ -306,6 +306,15 @@ export const MainLayout = () => {
               )
             },
             { 
+              value: 'semi-dark', 
+              label: (
+                <Space>
+                  <SunOutlined />
+                  Semi-Dark
+                </Space>
+              )
+            },
+            { 
               value: 'system', 
               label: (
                 <Space>
@@ -323,7 +332,13 @@ export const MainLayout = () => {
         </div>
       )}
     >
-      <div style={{ minHeight: 'calc(100vh - 56px - 64px)' }}>
+      <div 
+        style={{ 
+          minHeight: 'calc(100vh - 56px - 64px)',
+          backgroundColor: themeMode === 'semi-dark' ? '#ffffff' : 'transparent',
+          color: themeMode === 'semi-dark' ? '#000000' : 'inherit'
+        }}
+      >
         <Outlet />
       </div>
       </ProLayout>
