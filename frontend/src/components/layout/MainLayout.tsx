@@ -21,17 +21,30 @@ import {
 } from '@ant-design/icons';
 import { useAuthStore } from '@/store/authStore';
 import { useCompanyStore } from '@/store/companyStore';
-import { Dropdown, Space, Avatar, Select, Switch, Button } from 'antd';
+import { Dropdown, Space, Avatar, Select, Switch, Button, ConfigProvider, theme } from 'antd';
 import { GlobalOutlined, SunOutlined, MoonOutlined, DesktopOutlined } from '@ant-design/icons';
 
 // Ana layout bileşeni - Ant Design Pro Layout ile
 export const MainLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, logout } = useAuthStore();
+  const { user, clearAuth } = useAuthStore();
   const { currentCompany } = useCompanyStore();
   const [pathname, setPathname] = useState(location.pathname);
-  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
+  const [themeMode, setThemeMode] = useState<'light' | 'dark' | 'system'>('system');
+  
+  // Tema değiştirici fonksiyonu
+  const handleThemeChange = (newTheme: 'light' | 'dark' | 'system') => {
+    setThemeMode(newTheme);
+    
+    if (newTheme === 'system') {
+      // Sistem temasını algıla
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+    } else {
+      document.documentElement.setAttribute('data-theme', newTheme);
+    }
+  };
 
   // Menü yapısı - ProLayout formatında
   const route = {
@@ -48,7 +61,7 @@ export const MainLayout = () => {
         icon: <FileTextOutlined />,
         routes: [
           {
-            path: '/invoices',
+            path: '/invoices/list',
             name: 'Fatura Listesi',
           },
           {
@@ -88,7 +101,7 @@ export const MainLayout = () => {
         icon: <ShoppingOutlined />,
         routes: [
           {
-            path: '/products',
+            path: '/products/list',
             name: 'Ürün Listesi',
           },
           {
@@ -133,11 +146,11 @@ export const MainLayout = () => {
         icon: <WalletOutlined />,
         routes: [
           {
-            path: '/expense-categories',
+            path: '/expenses/categories',
             name: 'Masraf Kategorileri',
           },
           {
-            path: '/expenses',
+            path: '/expenses/list',
             name: 'Masraf Listesi',
           },
         ],
@@ -197,14 +210,19 @@ export const MainLayout = () => {
       icon: <LogoutOutlined />,
       label: 'Çıkış Yap',
       onClick: () => {
-        logout();
+        clearAuth();
         navigate('/login');
       },
     },
   ];
 
   return (
-    <ProLayout
+    <ConfigProvider
+      theme={{
+        algorithm: themeMode === 'dark' ? theme.darkAlgorithm : theme.defaultAlgorithm,
+      }}
+    >
+      <ProLayout
       title="AccountOS"
       logo="/logo.svg"
       layout="mix"
@@ -264,8 +282,8 @@ export const MainLayout = () => {
         // Tema Değiştirici
         <Select
           key="theme"
-          value={theme}
-          onChange={setTheme}
+          value={themeMode}
+          onChange={handleThemeChange}
           style={{ width: 120 }}
           size="small"
           options={[
@@ -308,6 +326,7 @@ export const MainLayout = () => {
       <div style={{ minHeight: 'calc(100vh - 56px - 64px)' }}>
         <Outlet />
       </div>
-    </ProLayout>
+      </ProLayout>
+    </ConfigProvider>
   );
 };
