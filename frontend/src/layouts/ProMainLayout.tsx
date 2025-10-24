@@ -17,31 +17,53 @@ import {
   WalletOutlined,
   BankOutlined,
   FileProtectOutlined,
-  CrownOutlined
+  CrownOutlined,
+  BankOutlined as BankOutlinedIcon,
+  QuestionCircleOutlined,
+  ThunderboltOutlined
 } from '@ant-design/icons';
-import { Dropdown, Space, Switch, Modal } from 'antd';
-import { useAuth } from '@/hooks/useAuth';
+import { Dropdown, Modal } from 'antd';
+import { useAuth } from '../hooks/useAuth';
+import { LanguageSelector } from '../components/common/LanguageSelector';
+import { ThemeSelector } from '../components/common/ThemeSelector';
+import { NotificationBell } from '../components/header/NotificationBell';
+import { SettingsButton } from '../components/header/SettingsButton';
+import { GlobalSearch } from '../components/header/GlobalSearch';
+import { useTheme } from '../hooks/useTheme';
+import { useSignalR } from '../hooks/useSignalR';
 
 /**
  * Ana layout bileşeni - Ant Design Pro Layout kullanır
  * Sidebar, header, footer ve içerik alanını yönetir
  */
 export const ProMainLayout: React.FC = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuth();
+  const { activeTheme } = useTheme();
+  
+  // SignalR bağlantısını başlat
+  useSignalR();
 
-  // ProLayout ayarları
-  const [settings] = useState<Partial<ProSettings>>({
+  // ProLayout ayarları - Tema ile güncellenmiş
+  const [settings, setSetting] = useState<Partial<ProSettings>>({
     fixSiderbar: true,
     layout: 'mix', // top + side layout
     splitMenus: false,
-    navTheme: 'light',
+    navTheme: activeTheme === 'dark' || activeTheme === 'semi-dark' ? 'realDark' : 'light',
     contentWidth: 'Fluid',
     colorPrimary: '#1890ff',
     siderMenuType: 'sub'
   });
+
+  // Tema değiştiğinde settings'i güncelle
+  React.useEffect(() => {
+    setSetting(prev => ({
+      ...prev,
+      navTheme: activeTheme === 'dark' || activeTheme === 'semi-dark' ? 'realDark' : 'light'
+    }));
+  }, [activeTheme]);
 
   /**
    * Menü rotaları tanımla - ProLayout formatında
@@ -245,9 +267,27 @@ export const ProMainLayout: React.FC = () => {
   };
 
   /**
-   * Kullanıcı menüsü
+   * Kullanıcı menüsü - Geliştirilmiş
    */
   const userMenuItems = [
+    {
+      key: 'user-info',
+      label: (
+        <div style={{ padding: '8px 0', borderBottom: '1px solid #f0f0f0' }}>
+          <div style={{ fontWeight: 600 }}>{user?.name || 'Kullanıcı'}</div>
+          <div style={{ fontSize: 12, color: '#8c8c8c' }}>
+            {user?.email || 'user@example.com'}
+          </div>
+          <div style={{ fontSize: 11, color: '#bfbfbf', marginTop: 4 }}>
+            {user?.role === 'admin' ? '👑 Yönetici' : '👤 Kullanıcı'}
+          </div>
+        </div>
+      ),
+      disabled: true
+    },
+    {
+      type: 'divider' as const
+    },
     {
       key: 'profile',
       icon: <UserOutlined />,
@@ -255,10 +295,31 @@ export const ProMainLayout: React.FC = () => {
       onClick: () => navigate('/profile')
     },
     {
-      key: 'settings',
+      key: 'account-settings',
       icon: <SettingOutlined />,
-      label: t('menu.settings'),
-      onClick: () => navigate('/settings')
+      label: t('menu.accountSettings'),
+      onClick: () => navigate('/settings/account')
+    },
+    {
+      key: 'company-settings',
+      icon: <BankOutlinedIcon />,
+      label: t('menu.companySettings'),
+      onClick: () => navigate('/settings/company')
+    },
+    {
+      type: 'divider' as const
+    },
+    {
+      key: 'help',
+      icon: <QuestionCircleOutlined />,
+      label: t('menu.help'),
+      onClick: () => window.open('https://docs.accountos.com', '_blank')
+    },
+    {
+      key: 'shortcuts',
+      icon: <ThunderboltOutlined />,
+      label: t('menu.keyboardShortcuts'),
+      onClick: () => console.log('Show shortcuts modal')
     },
     {
       type: 'divider' as const
@@ -272,14 +333,7 @@ export const ProMainLayout: React.FC = () => {
     }
   ];
 
-  /**
-   * Dil değiştirme handler'ı
-   */
-  const handleLanguageChange = (checked: boolean) => {
-    const newLang = checked ? 'en' : 'tr';
-    i18n.changeLanguage(newLang);
-    localStorage.setItem('language', newLang);
-  };
+  // Dil değiştirme handler'ı kaldırıldı - LanguageSelector component'i kullanıyoruz
 
   return (
     <ProLayout
@@ -294,26 +348,35 @@ export const ProMainLayout: React.FC = () => {
         collapsedShowGroupTitle: true
       }}
       avatarProps={{
-        src: user?.avatar || 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png',
-        size: 'small',
+        src: user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=1890ff&color=fff`,
+        size: 'default',
         title: user?.name || 'User',
         render: (_, avatarChildren) => (
-          <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
-            {avatarChildren}
+          <Dropdown 
+            menu={{ items: userMenuItems }} 
+            placement="bottomRight"
+            trigger={['click']}
+          >
+            <div style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8 }}>
+              {avatarChildren}
+              <span style={{ fontSize: 14, fontWeight: 500 }}>
+                {user?.name?.split(' ')[0] || 'User'}
+              </span>
+            </div>
           </Dropdown>
         )
       }}
       actionsRender={() => [
-        // Dil seçici
-        <Space key="language">
-          <span>TR</span>
-          <Switch
-            checked={i18n.language === 'en'}
-            onChange={handleLanguageChange}
-            size="small"
-          />
-          <span>EN</span>
-        </Space>
+        // Global arama
+        <GlobalSearch key="search" />,
+        // Ayarlar butonu
+        <SettingsButton key="settings" />,
+        // Bildirim zili
+        <NotificationBell key="notifications" />,
+        // Tema seçici
+        <ThemeSelector key="theme" />,
+        // Dil seçici - DB'den dilleri getirir
+        <LanguageSelector key="language" />
       ]}
       headerTitleRender={(logo, title) => (
         <div

@@ -1,0 +1,45 @@
+/**
+ * Gelişmiş filtre stilleri
+ */
+
+.filter-section-title {
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #262626;
+}
+
+[data-theme='dark'] .filter-section-title {
+  color: #f0f0f0;
+}
+
+.filter-presets {
+  margin-bottom: 16px;
+}
+
+.filter-preset-tag {
+  cursor: pointer;
+  margin-bottom: 8px;
+  padding: 6px 12px;
+  font-size: 13px;
+  border: 1px solid #d9d9d9;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.filter-preset-tag:hover {
+  border-color: #1890ff;
+  color: #1890ff;
+}
+
+[data-theme='dark'] .filter-preset-tag {
+  border-color: #434343;
+  background: #1f1f1f;
+}
+
+[data-theme='dark'] .filter-preset-tag:hover {
+  border-color: #1890ff;
+}
+
+.filter-save-preset {
+  margin-top: 16px;
+}

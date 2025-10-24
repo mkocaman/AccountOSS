@@ -1,0 +1,22 @@
+/**
+ * Pull-to-refresh stilleri
+ */
+
+.pull-to-refresh-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.pull-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: height 0.2s, opacity 0.2s;
+  overflow: hidden;
+}
+
+@media (min-width: 769px) {
+  .pull-indicator {
+    display: none;
+  }
+}

@@ -1,0 +1,48 @@
+/**
+ * Ayarlar layout stilleri
+ */
+
+.settings-layout {
+  display: flex;
+  gap: 24px;
+  min-height: 500px;
+}
+
+.settings-sidebar {
+  width: 240px;
+  flex-shrink: 0;
+}
+
+.settings-sidebar .ant-card-body {
+  padding: 0;
+}
+
+.settings-sidebar .ant-menu {
+  border: none;
+}
+
+.settings-content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .settings-layout {
+    flex-direction: column;
+  }
+
+  .settings-sidebar {
+    width: 100%;
+  }
+
+  .settings-sidebar .ant-menu {
+    display: flex;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+  }
+
+  .settings-sidebar .ant-menu-item {
+    flex-shrink: 0;
+  }
+}

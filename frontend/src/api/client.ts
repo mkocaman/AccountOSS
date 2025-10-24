@@ -1,4 +1,4 @@
-import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios';
+import axios, { type AxiosInstance } from 'axios';
 import { message } from 'antd';
 
 // Debug mode - Development ortamında console log
@@ -129,7 +129,34 @@ class ApiClient {
           }
         }
 
-        // Hata mesajı göster
+        // 404 - Sessizce logla, kullanıcıyı rahatsız etme
+        if (error.response?.status === 404) {
+          console.warn('❌ API Error (404):', error.config?.url);
+          // Empty state göster, hata mesajı gösterme
+          return Promise.reject({ 
+            ...error, 
+            silent: true, // Bu flag ile UI'da hata gösterme
+            message: 'Veri bulunamadı' 
+          });
+        }
+
+        // 403 - Yetki hatası
+        if (error.response?.status === 403) {
+          console.error('❌ API Error (403): Yetkisiz erişim');
+          // Kullanıcıyı bilgilendir ama redirect etme
+        }
+
+        // 500 - Sunucu hatası
+        if (error.response?.status === 500) {
+          console.error('❌ API Error (500): Sunucu hatası');
+        }
+
+        // Network error
+        if (!error.response) {
+          console.error('❌ Network Error:', error.message);
+        }
+
+        // Diğer hatalar için mesaj göster
         const errorMessage = error.response?.data?.message || 
                            error.message || 
                            'Bir hata oluştu';
@@ -141,22 +168,22 @@ class ApiClient {
   }
 
   // HTTP metodları
-  async get<T>(url: string, config?: AxiosRequestConfig) {
+  async get<T>(url: string, config?: any) {
     const response = await this.client.get<T>(url, config);
     return response.data;
   }
 
-  async post<T>(url: string, data?: unknown, config?: AxiosRequestConfig) {
+  async post<T>(url: string, data?: unknown, config?: any) {
     const response = await this.client.post<T>(url, data, config);
     return response.data;
   }
 
-  async put<T>(url: string, data?: unknown, config?: AxiosRequestConfig) {
+  async put<T>(url: string, data?: unknown, config?: any) {
     const response = await this.client.put<T>(url, data, config);
     return response.data;
   }
 
-  async delete<T>(url: string, config?: AxiosRequestConfig) {
+  async delete<T>(url: string, config?: any) {
     const response = await this.client.delete<T>(url, config);
     return response.data;
   }

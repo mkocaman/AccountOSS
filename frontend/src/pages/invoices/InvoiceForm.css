@@ -1,0 +1,80 @@
+/**
+ * Fatura formu stilleri
+ */
+
+.invoice-items-table {
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.invoice-items-header {
+  font-weight: 600;
+  padding: 12px 0;
+  border-bottom: 2px solid #f0f0f0;
+  margin-bottom: 12px;
+}
+
+.invoice-items-row {
+  padding: 12px 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.invoice-items-row:last-child {
+  border-bottom: none;
+}
+
+.invoice-items-row:hover {
+  background: #fafafa;
+}
+
+.invoice-totals {
+  padding: 16px;
+  background: #fafafa;
+  border-radius: 8px;
+}
+
+/* Dark theme */
+[data-theme='dark'] .invoice-items-table {
+  border-color: #303030;
+}
+
+[data-theme='dark'] .invoice-items-header {
+  border-bottom-color: #303030;
+}
+
+[data-theme='dark'] .invoice-items-row {
+  border-bottom-color: #1f1f1f;
+}
+
+[data-theme='dark'] .invoice-items-row:hover {
+  background: #262626;
+}
+
+[data-theme='dark'] .invoice-totals {
+  background: #1f1f1f;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .invoice-items-header,
+  .invoice-items-row {
+    font-size: 12px;
+  }
+
+  .invoice-items-row .ant-input-number,
+  .invoice-items-row .ant-select {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .invoice-items-table {
+    overflow-x: auto;
+  }
+
+  .invoice-items-header,
+  .invoice-items-row {
+    min-width: 1000px;
+  }
+}

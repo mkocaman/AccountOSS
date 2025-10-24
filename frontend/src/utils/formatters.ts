@@ -1,257 +1,153 @@
 /**
- * Utility fonksiyonları - Para birimi, tarih ve diğer formatlamalar
+ * Format utility fonksiyonları
  */
 
 /**
- * Para birimini formatlar
- * @param amount - Formatlanacak miktar
- * @param currency - Para birimi (varsayılan: TRY)
- * @returns Formatlanmış para birimi string'i
+ * Para birimi formatla (Türk Lirası)
  */
-export const formatCurrency = (amount: number | string, currency: string = 'TRY'): string => {
-  const numAmount = typeof amount === 'string' ? parseFloat(amount) : amount;
-  
-  if (isNaN(numAmount)) {
-    return '0,00 ₺';
-  }
-
-  // Para birimi sembolleri
-  const currencySymbols: Record<string, string> = {
-    'TRY': '₺',
-    'USD': '$',
-    'EUR': '€',
-    'GBP': '£'
-  };
-
-  const symbol = currencySymbols[currency] || currency;
-  
-  return new Intl.NumberFormat('tr-TR', {
+export const formatCurrency = (
+  amount: number,
+  currency: string = 'TRY',
+  locale: string = 'tr-TR'
+): string => {
+  return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: currency,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
-  }).format(numAmount).replace(currency, symbol);
+  }).format(amount);
 };
 
 /**
- * Tarihi formatlar
- * @param date - Formatlanacak tarih
- * @param format - Tarih formatı (varsayılan: 'DD/MM/YYYY')
- * @returns Formatlanmış tarih string'i
+ * Sayı formatla (binlik ayırıcı ile)
  */
-export const formatDate = (date: string | Date, format: string = 'DD/MM/YYYY'): string => {
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-  
-  if (isNaN(dateObj.getTime())) {
-    return '-';
-  }
-
-  const day = dateObj.getDate().toString().padStart(2, '0');
-  const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
-  const year = dateObj.getFullYear();
-  const hours = dateObj.getHours().toString().padStart(2, '0');
-  const minutes = dateObj.getMinutes().toString().padStart(2, '0');
-
-  switch (format) {
-    case 'DD/MM/YYYY':
-      return `${day}/${month}/${year}`;
-    case 'DD/MM/YYYY HH:mm':
-      return `${day}/${month}/${year} ${hours}:${minutes}`;
-    case 'YYYY-MM-DD':
-      return `${year}-${month}-${day}`;
-    case 'MM/DD/YYYY':
-      return `${month}/${day}/${year}`;
-    default:
-      return dateObj.toLocaleDateString('tr-TR');
-  }
-};
-
-/**
- * Sayıyı formatlar (binlik ayırıcı ile)
- * @param number - Formatlanacak sayı
- * @param decimals - Ondalık basamak sayısı (varsayılan: 2)
- * @returns Formatlanmış sayı string'i
- */
-export const formatNumber = (number: number | string, decimals: number = 2): string => {
-  const num = typeof number === 'string' ? parseFloat(number) : number;
-  
-  if (isNaN(num)) {
-    return '0';
-  }
-
-  return new Intl.NumberFormat('tr-TR', {
+export const formatNumber = (
+  value: number,
+  decimals: number = 2,
+  locale: string = 'tr-TR'
+): string => {
+  return new Intl.NumberFormat(locale, {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals
-  }).format(num);
+  }).format(value);
 };
 
 /**
- * Yüzdeyi formatlar
- * @param value - Formatlanacak değer
- * @param decimals - Ondalık basamak sayısı (varsayılan: 1)
- * @returns Formatlanmış yüzde string'i
+ * Tarih formatla
  */
-export const formatPercentage = (value: number | string, decimals: number = 1): string => {
-  const num = typeof value === 'string' ? parseFloat(value) : value;
-  
-  if (isNaN(num)) {
-    return '0%';
+export const formatDate = (
+  date: string | Date,
+  format: 'short' | 'long' | 'time' = 'short',
+  locale: string = 'tr-TR'
+): string => {
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+
+  if (format === 'short') {
+    return dateObj.toLocaleDateString(locale);
   }
 
-  return `${formatNumber(num, decimals)}%`;
+  if (format === 'long') {
+    return dateObj.toLocaleDateString(locale, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+
+  if (format === 'time') {
+    return dateObj.toLocaleString(locale, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  return dateObj.toLocaleDateString(locale);
 };
 
 /**
- * Dosya boyutunu formatlar
- * @param bytes - Byte cinsinden dosya boyutu
- * @returns Formatlanmış dosya boyutu string'i
+ * Yüzde formatla
+ */
+export const formatPercent = (value: number, decimals: number = 0): string => {
+  return `%${formatNumber(value, decimals)}`;
+};
+
+/**
+ * Dosya boyutu formatla
  */
 export const formatFileSize = (bytes: number): string => {
   if (bytes === 0) return '0 Bytes';
 
   const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
 };
 
 /**
- * Telefon numarasını formatlar
- * @param phone - Formatlanacak telefon numarası
- * @returns Formatlanmış telefon numarası string'i
+ * Telefon formatla (Türkiye formatı)
  */
 export const formatPhone = (phone: string): string => {
-  if (!phone) return '';
-  
-  // Sadece rakamları al
+  // +905551234567 -> +90 555 123 45 67
   const cleaned = phone.replace(/\D/g, '');
   
-  // Türkiye telefon numarası formatı
-  if (cleaned.length === 10) {
-    return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)} ${cleaned.slice(6, 8)} ${cleaned.slice(8, 10)}`;
+  if (cleaned.length === 12 && cleaned.startsWith('90')) {
+    return `+90 ${cleaned.slice(2, 5)} ${cleaned.slice(5, 8)} ${cleaned.slice(8, 10)} ${cleaned.slice(10)}`;
   }
   
-  if (cleaned.length === 11 && cleaned.startsWith('0')) {
-    return `(${cleaned.slice(1, 4)}) ${cleaned.slice(4, 7)} ${cleaned.slice(7, 9)} ${cleaned.slice(9, 11)}`;
+  if (cleaned.length === 10) {
+    return `${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6, 8)} ${cleaned.slice(8)}`;
   }
   
   return phone;
 };
 
 /**
- * E-posta adresini maskeler
- * @param email - Maskelenecek e-posta adresi
- * @returns Maskelenmiş e-posta adresi string'i
+ * Vergi numarası formatla (Türkiye formatı)
  */
-export const maskEmail = (email: string): string => {
-  if (!email || !email.includes('@')) return email;
+export const formatTaxNumber = (taxNumber: string): string => {
+  // 1234567890 -> 123 456 789 0
+  const cleaned = taxNumber.replace(/\D/g, '');
   
-  const [localPart, domain] = email.split('@');
-  const maskedLocal = localPart.length > 2 
-    ? localPart.slice(0, 2) + '*'.repeat(localPart.length - 2)
-    : localPart;
+  if (cleaned.length === 10) {
+    return `${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6, 9)} ${cleaned.slice(9)}`;
+  }
   
-  return `${maskedLocal}@${domain}`;
+  return taxNumber;
 };
 
 /**
- * Kullanıcı adının baş harflerini alır
- * @param name - Kullanıcı adı
- * @returns Baş harfler string'i
+ * IBAN formatla (Türkiye formatı)
  */
-export const getInitials = (name: string): string => {
-  if (!name) return '';
+export const formatIBAN = (iban: string): string => {
+  // TR330006100519786457841326 -> TR33 0006 1005 1978 6457 8413 26
+  const cleaned = iban.replace(/\s/g, '');
   
-  return name
+  if (cleaned.length === 26 && cleaned.startsWith('TR')) {
+    return cleaned.match(/.{1,4}/g)?.join(' ') || iban;
+  }
+  
+  return iban;
+};
+
+/**
+ * Metin kısalt (ellipsis)
+ */
+export const truncate = (text: string, length: number = 50): string => {
+  if (text.length <= length) return text;
+  return text.substring(0, length) + '...';
+};
+
+/**
+ * İlk harfleri büyük yap (Title Case)
+ */
+export const toTitleCase = (text: string): string => {
+  return text
+    .toLowerCase()
     .split(' ')
-    .map(word => word.charAt(0).toUpperCase())
-    .join('')
-    .slice(0, 2);
-};
-
-/**
- * Relatif zamanı formatlar (örn: "2 saat önce")
- * @param date - Tarih
- * @returns Relatif zaman string'i
- */
-export const formatRelativeTime = (date: string | Date): string => {
-  const now = new Date();
-  const targetDate = typeof date === 'string' ? new Date(date) : date;
-  
-  if (isNaN(targetDate.getTime())) {
-    return '-';
-  }
-
-  const diffInSeconds = Math.floor((now.getTime() - targetDate.getTime()) / 1000);
-  
-  if (diffInSeconds < 60) {
-    return 'Az önce';
-  }
-  
-  const diffInMinutes = Math.floor(diffInSeconds / 60);
-  if (diffInMinutes < 60) {
-    return `${diffInMinutes} dakika önce`;
-  }
-  
-  const diffInHours = Math.floor(diffInMinutes / 60);
-  if (diffInHours < 24) {
-    return `${diffInHours} saat önce`;
-  }
-  
-  const diffInDays = Math.floor(diffInHours / 24);
-  if (diffInDays < 7) {
-    return `${diffInDays} gün önce`;
-  }
-  
-  const diffInWeeks = Math.floor(diffInDays / 7);
-  if (diffInWeeks < 4) {
-    return `${diffInWeeks} hafta önce`;
-  }
-  
-  const diffInMonths = Math.floor(diffInDays / 30);
-  if (diffInMonths < 12) {
-    return `${diffInMonths} ay önce`;
-  }
-  
-  const diffInYears = Math.floor(diffInDays / 365);
-  return `${diffInYears} yıl önce`;
-};
-
-/**
- * Stok durumunu formatlar
- * @param quantity - Stok miktarı
- * @param minLevel - Minimum stok seviyesi
- * @returns Stok durumu string'i
- */
-export const formatStockStatus = (quantity: number, minLevel: number = 0): string => {
-  if (quantity <= 0) {
-    return 'Stokta Yok';
-  }
-  
-  if (quantity <= minLevel) {
-    return 'Düşük Stok';
-  }
-  
-  return 'Stokta';
-};
-
-/**
- * Durum rengini döndürür
- * @param status - Durum
- * @returns Renk kodu
- */
-export const getStatusColor = (status: string): string => {
-  const statusColors: Record<string, string> = {
-    'active': '#52c41a',
-    'inactive': '#ff4d4f',
-    'pending': '#faad14',
-    'approved': '#52c41a',
-    'rejected': '#ff4d4f',
-    'draft': '#d9d9d9',
-    'published': '#52c41a',
-    'archived': '#8c8c8c'
-  };
-  
-  return statusColors[status.toLowerCase()] || '#d9d9d9';
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 };

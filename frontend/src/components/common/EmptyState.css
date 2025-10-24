@@ -1,0 +1,83 @@
+/**
+ * Boş durum component stilleri
+ */
+
+.empty-state-container {
+  max-width: 600px;
+  margin: 60px auto;
+  text-align: center;
+  padding: 0 24px;
+}
+
+.empty-state-icon {
+  font-size: 64px;
+  margin-bottom: 24px;
+  opacity: 0.25;
+}
+
+.empty-state-description h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #262626;
+}
+
+.empty-state-description p {
+  font-size: 14px;
+  color: #8c8c8c;
+  margin-bottom: 16px;
+  line-height: 1.6;
+}
+
+.empty-state-tips {
+  margin-top: 48px;
+  padding: 24px;
+  background: #fafafa;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.empty-state-tips h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #262626;
+}
+
+.empty-state-tips ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.empty-state-tips li {
+  padding: 10px 0;
+  padding-left: 28px;
+  position: relative;
+  color: #595959;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.empty-state-tips li:before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: #52c41a;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+/* Dark theme */
+[data-theme='dark'] .empty-state-description h3 {
+  color: #f0f0f0;
+}
+
+[data-theme='dark'] .empty-state-tips {
+  background: #1f1f1f;
+  border: 1px solid #303030;
+}
+
+[data-theme='dark'] .empty-state-tips h4 {
+  color: #f0f0f0;
+}

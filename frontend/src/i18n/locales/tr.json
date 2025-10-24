@@ -37,7 +37,27 @@
     "filters": "Filtreler",
     "searchPlaceholder": "Ara...",
     "totalRecords": "Toplam {{total}} kayıt",
-    "pageSizeOptions": "10,20,50,100"
+    "pageSizeOptions": "10,20,50,100",
+    "reset": "Sıfırla"
+  },
+  "pwa": {
+    "install": {
+      "title": "AccountOS'u Yükle",
+      "description": "Uygulamayı cihazınıza yükleyerek daha hızlı erişin ve offline çalışın",
+      "feature1": "Anasayfaya kısayol ekle",
+      "feature2": "Offline çalış",
+      "feature3": "Daha hızlı yükleme",
+      "feature4": "Bildirimler al",
+      "install": "Yükle",
+      "later": "Daha Sonra"
+    },
+    "ios": {
+      "title": "iOS'a Nasıl Yüklenir",
+      "step1": "Safari'de şu adımları izleyin:",
+      "tapShare": "Paylaş butonuna dokunun",
+      "addToHome": "'Ana Ekrana Ekle' seçeneğine dokunun",
+      "confirm": "'Ekle' butonuna basın"
+    }
   },
   "menu": {
     "dashboard": "Dashboard",
@@ -47,6 +67,8 @@
     "suppliers": "Tedarikçiler",
     "products": "Ürünler",
     "productList": "Ürün Listesi",
+    "invoices": "Faturalar",
+    "profile": "Profil",
     "categories": "Kategoriler",
     "stock": "Stok",
     "stockMovements": "Stok Hareketleri",
@@ -94,6 +116,11 @@
     "preferences": "Tercihler",
     "companies": "Şirketler",
     "notifications": "Bildirimler",
+    "profile": "Profilim",
+    "accountSettings": "Hesap Ayarları",
+    "companySettings": "Şirket Ayarları",
+    "help": "Yardım",
+    "keyboardShortcuts": "Klavye Kısayolları",
     "erpAccounting": "ERP & Muhasebe",
     "goodsReceipt": "Mal Kabul",
     "lowStock": "Düşük Stok",
@@ -163,6 +190,7 @@
     "title": "Cari Hesaplar",
     "subtitle": "Müşteri ve tedarikçi listesi",
     "newPartner": "Yeni Ekle",
+    "addPartner": "Cari Hesap Ekle",
     "editPartner": "Düzenle",
     "deletePartner": "Sil",
     "partnerDetail": "Detay",
@@ -191,7 +219,8 @@
     "activate": "Aktifleştir",
     "deactivate": "Pasifleştir",
     "deleteConfirm": "Cari Hesabı Sil",
-    "deleteConfirmMessage": "Bu cari hesabı silmek istediğinize emin misiniz?",
+    "deleteConfirmTitle": "Cari Hesabı Sil",
+    "deleteConfirmMessage": "'{name}' cari hesabını silmek istediğinizden emin misiniz?",
     "deleteSuccess": "Cari hesap silindi",
     "deleteError": "Cari hesap silinemedi",
     "activateSuccess": "Cari hesap aktifleştirildi",
@@ -201,7 +230,31 @@
     "loadError": "Cari hesaplar yüklenemedi",
     "blockSuccess": "Cari hesap bloke edildi",
     "unblockSuccess": "Bloke kaldırıldı",
-    "blocked": "Bloke"
+    "blocked": "Bloke",
+    "columns": {
+      "code": "Kod",
+      "name": "Ad",
+      "type": "Tür",
+      "taxNumber": "Vergi No",
+      "phone": "Telefon",
+      "email": "E-posta",
+      "balance": "Bakiye",
+      "status": "Durum",
+      "actions": "İşlemler"
+    },
+    "types": {
+      "customer": "Müşteri",
+      "supplier": "Tedarikçi",
+      "both": "Her İkisi"
+    },
+    "empty": {
+      "title": "Cari Hesap Bulunamadı",
+      "description": "Henüz müşteri veya tedarikçi eklemediniz. Hemen ilk cari hesabınızı oluşturun ve işlemlerinizi takip etmeye başlayın!",
+      "createFirst": "İlk Cari Hesabı Oluştur",
+      "tip1": "Müşteriler ve tedarikçiler için ayrı ayrı cari hesap açabilirsiniz",
+      "tip2": "Her cari hesap için bakiye takibi otomatik olarak yapılır",
+      "tip3": "Fatura ve ödemelerde cari hesapları kolayca seçebilirsiniz"
+    }
   },
   "products": {
     "title": "Ürün Listesi",
@@ -375,7 +428,89 @@
     "email": "E-posta Ayarları",
     "security": "Güvenlik",
     "theme": "Tema",
-    "language": "Dil"
+    "language": "Dil",
+    "languageChanged": "Dil başarıyla değiştirildi",
+    "languageChangeError": "Dil değiştirilemedi",
+    "saveSuccess": "Ayarlar başarıyla kaydedildi",
+    "saveError": "Ayarlar kaydedilemedi",
+    "menu": {
+      "account": "Hesap Ayarları",
+      "company": "Şirket Bilgileri",
+      "security": "Güvenlik",
+      "notifications": "Bildirimler",
+      "localization": "Bölgeselleştirme",
+      "integrations": "Entegrasyonlar"
+    },
+    "account": {
+      "title": "Hesap Ayarları",
+      "fullName": "Ad Soyad",
+      "fullNamePlaceholder": "Adınızı ve soyadınızı girin",
+      "email": "E-posta",
+      "emailTooltip": "E-posta adresi değiştirilemez. Destek ile iletişime geçin.",
+      "phone": "Telefon",
+      "preferences": "Tercihler",
+      "dateFormat": "Tarih Formatı",
+      "numberFormat": "Sayı Formatı"
+    },
+    "company": {
+      "title": "Şirket Bilgileri",
+      "logo": "Şirket Logosu",
+      "logoHint": "Maksimum 2MB, PNG veya JPG formatında",
+      "name": "Şirket Adı",
+      "namePlaceholder": "Şirket adını girin",
+      "taxNumber": "Vergi Numarası",
+      "taxOffice": "Vergi Dairesi",
+      "taxOfficePlaceholder": "Vergi dairesini girin",
+      "address": "Adres",
+      "addressPlaceholder": "Şirket adresini girin",
+      "phone": "Telefon",
+      "email": "E-posta",
+      "website": "Website"
+    }
+  },
+  "notifications": {
+    "title": "Bildirimler",
+    "unreadCount": "{{count}} okunmamış",
+    "markAllRead": "Tümünü Okundu İşaretle",
+    "empty": "Bildirim bulunmuyor",
+    "viewAll": "Tümünü Görüntüle"
+  },
+  "profile": {
+    "title": "Profilim",
+    "updateSuccess": "Profil başarıyla güncellendi",
+    "updateError": "Profil güncellenirken hata oluştu",
+    "avatarUpdateSuccess": "Profil fotoğrafı güncellendi",
+    "avatarUpdateError": "Profil fotoğrafı güncellenirken hata oluştu",
+    "changeAvatar": "Fotoğraf Değiştir",
+    "fields": {
+      "fullName": "Ad Soyad",
+      "fullNameRequired": "Ad soyad zorunludur",
+      "fullNamePlaceholder": "Adınızı ve soyadınızı girin",
+      "email": "E-posta",
+      "phone": "Telefon",
+      "company": "Şirket",
+      "companyPlaceholder": "Şirket adını girin",
+      "address": "Adres",
+      "addressPlaceholder": "Adres bilgilerini girin",
+      "role": "Rol",
+      "joinDate": "Kayıt Tarihi"
+    },
+    "roles": {
+      "admin": "Yönetici",
+      "user": "Kullanıcı"
+    },
+    "security": {
+      "title": "Güvenlik",
+      "currentPassword": "Mevcut Şifre",
+      "currentPasswordRequired": "Mevcut şifre zorunludur",
+      "newPassword": "Yeni Şifre",
+      "newPasswordRequired": "Yeni şifre zorunludur",
+      "confirmPassword": "Şifre Tekrar",
+      "confirmPasswordRequired": "Şifre tekrarı zorunludur",
+      "changePassword": "Şifreyi Değiştir",
+      "passwordChanged": "Şifre başarıyla değiştirildi",
+      "passwordChangeError": "Şifre değiştirilemedi"
+    }
   },
   "validation": {
     "required": "Bu alan zorunludur",
@@ -397,10 +532,10 @@
     "loadingData": "Veriler yükleniyor..."
   },
   "theme": {
-    "light": "Açık",
-    "dark": "Koyu",
-    "semiDark": "Semi-Dark",
-    "system": "Sistem"
+    "light": "Açık Tema",
+    "dark": "Koyu Tema",
+    "semiDark": "Yarı Koyu",
+    "system": "Sistem Teması"
   },
   "auth": {
     "welcome": "Hesabınıza giriş yapın",
@@ -559,6 +694,247 @@
     },
     "backToHome": "Ana Sayfaya Dön",
     "reload": "Sayfayı Yenile"
+  },
+  "invoices": {
+    "create": "Fatura Oluştur",
+    "edit": "Fatura Düzenle",
+    "saveAndApprove": "Kaydet ve Onayla",
+    "basicInfo": "Temel Bilgiler",
+    "items": "Fatura Kalemleri",
+    "noItems": "Henüz kalem eklenmedi",
+    "noItemsDesc": "Fatura için ürün eklemek üzere 'Yeni Satır Ekle' butonuna tıklayın",
+    "addItem": "Yeni Satır Ekle",
+    "createSuccess": "Fatura başarıyla oluşturuldu",
+    "updateSuccess": "Fatura başarıyla güncellendi",
+    "saveError": "Fatura kaydedilemedi",
+    "approveSuccess": "Fatura başarıyla onaylandı",
+    "approveError": "Fatura onaylanamadı",
+    "loadError": "Fatura yüklenemedi",
+    "fields": {
+      "invoiceNumber": "Fatura No",
+      "type": "Fatura Tipi",
+      "date": "Fatura Tarihi",
+      "dueDate": "Vade Tarihi",
+      "customer": "Müşteri",
+      "supplier": "Tedarikçi",
+      "notes": "Notlar"
+    },
+    "placeholders": {
+      "selectPartner": "Cari hesap seçin",
+      "selectProduct": "Ürün seçin",
+      "notes": "Fatura notları (opsiyonel)"
+    },
+    "columns": {
+      "product": "Ürün",
+      "quantity": "Miktar",
+      "unit": "Birim",
+      "unitPrice": "Birim Fiyat",
+      "discount": "İskonto",
+      "taxRate": "KDV",
+      "total": "Toplam"
+    },
+    "totals": {
+      "subtotal": "Ara Toplam",
+      "discount": "Toplam İskonto",
+      "tax": "Toplam KDV",
+      "grandTotal": "Genel Toplam"
+    },
+    "validation": {
+      "noItems": "En az bir ürün eklemelisiniz",
+      "emptyItems": "Tüm satırlarda ürün seçilmelidir"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "sales": "Satışlar",
+    "purchases": "Alışlar",
+    "periods": {
+      "week": "Bu Hafta",
+      "month": "Bu Ay",
+      "quarter": "Bu Çeyrek",
+      "year": "Bu Yıl"
+    },
+    "stats": {
+      "totalSales": "Toplam Satış",
+      "totalPurchases": "Toplam Alış",
+      "profit": "Kâr",
+      "profitMargin": "Kâr Marjı",
+      "invoiceCount": "Toplam Fatura",
+      "recentInvoices": "Son 7 Gün",
+      "vsLastPeriod": "önceki döneme göre"
+    },
+    "cashFlow": {
+      "title": "Nakit Akışı",
+      "collections": "Tahsilatlar",
+      "payments": "Ödemeler",
+      "net": "Net Nakit Akışı"
+    },
+    "quickStats": {
+      "title": "Hızlı İstatistikler",
+      "activePartners": "Aktif Cari Hesap",
+      "recentInvoices": "Son Faturalar",
+      "lowStock": "Düşük Stok"
+    },
+    "lowStockAlerts": {
+      "title": "Düşük Stok Uyarıları",
+      "empty": "Düşük stoklu ürün yok"
+    },
+    "salesChart": {
+      "title": "Satış/Alış Grafiği"
+    },
+    "recentActivities": {
+      "title": "Son Aktiviteler",
+      "columns": {
+        "type": "Tip",
+        "activity": "Aktivite",
+        "amount": "Tutar",
+        "date": "Tarih"
+      }
+    }
+  },
+  "stock": {
+    "title": "Stok Yönetimi",
+    "movements": "Stok Hareketleri",
+    "levels": "Stok Seviyeleri",
+    "adjustment": "Stok Düzeltme",
+    "fifo": "FIFO Hesaplama",
+    "columns": {
+      "product": "Ürün",
+      "type": "Hareket Tipi",
+      "quantity": "Miktar",
+      "unitCost": "Birim Maliyet",
+      "totalCost": "Toplam Maliyet",
+      "reference": "Referans",
+      "date": "Tarih",
+      "currentStock": "Mevcut Stok",
+      "averageCost": "Ortalama Maliyet",
+      "fifoCost": "FIFO Maliyeti",
+      "totalValue": "Stok Değeri"
+    },
+    "types": {
+      "in": "Giriş",
+      "out": "Çıkış",
+      "adjustment": "Düzeltme"
+    },
+    "adjustmentSuccess": "Stok düzeltmesi başarıyla yapıldı",
+    "adjustmentError": "Stok düzeltmesi yapılamadı"
+  },
+  "reports": {
+    "title": "Raporlar",
+    "period": "Dönem",
+    "noData": "Veri bulunamadı",
+    "periods": {
+      "daily": "Günlük",
+      "weekly": "Haftalık",
+      "monthly": "Aylık",
+      "quarterly": "Çeyreklik",
+      "yearly": "Yıllık",
+      "custom": "Özel"
+    },
+    "sales": {
+      "title": "Satış Raporu",
+      "totalSales": "Toplam Satış",
+      "totalQuantity": "Toplam Miktar",
+      "averageOrderValue": "Ortalama Sipariş Değeri",
+      "topProducts": "En Çok Satan Ürünler",
+      "topPartners": "En Çok Alışveriş Yapan Müşteriler",
+      "topProductsDetail": "Ürün Detayları",
+      "topPartnersDetail": "Müşteri Detayları",
+      "salesByDay": "Günlük Satışlar",
+      "revenue": "Gelir",
+      "columns": {
+        "product": "Ürün",
+        "quantity": "Miktar",
+        "revenue": "Gelir",
+        "partner": "Müşteri",
+        "invoiceCount": "Fatura Sayısı",
+        "totalSales": "Toplam Satış",
+        "date": "Tarih",
+        "sales": "Satış"
+      }
+    },
+    "profitLoss": {
+      "title": "Kâr/Zarar Raporu",
+      "totalRevenue": "Toplam Gelir",
+      "totalCost": "Toplam Maliyet",
+      "grossProfit": "Brüt Kâr",
+      "grossProfitMargin": "Brüt Kâr Marjı",
+      "operatingExpenses": "İşletme Giderleri",
+      "netProfit": "Net Kâr",
+      "netProfitMargin": "Net Kâr Marjı"
+    },
+    "partnerAging": {
+      "title": "Cari Yaşlandırma Raporu",
+      "current": "Cari (0-30 gün)",
+      "days30": "31-60 gün",
+      "days60": "61-90 gün",
+      "days90Plus": "90+ gün",
+      "overdueAmount": "Vadesi Geçen"
+    },
+    "stockValuation": {
+      "title": "Stok Değerleme Raporu",
+      "totalValue": "Toplam Değer",
+      "totalQuantity": "Toplam Miktar"
+    },
+    "tax": {
+      "title": "Vergi Raporu",
+      "taxCollected": "Tahsil Edilen KDV",
+      "taxPaid": "Ödenen KDV",
+      "netTax": "Net KDV (Ödenecek/İade)"
+    }
+  },
+  "filters": {
+    "advanced": "Gelişmiş Filtreler",
+    "clear": "Temizle",
+    "apply": "Uygula",
+    "savedPresets": "Kayıtlı Filtreler",
+    "savePreset": "Filtreyi Kaydet",
+    "presetName": "Filtre adı girin"
+  },
+  "bulk": {
+    "selected": "{{count}} kayıt seçildi",
+    "clearSelection": "Seçimi Temizle",
+    "approve": "Toplu Onayla",
+    "approveConfirm": "{{count}} kaydı onaylamak istediğinizden emin misiniz?",
+    "cancel": "Toplu İptal Et",
+    "cancelConfirm": "{{count}} kaydı iptal etmek istediğinizden emin misiniz?",
+    "delete": "Toplu Sil",
+    "deleteConfirm": "{{count}} kaydı silmek istediğinizden emin misiniz?",
+    "exportExcel": "Excel'e Aktar",
+    "exportPdf": "PDF'e Aktar",
+    "more": "Daha Fazla"
+  },
+  "search": {
+    "placeholder": "Ara... (Fatura, Cari, Ürün)",
+    "noResults": "Sonuç bulunamadı",
+    "invoice": "Fatura",
+    "partner": "Cari Hesap",
+    "product": "Ürün",
+    "payment": "Ödeme"
+  },
+  "payments": {
+    "title": "Ödemeler",
+    "create": "Yeni Ödeme",
+    "collection": "Tahsilat",
+    "payment": "Ödeme",
+    "methods": {
+      "cash": "Nakit",
+      "bank_transfer": "Banka Havalesi",
+      "credit_card": "Kredi Kartı",
+      "check": "Çek",
+      "other": "Diğer"
+    },
+    "columns": {
+      "paymentNumber": "Ödeme No",
+      "type": "Tip",
+      "partner": "Cari Hesap",
+      "amount": "Tutar",
+      "method": "Yöntem",
+      "date": "Tarih",
+      "invoice": "Fatura"
+    },
+    "createSuccess": "Ödeme başarıyla kaydedildi",
+    "deleteSuccess": "Ödeme başarıyla silindi"
   }
 }
 

@@ -1,66 +1,96 @@
+import React, { lazy, Suspense } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { Login } from '@/features/auth/Login';
-import { Register } from '@/features/auth/Register';
-import { ForgotPassword } from '@/features/auth/ForgotPassword';
-import Dashboard from '@/features/dashboard/Dashboard';
-import { ProMainLayout } from '@/layouts/ProMainLayout';
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import { Error403 } from '@/pages/errors/403';
-import { Error404 } from '@/pages/errors/404';
-import NotFoundPage from '@/pages/404';
-import ForbiddenPage from '@/pages/403';
-import ServerErrorPage from '@/pages/500';
-import { CompanyList } from '@/features/companies/CompanyList';
-import { CompanyForm } from '@/features/companies/CompanyForm';
-import CategoryList from '@/features/categories/CategoryList';
-import PartnerList from '@/features/partners/PartnerList';
-import PartnerDetail from '@/features/partners/PartnerDetail';
-import ProductList from '@/features/products/ProductList';
-import { ProductForm } from '@/features/products/ProductForm';
-import ProductCategoryList from '@/features/products/CategoryList';
-import InvoiceList from '@/features/invoices/InvoiceList';
-import { InvoiceForm } from '@/features/invoices/InvoiceForm';
-import { InvoiceDetail } from '@/features/invoices/InvoiceDetail';
-import { PaymentList } from '@/features/payments/PaymentList';
-import { PaymentForm } from '@/features/payments/PaymentForm';
-import { CashAccountList } from '@/features/payments/CashAccountList';
-import { BankAccountList } from '@/features/payments/BankAccountList';
-import { GrQueueList } from '@/features/grQueue/GrQueueList';
-import ReportsPage from '@/features/reports/ReportsPage';
-import SettingsPage from '@/features/settings/SettingsPage';
-import StockMovementList from '@/features/stockMovements/StockMovementList';
-import PurchaseOrderList from '@/features/purchaseOrders/PurchaseOrderList';
-import PurchaseOrderForm from '@/features/purchaseOrders/PurchaseOrderForm';
-import PurchaseOrderDetail from '@/features/purchaseOrders/PurchaseOrderDetail';
-import GoodsReceiptList from '@/features/goodsReceipts/GoodsReceiptList';
-import GoodsReceiptForm from '@/features/goodsReceipts/GoodsReceiptForm';
-import GoodsReceiptDetail from '@/features/goodsReceipts/GoodsReceiptDetail';
-import QuotationList from '@/features/quotations/QuotationList';
-import QuotationForm from '@/features/quotations/QuotationForm';
-import QuotationDetail from '@/features/quotations/QuotationDetail';
-import SalesOrderList from '@/features/salesOrders/SalesOrderList';
-import SalesOrderForm from '@/features/salesOrders/SalesOrderForm';
-import SalesOrderDetail from '@/features/salesOrders/SalesOrderDetail';
-import ContractList from '@/features/contracts/ContractList';
-import ContractForm from '@/features/contracts/ContractForm';
-import ContractDetail from '@/features/contracts/ContractDetail';
-import PowerOfAttorneyList from '@/features/powerOfAttorney/PowerOfAttorneyList';
-import OwnerSettingsPage from '@/features/ownerSettings/OwnerSettingsPage';
-import ExpenseCategoryList from '@/features/expenses/ExpenseCategoryList';
-import ExpenseList from '@/features/expenses/ExpenseList';
-import ExpenseForm from '@/features/expenses/ExpenseForm';
-import ExpenseDetail from '@/features/expenses/ExpenseDetail';
-import ChartOfAccountsList from '@/features/chartOfAccounts/ChartOfAccountsList';
-import TrialBalance from '@/features/chartOfAccounts/TrialBalance';
-import JournalEntryList from '@/features/journalEntries/JournalEntryList';
-import JournalEntryForm from '@/features/journalEntries/JournalEntryForm';
-import JournalEntryDetail from '@/features/journalEntries/JournalEntryDetail';
-import LedgerView from '@/features/journalEntries/LedgerView';
-import ReportsDashboard from '@/features/reports/ReportsDashboard';
-import IncomeStatementReport from '@/features/reports/IncomeStatementReport';
-import SalesReport from '@/features/reports/SalesReport';
-import InventoryReport from '@/features/reports/InventoryReport';
-import AgingReport from '@/features/reports/AgingReport';
+import { Spin } from 'antd';
+
+/**
+ * Lazy loading wrapper component
+ */
+const LazyLoad = (Component: React.LazyExoticComponent<any>) => {
+  return (
+    <Suspense
+      fallback={
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          minHeight: '100vh'
+        }}>
+          <Spin size="large" />
+        </div>
+      }
+    >
+      <Component />
+    </Suspense>
+  );
+};
+
+// Lazy load all pages
+const Login = lazy(() => import('../features/auth/Login').then(m => ({ default: m.Login })));
+const Register = lazy(() => import('../features/auth/Register').then(m => ({ default: m.Register })));
+const ForgotPassword = lazy(() => import('../features/auth/ForgotPassword').then(m => ({ default: m.ForgotPassword })));
+const Dashboard = lazy(() => import('../features/dashboard/Dashboard'));
+const ProMainLayout = lazy(() => import('../layouts/ProMainLayout').then(m => ({ default: m.ProMainLayout })));
+const ProtectedRoute = lazy(() => import('../components/auth/ProtectedRoute').then(m => ({ default: m.ProtectedRoute })));
+const ProfilePage = lazy(() => import('../pages/profile/ProfilePage').then(m => ({ default: m.ProfilePage })));
+const SettingsLayout = lazy(() => import('../pages/settings/SettingsLayout').then(m => ({ default: m.SettingsLayout })));
+const AccountSettings = lazy(() => import('../pages/settings/AccountSettings').then(m => ({ default: m.AccountSettings })));
+const CompanySettings = lazy(() => import('../pages/settings/CompanySettings').then(m => ({ default: m.CompanySettings })));
+const ApiTestPage = lazy(() => import('../pages/debug/ApiTestPage').then(m => ({ default: m.ApiTestPage })));
+const Error403 = lazy(() => import('../pages/errors/403').then(m => ({ default: m.Error403 })));
+const Error404 = lazy(() => import('../pages/errors/404').then(m => ({ default: m.Error404 })));
+const NotFoundPage = lazy(() => import('../pages/404'));
+const ServerErrorPage = lazy(() => import('../pages/500'));
+const CompanyList = lazy(() => import('../features/companies/CompanyList').then(m => ({ default: m.CompanyList })));
+const CompanyForm = lazy(() => import('../features/companies/CompanyForm').then(m => ({ default: m.CompanyForm })));
+const CategoryList = lazy(() => import('../features/categories/CategoryList'));
+const PartnerList = lazy(() => import('../features/partners/PartnerList'));
+const PartnerDetail = lazy(() => import('../features/partners/PartnerDetail'));
+const ProductList = lazy(() => import('../features/products/ProductList'));
+const ProductForm = lazy(() => import('../features/products/ProductForm').then(m => ({ default: m.ProductForm })));
+const ProductCategoryList = lazy(() => import('../features/products/CategoryList'));
+const InvoiceList = lazy(() => import('../features/invoices/InvoiceList'));
+const InvoiceForm = lazy(() => import('../features/invoices/InvoiceForm').then(m => ({ default: m.InvoiceForm })));
+const InvoiceDetail = lazy(() => import('../features/invoices/InvoiceDetail').then(m => ({ default: m.InvoiceDetail })));
+const PaymentList = lazy(() => import('../features/payments/PaymentList').then(m => ({ default: m.PaymentList })));
+const PaymentForm = lazy(() => import('../features/payments/PaymentForm').then(m => ({ default: m.PaymentForm })));
+const CashAccountList = lazy(() => import('../features/payments/CashAccountList').then(m => ({ default: m.CashAccountList })));
+const BankAccountList = lazy(() => import('../features/payments/BankAccountList').then(m => ({ default: m.BankAccountList })));
+const GrQueueList = lazy(() => import('../features/grQueue/GrQueueList').then(m => ({ default: m.GrQueueList })));
+const ReportsPage = lazy(() => import('../features/reports/ReportsPage'));
+const SettingsPage = lazy(() => import('../features/settings/SettingsPage'));
+const StockMovementList = lazy(() => import('@/features/stockMovements/StockMovementList'));
+const PurchaseOrderList = lazy(() => import('@/features/purchaseOrders/PurchaseOrderList'));
+const PurchaseOrderForm = lazy(() => import('@/features/purchaseOrders/PurchaseOrderForm'));
+const PurchaseOrderDetail = lazy(() => import('@/features/purchaseOrders/PurchaseOrderDetail'));
+const GoodsReceiptList = lazy(() => import('@/features/goodsReceipts/GoodsReceiptList'));
+const GoodsReceiptForm = lazy(() => import('@/features/goodsReceipts/GoodsReceiptForm'));
+const GoodsReceiptDetail = lazy(() => import('@/features/goodsReceipts/GoodsReceiptDetail'));
+const QuotationList = lazy(() => import('@/features/quotations/QuotationList'));
+const QuotationForm = lazy(() => import('@/features/quotations/QuotationForm'));
+const QuotationDetail = lazy(() => import('@/features/quotations/QuotationDetail'));
+const SalesOrderList = lazy(() => import('@/features/salesOrders/SalesOrderList'));
+const SalesOrderForm = lazy(() => import('@/features/salesOrders/SalesOrderForm'));
+const SalesOrderDetail = lazy(() => import('@/features/salesOrders/SalesOrderDetail'));
+const ContractList = lazy(() => import('@/features/contracts/ContractList'));
+const ContractForm = lazy(() => import('@/features/contracts/ContractForm'));
+const ContractDetail = lazy(() => import('@/features/contracts/ContractDetail'));
+const PowerOfAttorneyList = lazy(() => import('@/features/powerOfAttorney/PowerOfAttorneyList'));
+const OwnerSettingsPage = lazy(() => import('@/features/ownerSettings/OwnerSettingsPage'));
+const ExpenseCategoryList = lazy(() => import('@/features/expenses/ExpenseCategoryList'));
+const ExpenseList = lazy(() => import('@/features/expenses/ExpenseList'));
+const ExpenseForm = lazy(() => import('@/features/expenses/ExpenseForm'));
+const ExpenseDetail = lazy(() => import('@/features/expenses/ExpenseDetail'));
+const ChartOfAccountsList = lazy(() => import('@/features/chartOfAccounts/ChartOfAccountsList'));
+const TrialBalance = lazy(() => import('@/features/chartOfAccounts/TrialBalance'));
+const JournalEntryList = lazy(() => import('@/features/journalEntries/JournalEntryList'));
+const JournalEntryForm = lazy(() => import('@/features/journalEntries/JournalEntryForm'));
+const JournalEntryDetail = lazy(() => import('@/features/journalEntries/JournalEntryDetail'));
+const LedgerView = lazy(() => import('@/features/journalEntries/LedgerView'));
+const ReportsDashboard = lazy(() => import('@/features/reports/ReportsDashboard'));
+const IncomeStatementReport = lazy(() => import('@/features/reports/IncomeStatementReport'));
+const SalesReport = lazy(() => import('@/features/reports/SalesReport'));
+const InventoryReport = lazy(() => import('@/features/reports/InventoryReport'));
+const AgingReport = lazy(() => import('@/features/reports/AgingReport'));
 
 // Protected Route komponenti - useAuth hook'u kullanıyor
 
@@ -69,15 +99,15 @@ export const router = createBrowserRouter([
   // Public routes
   {
     path: '/login',
-    element: <Login />,
+    element: LazyLoad(Login),
   },
   {
     path: '/register',
-    element: <Register />,
+    element: LazyLoad(Register),
   },
   {
     path: '/forgot-password',
-    element: <ForgotPassword />,
+    element: LazyLoad(ForgotPassword),
   },
 
   // Protected routes (Layout içinde)
@@ -95,7 +125,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'dashboard',
-        element: <Dashboard />,
+        element: LazyLoad(Dashboard),
       },
       {
         path: 'companies',
@@ -494,11 +524,29 @@ export const router = createBrowserRouter([
       },
       {
         path: 'settings',
-        element: <div className="text-2xl">Ayarlar (TODO)</div>,
+        element: <SettingsLayout />,
+        children: [
+          {
+            index: true,
+            element: <Navigate to="/settings/account" replace />
+          },
+          {
+            path: 'account',
+            element: <AccountSettings />
+          },
+          {
+            path: 'company',
+            element: <CompanySettings />
+          }
+        ]
+      },
+      {
+        path: 'debug/api-test',
+        element: <ApiTestPage />
       },
       {
         path: 'profile',
-        element: <div className="text-2xl">Profilim (TODO)</div>,
+        element: <ProfilePage />,
       },
       {
         path: 'notifications',

@@ -1,0 +1,29 @@
+/**
+ * Tema seçici stilleri
+ */
+.theme-selector {
+  cursor: pointer;
+  padding: 4px 12px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.theme-selector:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme='dark'] .theme-selector:hover,
+[data-theme='semi-dark'] .theme-selector:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.theme-label {
+  font-size: 14px;
+}
+
+/* Mobilde label'ı gizle */
+@media (max-width: 768px) {
+  .theme-label {
+    display: none;
+  }
+}

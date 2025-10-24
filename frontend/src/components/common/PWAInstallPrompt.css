@@ -1,0 +1,106 @@
+/**
+ * PWA install prompt stilleri
+ */
+
+.pwa-install-modal .ant-modal-body {
+  padding: 32px;
+}
+
+.pwa-install-content {
+  text-align: center;
+}
+
+.pwa-icon {
+  margin-bottom: 20px;
+}
+
+.pwa-install-content h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #262626;
+}
+
+.pwa-install-content p {
+  color: #8c8c8c;
+  margin-bottom: 20px;
+}
+
+.pwa-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px 0;
+  text-align: left;
+}
+
+.pwa-features li {
+  padding: 8px 0;
+  color: #595959;
+  font-size: 14px;
+}
+
+/* iOS Instructions */
+.ios-install-instructions {
+  padding: 16px 0;
+}
+
+.instruction-step {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  margin-bottom: 12px;
+  background: #fafafa;
+  border-radius: 8px;
+}
+
+.step-number {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #1890ff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+[data-theme='dark'] .instruction-step {
+  background: #1f1f1f;
+}
+
+/* Floating install button */
+.pwa-floating-button {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #1890ff;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.4);
+  cursor: pointer;
+  z-index: 999;
+  transition: all 0.3s;
+}
+
+.pwa-floating-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(24, 144, 255, 0.5);
+}
+
+.pwa-floating-button:active {
+  transform: scale(0.95);
+}
+
+@media (min-width: 769px) {
+  .pwa-floating-button {
+    display: none;
+  }
+}

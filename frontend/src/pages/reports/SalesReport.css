@@ -1,0 +1,24 @@
+/**
+ * Satış raporu stilleri
+ */
+
+.sales-report-filters {
+  background: #fafafa;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+[data-theme='dark'] .sales-report-filters {
+  background: #1f1f1f;
+}
+
+.report-stat-card {
+  text-align: center;
+  padding: 20px;
+}
+
+.report-chart-container {
+  min-height: 300px;
+  padding: 16px;
+}

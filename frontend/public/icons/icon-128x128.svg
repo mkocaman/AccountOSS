@@ -1,0 +1,6 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="128" height="128" fill="#1890ff"/>
+<path d="M64 32C77.2548 32 88 42.7452 88 56V64C88 77.2548 77.2548 88 64 88H40C26.7452 88 16 77.2548 16 64V56C16 42.7452 26.7452 32 40 32H64Z" fill="white"/>
+<path d="M56 44C56.5523 44 57 44.4477 57 45V83C57 83.5523 56.5523 84 56 84H40C39.4477 84 39 83.5523 39 83V45C39 44.4477 39.4477 44 40 44H56Z" fill="#1890ff"/>
+<text x="64" y="108" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="12" font-weight="bold">AccountOS</text>
+</svg>

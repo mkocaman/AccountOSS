@@ -1,0 +1,113 @@
+{
+  "name": "AccountOS - Muhasebe Yönetim Sistemi",
+  "short_name": "AccountOS",
+  "description": "Profesyonel muhasebe ve fatura yönetim sistemi",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1890ff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.svg",
+      "sizes": "72x72",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-96x96.svg",
+      "sizes": "96x96",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-128x128.svg",
+      "sizes": "128x128",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-144x144.svg",
+      "sizes": "144x144",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-152x152.svg",
+      "sizes": "152x152",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-192x192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-384x384.svg",
+      "sizes": "384x384",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Yeni Fatura",
+      "short_name": "Fatura",
+      "description": "Yeni fatura oluştur",
+      "url": "/invoices/create",
+      "icons": [
+        {
+          "src": "/icons/shortcut-invoice.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Ürünler",
+      "short_name": "Ürünler",
+      "description": "Ürün listesi",
+      "url": "/products/list",
+      "icons": [
+        {
+          "src": "/icons/shortcut-products.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Cariler",
+      "short_name": "Cariler",
+      "description": "Cari hesap listesi",
+      "url": "/partners/list",
+      "icons": [
+        {
+          "src": "/icons/shortcut-partners.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "categories": ["business", "finance", "productivity"],
+  "screenshots": [
+    {
+      "src": "/screenshots/dashboard.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "Dashboard"
+    },
+    {
+      "src": "/screenshots/invoices.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "Faturalar"
+    }
+  ]
+}

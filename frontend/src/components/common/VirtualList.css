@@ -1,0 +1,15 @@
+/**
+ * Virtual list stilleri
+ */
+
+.virtual-list-container {
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.virtual-list-loading {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}

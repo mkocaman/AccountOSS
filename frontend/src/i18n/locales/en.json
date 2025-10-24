@@ -37,7 +37,8 @@
     "filters": "Filters",
     "searchPlaceholder": "Search...",
     "totalRecords": "Total {{total}} records",
-    "pageSizeOptions": "10,20,50,100"
+    "pageSizeOptions": "10,20,50,100",
+    "reset": "Reset"
   },
   "menu": {
     "dashboard": "Dashboard",
@@ -94,6 +95,11 @@
     "preferences": "Preferences",
     "companies": "Companies",
     "notifications": "Notifications",
+    "profile": "My Profile",
+    "accountSettings": "Account Settings",
+    "companySettings": "Company Settings",
+    "help": "Help",
+    "keyboardShortcuts": "Keyboard Shortcuts",
     "erpAccounting": "ERP & Accounting",
     "goodsReceipt": "Goods Receipt",
     "lowStock": "Low Stock",
@@ -375,7 +381,89 @@
     "email": "Email Settings",
     "security": "Security",
     "theme": "Theme",
-    "language": "Language"
+    "language": "Language",
+    "languageChanged": "Language changed successfully",
+    "languageChangeError": "Failed to change language",
+    "saveSuccess": "Settings saved successfully",
+    "saveError": "Failed to save settings",
+    "menu": {
+      "account": "Account Settings",
+      "company": "Company Information",
+      "security": "Security",
+      "notifications": "Notifications",
+      "localization": "Localization",
+      "integrations": "Integrations"
+    },
+    "account": {
+      "title": "Account Settings",
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "Enter your full name",
+      "email": "Email",
+      "emailTooltip": "Email address cannot be changed. Contact support.",
+      "phone": "Phone",
+      "preferences": "Preferences",
+      "dateFormat": "Date Format",
+      "numberFormat": "Number Format"
+    },
+    "company": {
+      "title": "Company Information",
+      "logo": "Company Logo",
+      "logoHint": "Maximum 2MB, PNG or JPG format",
+      "name": "Company Name",
+      "namePlaceholder": "Enter company name",
+      "taxNumber": "Tax Number",
+      "taxOffice": "Tax Office",
+      "taxOfficePlaceholder": "Enter tax office",
+      "address": "Address",
+      "addressPlaceholder": "Enter company address",
+      "phone": "Phone",
+      "email": "Email",
+      "website": "Website"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "unreadCount": "{{count}} unread",
+    "markAllRead": "Mark All as Read",
+    "empty": "No notifications",
+    "viewAll": "View All"
+  },
+  "profile": {
+    "title": "My Profile",
+    "updateSuccess": "Profile updated successfully",
+    "updateError": "Error updating profile",
+    "avatarUpdateSuccess": "Avatar updated successfully",
+    "avatarUpdateError": "Error updating avatar",
+    "changeAvatar": "Change Avatar",
+    "fields": {
+      "fullName": "Full Name",
+      "fullNameRequired": "Full name is required",
+      "fullNamePlaceholder": "Enter your full name",
+      "email": "Email",
+      "phone": "Phone",
+      "company": "Company",
+      "companyPlaceholder": "Enter company name",
+      "address": "Address",
+      "addressPlaceholder": "Enter address",
+      "role": "Role",
+      "joinDate": "Join Date"
+    },
+    "roles": {
+      "admin": "Administrator",
+      "user": "User"
+    },
+    "security": {
+      "title": "Security",
+      "currentPassword": "Current Password",
+      "currentPasswordRequired": "Current password is required",
+      "newPassword": "New Password",
+      "newPasswordRequired": "New password is required",
+      "confirmPassword": "Confirm Password",
+      "confirmPasswordRequired": "Password confirmation is required",
+      "changePassword": "Change Password",
+      "passwordChanged": "Password changed successfully",
+      "passwordChangeError": "Failed to change password"
+    }
   },
   "validation": {
     "required": "This field is required",
@@ -397,10 +485,10 @@
     "loadingData": "Loading data..."
   },
   "theme": {
-    "light": "Light",
-    "dark": "Dark",
-    "semiDark": "Semi-Dark",
-    "system": "System"
+    "light": "Light Theme",
+    "dark": "Dark Theme",
+    "semiDark": "Semi Dark",
+    "system": "System Theme"
   },
   "errors": {
     "404": "Page Not Found",

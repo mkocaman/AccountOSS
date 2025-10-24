@@ -1,0 +1,68 @@
+/**
+ * Tema renk değişkenleri
+ */
+
+/* Light Theme */
+[data-theme='light'] {
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F5F6F8;
+  --bg-tertiary: #E5E7EB;
+  
+  --text-primary: #1A1A1A;
+  --text-secondary: #6B7280;
+  --text-tertiary: #9CA3AF;
+  
+  --border-color: #E5E7EB;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Dark Theme */
+[data-theme='dark'] {
+  --bg-primary: #1A1A1A;
+  --bg-secondary: #2D2D2D;
+  --bg-tertiary: #404040;
+  
+  --text-primary: #F3F4F6;
+  --text-secondary: #D1D5DB;
+  --text-tertiary: #9CA3AF;
+  
+  --border-color: #404040;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Semi-Dark Theme - Sidebar koyu, content açık */
+[data-theme='semi-dark'] {
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F5F6F8;
+  --bg-tertiary: #E5E7EB;
+  
+  --text-primary: #1A1A1A;
+  --text-secondary: #6B7280;
+  --text-tertiary: #9CA3AF;
+  
+  --border-color: #E5E7EB;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  
+  /* Sidebar için koyu renkler */
+  --sidebar-bg: #1A1A1A;
+  --sidebar-text: #F3F4F6;
+  --sidebar-hover: #2D2D2D;
+}
+
+/* ProLayout için tema uygulaması */
+[data-theme='semi-dark'] .ant-pro-sider {
+  background: var(--sidebar-bg) !important;
+}
+
+[data-theme='semi-dark'] .ant-pro-sider .ant-menu {
+  background: transparent;
+  color: var(--sidebar-text);
+}
+
+[data-theme='semi-dark'] .ant-pro-sider .ant-menu-item {
+  color: var(--sidebar-text);
+}
+
+[data-theme='semi-dark'] .ant-pro-sider .ant-menu-item:hover {
+  background: var(--sidebar-hover);
+}
