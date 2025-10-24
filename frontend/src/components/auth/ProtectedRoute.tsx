@@ -18,24 +18,8 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const location = useLocation();
   
   // Token kontrolü
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('accessToken');
   const isAuthenticated = !!token;
-
-  // Loading durumunda spinner göster
-  if (!token) {
-    return (
-      <div 
-        style={{ 
-          height: '100vh', 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center' 
-        }}
-      >
-        <Spin size="large" />
-      </div>
-    );
-  }
 
   // Giriş yapmamış kullanıcıları login sayfasına yönlendir
   if (!isAuthenticated) {
