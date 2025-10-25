@@ -28,7 +28,7 @@ const LazyLoad = (Component: React.LazyExoticComponent<any>) => {
 const Login = lazy(() => import('../features/auth/Login').then(m => ({ default: m.Login })));
 const Register = lazy(() => import('../features/auth/Register').then(m => ({ default: m.Register })));
 const ForgotPassword = lazy(() => import('../features/auth/ForgotPassword').then(m => ({ default: m.ForgotPassword })));
-const Dashboard = lazy(() => import('../features/dashboard/Dashboard'));
+const Dashboard = lazy(() => import('../pages/Dashboard'));
 const ComingSoon = lazy(() => import('../pages/common/ComingSoon'));
 const InvoiceList = lazy(() => import('../pages/invoices/InvoiceList'));
 const InvoiceForm = lazy(() => import('../pages/invoices/InvoiceForm'));
