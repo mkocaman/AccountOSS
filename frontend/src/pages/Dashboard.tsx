@@ -98,6 +98,14 @@ export const Dashboard: React.FC = () => {
     console.log('🔄 Loading state changed:', isLoading);
   }, [isLoading]);
 
+  // Chart render öncesi debug
+  console.log('🟣 Will render charts:', {
+    salesChart: !!dashboardData?.salesChart,
+    topProducts: !!dashboardData?.topProducts,
+    customerRevenue: !!dashboardData?.customerRevenue,
+    cashFlow: !!dashboardData?.cashFlow,
+  });
+
   // Hata durumu
   useEffect(() => {
     if (error) {
