@@ -1,5 +1,3 @@
-import type { TooltipProps } from 'recharts';
-
 // Para birimi formatı
 export const formatCurrency = (value: number, locale: string = 'tr-TR'): string => {
   return new Intl.NumberFormat(locale, {
@@ -10,7 +8,7 @@ export const formatCurrency = (value: number, locale: string = 'tr-TR'): string 
   }).format(value);
 };
 
-// Kısa para formatı (K, M notasyonu ile)
+// Kısa para birimi formatı
 export const formatCurrencyShort = (value: number, locale: string = 'tr-TR'): string => {
   if (value >= 1000000) {
     return `₺${(value / 1000000).toFixed(1)}M`;
@@ -21,114 +19,63 @@ export const formatCurrencyShort = (value: number, locale: string = 'tr-TR'): st
   return formatCurrency(value, locale);
 };
 
-// Sayı formatı (binlik ayırıcı)
-export const formatNumber = (value: number, locale: string = 'tr-TR'): string => {
-  return new Intl.NumberFormat(locale).format(value);
+// Tarih formatı
+export const formatDate = (dateString: string, locale: string = 'tr'): string => {
+  const date = new Date(dateString);
+  const options: Intl.DateTimeFormatOptions = { month: 'short', year: 'numeric' };
+  
+  if (locale === 'tr') {
+    return date.toLocaleDateString('tr-TR', options);
+  } else {
+    return date.toLocaleDateString('en-US', options);
+  }
+};
+
+// Ay formatı
+export const formatMonth = (monthString: string, locale: string = 'tr'): string => {
+  const date = new Date(monthString);
+  const options: Intl.DateTimeFormatOptions = { month: 'short' };
+  
+  if (locale === 'tr') {
+    return date.toLocaleDateString('tr-TR', options);
+  } else {
+    return date.toLocaleDateString('en-US', options);
+  }
 };
 
 // Yüzde formatı
 export const formatPercent = (value: number): string => {
-  return `%${value.toFixed(1)}`;
+  return `${value.toFixed(1)}%`;
 };
 
-// Tarih formatı (Grafik için)
-export const formatDate = (dateString: string, locale: string = 'tr-TR'): string => {
-  const date = new Date(dateString);
-  return new Intl.DateTimeFormat(locale, {
-    month: 'short',
-    day: 'numeric',
-  }).format(date);
+// Sayı formatı
+export const formatNumber = (value: number, locale: string = 'tr-TR'): string => {
+  return new Intl.NumberFormat(locale).format(value);
 };
 
-// Ay formatı (YYYY-MM -> Ocak 2024)
-export const formatMonth = (monthString: string, locale: string = 'tr-TR'): string => {
-  const [year, month] = monthString.split('-');
-  const date = new Date(parseInt(year), parseInt(month) - 1);
-  return new Intl.DateTimeFormat(locale, {
-    year: 'numeric',
-    month: 'short',
-  }).format(date);
-};
+// Chart renk paleti
+export const chartColors = [
+  '#1890ff', // Mavi
+  '#52c41a', // Yeşil
+  '#fa8c16', // Turuncu
+  '#722ed1', // Mor
+  '#eb2f96', // Pembe
+  '#13c2c2', // Cyan
+  '#faad14', // Sarı
+  '#f5222d', // Kırmızı
+];
 
-// Grafik renk paleti
-export const chartColors = {
-  primary: '#1890ff',
-  success: '#52c41a',
-  warning: '#faad14',
-  error: '#ff4d4f',
-  purple: '#722ed1',
-  cyan: '#13c2c2',
+// Responsive chart height calculator
+export const getResponsiveChartHeight = (baseHeight: number = 350): number => {
+  if (typeof window === 'undefined') return baseHeight;
   
-  // Çok renkli set (Pie/Donut chart için)
-  palette: [
-    '#1890ff', // Mavi
-    '#52c41a', // Yeşil
-    '#faad14', // Turuncu
-    '#ff4d4f', // Kırmızı
-    '#722ed1', // Mor
-    '#13c2c2', // Cyan
-    '#eb2f96', // Pembe
-    '#fa8c16', // Turuncu 2
-  ],
-};
-
-// Custom Tooltip bileşeni için wrapper
-export const CustomTooltipWrapper: React.FC<
-  TooltipProps<number, string> & {
-    formatter?: (value: number) => string;
-    labelFormatter?: (label: string) => string;
+  const width = window.innerWidth;
+  
+  if (width < 768) {
+    return baseHeight * 0.8;
+  } else if (width < 992) {
+    return baseHeight * 0.9;
+  } else {
+    return baseHeight;
   }
-> = ({ active, payload, label, formatter, labelFormatter }) => {
-  if (!active || !payload || !payload.length) return null;
-
-  return (
-    <div
-      style={{
-        backgroundColor: '#fff',
-        padding: '12px',
-        border: '1px solid #d9d9d9',
-        borderRadius: '4px',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-      }}
-    >
-      {label && (
-        <div style={{ marginBottom: 8, fontWeight: 600, color: '#262626' }}>
-          {labelFormatter ? labelFormatter(label) : label}
-        </div>
-      )}
-      {payload.map((entry, index) => (
-        <div
-          key={index}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            marginBottom: 4,
-          }}
-        >
-          <div
-            style={{
-              width: 10,
-              height: 10,
-              backgroundColor: entry.color,
-              marginRight: 8,
-              borderRadius: 2,
-            }}
-          />
-          <span style={{ color: '#595959', marginRight: 8 }}>
-            {entry.name}:
-          </span>
-          <span style={{ fontWeight: 600, color: '#262626' }}>
-            {formatter ? formatter(entry.value as number) : entry.value}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-// Responsive chart boyutları
-export const getResponsiveChartHeight = (windowWidth: number): number => {
-  if (windowWidth < 576) return 250; // Mobile
-  if (windowWidth < 992) return 300; // Tablet
-  return 350; // Desktop
 };
