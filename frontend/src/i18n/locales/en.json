@@ -1012,6 +1012,59 @@
     "new": "New Bank Account",
     "iban": "IBAN",
     "balance": "Balance"
+  },
+  "stock": {
+    "levels": {
+      "title": "Stock Levels",
+      "description": "Current stock status for all products",
+      "columns": {
+        "product": "Product",
+        "warehouse": "Warehouse",
+        "currentStock": "Current Stock",
+        "reserved": "Reserved",
+        "available": "Available",
+        "minMax": "Min/Max",
+        "status": "Status",
+        "unitCost": "Unit Cost",
+        "totalValue": "Total Value"
+      },
+      "status": {
+        "ok": "OK",
+        "low": "Low",
+        "critical": "Critical",
+        "overstock": "Overstock"
+      },
+      "stats": {
+        "totalValue": "Total Stock Value",
+        "products": "products",
+        "critical": "Critical Items",
+        "needsImmediate": "Immediate order required",
+        "low": "Low Stock",
+        "needsAttention": "Needs attention",
+        "ok": "Healthy Stock",
+        "healthyStock": "Normal levels"
+      },
+      "filters": {
+        "searchPlaceholder": "Search product name or code...",
+        "statusPlaceholder": "Filter by status",
+        "warehousePlaceholder": "Filter by warehouse",
+        "reset": "Reset Filters"
+      },
+      "actions": {
+        "order": "Order"
+      },
+      "messages": {
+        "filtersReset": "Filters reset",
+        "refreshed": "Data refreshed"
+      }
+    }
+  },
+  "common": {
+    "view": "View",
+    "refresh": "Refresh",
+    "actions": "Actions",
+    "total": "Total",
+    "items": "items"
   }
 }
 

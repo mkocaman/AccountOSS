@@ -1159,11 +1159,59 @@
     }
   },
   "stock": {
-    "title": "Stok Yönetimi",
-    "movements": "Stok Hareketleri",
-    "levels": "Stok Seviyeleri",
-    "adjustment": "Stok Düzeltme",
-    "fifo": "FIFO Hesaplama",
+    "levels": {
+      "title": "Stok Seviyeleri",
+      "description": "Tüm ürünlerin güncel stok durumu",
+      "columns": {
+        "product": "Ürün",
+        "warehouse": "Depo",
+        "currentStock": "Mevcut Stok",
+        "reserved": "Rezerve",
+        "available": "Kullanılabilir",
+        "minMax": "Min/Max",
+        "status": "Durum",
+        "unitCost": "Birim Maliyet",
+        "totalValue": "Toplam Değer"
+      },
+      "status": {
+        "ok": "Normal",
+        "low": "Düşük",
+        "critical": "Kritik",
+        "overstock": "Fazla Stok"
+      },
+      "stats": {
+        "totalValue": "Toplam Stok Değeri",
+        "products": "ürün",
+        "critical": "Kritik Ürünler",
+        "needsImmediate": "Acil sipariş gerekli",
+        "low": "Düşük Stoklar",
+        "needsAttention": "Dikkat gerekli",
+        "ok": "Sağlıklı Stok",
+        "healthyStock": "Normal seviyede"
+      },
+      "filters": {
+        "searchPlaceholder": "Ürün adı veya kodu ara...",
+        "statusPlaceholder": "Duruma göre filtrele",
+        "warehousePlaceholder": "Depoya göre filtrele",
+        "reset": "Filtreleri Sıfırla"
+      },
+      "actions": {
+        "order": "Sipariş Ver"
+      },
+      "messages": {
+        "filtersReset": "Filtreler sıfırlandı",
+        "refreshed": "Veriler güncellendi"
+      }
+    }
+  },
+  "common": {
+    "view": "Görüntüle",
+    "refresh": "Yenile",
+    "actions": "İşlemler",
+    "total": "Toplam",
+    "items": "kayıt"
+  },
+  "stock": {
     "columns": {
       "product": "Ürün",
       "type": "Hareket Tipi",

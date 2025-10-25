@@ -30,6 +30,7 @@ const Register = lazy(() => import('../features/auth/Register').then(m => ({ def
 const ForgotPassword = lazy(() => import('../features/auth/ForgotPassword').then(m => ({ default: m.ForgotPassword })));
 const Dashboard = lazy(() => import('../pages/Dashboard'));
 const ComingSoon = lazy(() => import('../pages/common/ComingSoon'));
+const StockLevels = lazy(() => import('../pages/stock/StockLevels'));
 const InvoiceList = lazy(() => import('../pages/invoices/InvoiceList'));
 const InvoiceForm = lazy(() => import('../pages/invoices/InvoiceForm'));
 const InvoiceDetail = lazy(() => import('../pages/invoices/InvoiceDetail'));
@@ -128,6 +129,15 @@ export const router = createBrowserRouter([
       {
         path: 'dashboard',
         element: LazyLoad(Dashboard),
+      },
+      {
+        path: 'stock',
+        children: [
+          {
+            path: 'levels',
+            element: LazyLoad(StockLevels),
+          },
+        ],
       },
       {
         path: 'companies',
