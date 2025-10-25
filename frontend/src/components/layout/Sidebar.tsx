@@ -45,6 +45,8 @@ export const Sidebar = ({ collapsed, onCollapse }: SidebarProps) => {
       children: [
         { key: '/invoices', label: t('menu.invoiceList') },
         { key: '/invoices/create', label: t('menu.newInvoice') },
+        { key: '/invoices/edit/:id', label: t('menu.editInvoice'), hideInMenu: true },
+        { key: '/invoices/:id', label: t('menu.invoiceDetail'), hideInMenu: true },
       ],
     },
     {

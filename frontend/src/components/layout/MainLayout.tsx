@@ -67,6 +67,16 @@ export const MainLayout = () => {
             path: '/invoices/create',
             name: 'Yeni Fatura',
           },
+          {
+            path: '/invoices/edit/:id',
+            name: 'Fatura Düzenle',
+            hideInMenu: true,
+          },
+          {
+            path: '/invoices/:id',
+            name: 'Fatura Detayı',
+            hideInMenu: true,
+          },
         ],
       },
       {

@@ -87,6 +87,16 @@ export const ProMainLayout: React.FC = () => {
         {
           path: '/invoices/create',
           name: t('menu.createInvoice')
+        },
+        {
+          path: '/invoices/edit/:id',
+          name: t('menu.editInvoice'),
+          hideInMenu: true
+        },
+        {
+          path: '/invoices/:id',
+          name: t('menu.invoiceDetail'),
+          hideInMenu: true
         }
       ]
     },
