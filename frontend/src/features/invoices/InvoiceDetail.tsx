@@ -1,211 +1,90 @@
 import { useEffect, useState } from 'react';
-import { 
-  Card, 
-  Descriptions, 
-  Table, 
-  Tag, 
-  Button, 
-  Space, 
-  Spin, 
-  message, 
-  Modal, 
-  Result,
-  Badge,
-  Divider
-} from 'antd';
+import { Card, Descriptions, Table, Tag, Button, Space, Spin, App } from 'antd';
 import {
   FilePdfOutlined,
   PrinterOutlined,
   EditOutlined,
-  DeleteOutlined,
-  ArrowLeftOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
-  FileTextOutlined,
-  UserOutlined,
-  CalendarOutlined,
-  DollarOutlined
 } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
-import { getInvoice, deleteInvoice, updateInvoiceStatus, generateInvoicePDF } from '@/services/invoiceService';
-import type { Invoice, InvoiceStatus } from '@/types/invoice';
+import { invoicesApi } from '@/api/invoices';
+import type { Invoice } from '@/types/invoice';
+import {
+  INVOICE_STATUS_LABELS,
+  PAYMENT_STATUS_LABELS,
+  INVOICE_TYPE_LABELS,
+  InvoiceStatus,
+} from '@/types/invoice';
 import type { ColumnsType } from 'antd/es/table';
 
-// Para birimi formatı
-const formatCurrency = (amount: number, currencyCode: string = 'TRY'): string => {
-  return new Intl.NumberFormat('tr-TR', {
-    style: 'currency',
-    currency: currencyCode,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(amount);
-};
-
-// Tarih formatı
-const formatDate = (date: string): string => {
-  return new Date(date).toLocaleDateString('tr-TR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  });
-};
-
-/**
- * Fatura detay sayfası - Gerçek API ile entegre edilmiş
- * Fatura bilgilerini görüntüleme, düzenleme, silme ve PDF oluşturma
- */
+// Fatura detay sayfası
 export const InvoiceDetail = () => {
-  const { t } = useTranslation();
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams();
   const navigate = useNavigate();
   const [invoice, setInvoice] = useState<Invoice | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const { modal, message } = App.useApp();
 
-  /**
-   * Fatura detayını API'den çek
-   */
-  const fetchInvoiceDetail = async () => {
-    if (!id) {
-      message.error(t('invoice.errors.notFound'));
-      navigate('/invoices');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      console.log('📄 Fatura detayı getiriliyor:', id);
-      
-      // API çağrısı - doğru fonksiyonu kullan
-      const data = await getInvoice(id);
-      
-      setInvoice(data);
-      console.log('✅ Fatura detayı yüklendi:', data);
-      setLoading(false);
-    } catch (error: any) {
-      setLoading(false);
-      message.error(error.message || t('invoice.errors.loadDetailFailed'));
-      console.error('❌ Fatura detayı hatası:', error);
-      // 404 ise listeye yönlendir
-      if (error.response?.status === 404) {
-        navigate('/invoices');
-      }
-    }
-  };
-
-  /**
-   * Sayfa yüklendiğinde fatura detayını çek
-   */
   useEffect(() => {
-    fetchInvoiceDetail();
+    if (id) {
+      loadInvoice();
+    }
   }, [id]);
 
-  /**
-   * Düzenle butonu
-   */
-  const handleEdit = () => {
-    navigate(`/invoices/edit/${invoice?.id}`);
+  const loadInvoice = async () => {
+    setLoading(true);
+    try {
+      const response = await invoicesApi.getById(id!);
+      if (response.success) {
+        setInvoice(response.data);
+      }
+    } catch (error) {
+      message.error('Fatura yüklenemedi');
+      navigate('/invoices');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  /**
-   * Sil butonu
-   */
-  const handleDelete = () => {
-    Modal.confirm({
-      title: t('invoice.messages.deleteConfirmTitle'),
-      content: t('invoice.messages.deleteConfirmContent'),
-      okText: t('invoice.confirmModal.okText'),
+  const handleApprove = async () => {
+    try {
+      await invoicesApi.approve(id!);
+      message.success('Fatura onaylandı');
+      loadInvoice();
+    } catch (error) {
+      message.error('Fatura onaylanamadı');
+    }
+  };
+
+  const handleCancel = () => {
+    modal.confirm({
+      title: 'Faturayı İptal Et',
+      content: 'Faturayı iptal etmek istediğinize emin misiniz? Bu işlem geri alınamaz!',
+      okText: 'İptal Et',
       okType: 'danger',
-      cancelText: t('invoice.confirmModal.cancelText'),
+      cancelText: 'Vazgeç',
       onOk: async () => {
         try {
-          await deleteInvoice(invoice!.id);
-          message.success(t('invoice.messages.deleteSuccess'));
-          navigate('/invoices');
-        } catch (error: any) {
-          message.error(error.message || t('invoice.errors.deleteFailed'));
+          await invoicesApi.cancel(id!, 'Kullanıcı tarafından iptal edildi');
+          message.success('Fatura iptal edildi');
+          loadInvoice();
+        } catch (error) {
+          message.error('Fatura iptal edilemedi');
         }
       },
     });
   };
 
-  /**
-   * PDF oluştur butonu
-   */
-  const handleGeneratePDF = async () => {
-    try {
-      message.loading(t('invoice.messages.pdfGenerating'), 0);
-      await generateInvoicePDF(invoice!.id);
-      message.destroy();
-      message.success(t('invoice.messages.pdfSuccess'));
-    } catch (error: any) {
-      message.destroy();
-      message.error(error.message || t('invoice.errors.pdfFailed'));
-    }
-  };
-
-  /**
-   * Yazdır butonu
-   */
-  const handlePrint = () => {
-    window.print();
-  };
-
-  /**
-   * Durum değiştir
-   */
-  const handleStatusChange = async (newStatus: string) => {
-    try {
-      await updateInvoiceStatus(invoice!.id, newStatus);
-      message.success(t('invoice.messages.updateSuccess'));
-      // Detayı yeniden yükle
-      fetchInvoiceDetail();
-    } catch (error: any) {
-      message.error(error.message || t('invoice.errors.updateFailed'));
-    }
-  };
-
-  /**
-   * Durum badge'i için renk
-   */
-  const getStatusConfig = (status: string) => {
-    const configs: Record<string, { color: string; text: string }> = {
-      'draft': { color: 'default', text: t('invoice.status.draft') },
-      'sent': { color: 'processing', text: t('invoice.status.pending') },
-      'paid': { color: 'success', text: t('invoice.status.paid') },
-      'overdue': { color: 'error', text: t('invoice.status.overdue') },
-      'cancelled': { color: 'default', text: t('invoice.status.cancelled') },
-    };
-    return configs[status] || { color: 'default', text: status };
-  };
-
-  // Loading durumunda spinner göster
-  if (loading) {
+  if (loading || !invoice) {
     return (
-      <div style={{ textAlign: 'center', padding: '50px' }}>
-        <Spin size="large" tip={t('invoice.messages.loadingInvoice')} />
+      <div className="flex items-center justify-center h-64">
+        <Spin size="large" />
       </div>
     );
   }
 
-  // Fatura yoksa hata göster
-  if (!invoice) {
-    return (
-      <Result
-        status="404"
-        title={t('invoice.errors.notFound')}
-        subTitle={t('invoice.errors.notFoundDescription')}
-        extra={
-          <Button type="primary" onClick={() => navigate('/invoices')}>
-            {t('invoice.buttons.back')}
-          </Button>
-        }
-      />
-    );
-  }
-
-  // Fatura kalemleri için tablo kolonları
   const itemColumns: ColumnsType<any> = [
     {
       title: '#',
@@ -214,12 +93,12 @@ export const InvoiceDetail = () => {
       width: 50,
     },
     {
-      title: t('invoice.labels.product'),
+      title: 'Ürün',
       key: 'product',
       render: (_, record) => (
         <div>
-          <div className="font-medium">{record.productName || record.description}</div>
-          <div className="text-xs text-gray-500">{record.productCode}</div>
+          <div className="font-medium">{record.product?.name || record.description}</div>
+          <div className="text-xs text-gray-500">{record.product?.code}</div>
         </div>
       ),
     },
@@ -229,41 +108,40 @@ export const InvoiceDetail = () => {
       key: 'description',
     },
     {
-      title: t('invoice.labels.quantity'),
+      title: 'Miktar',
       key: 'quantity',
-      align: 'right' as const,
-      render: (_, record) => `${record.quantity} ${record.unit || 'adet'}`,
+      render: (_, record) => `${record.quantity} ${record.unit}`,
     },
     {
-      title: t('invoice.labels.unitPrice'),
+      title: 'Birim Fiyat',
       dataIndex: 'unitPrice',
       key: 'unitPrice',
-      align: 'right' as const,
-      render: (price) => formatCurrency(price, invoice.currency),
+      align: 'right',
+      render: (price) => `${price.toFixed(2)} ${invoice.currency}`,
     },
     {
-      title: t('invoice.labels.discount'),
+      title: 'İndirim',
       key: 'discount',
-      align: 'right' as const,
+      align: 'right',
       render: (_, record) =>
-        record.discountPercentage > 0
-          ? `%${record.discountPercentage} (-${formatCurrency(record.discountAmount, invoice.currency)})`
+        record.discountRate > 0
+          ? `%${record.discountRate} (-${record.discountAmount.toFixed(2)})`
           : '-',
     },
     {
-      title: t('invoice.labels.taxRate'),
-      key: 'tax',
-      align: 'right' as const,
-      render: (_, record) => `%${record.taxRate} (${formatCurrency(record.taxAmount, invoice.currency)})`,
+      title: 'KDV',
+      key: 'vat',
+      align: 'right',
+      render: (_, record) => `%${record.vatRate} (${record.vatAmount.toFixed(2)})`,
     },
     {
-      title: t('invoice.labels.amount'),
-      dataIndex: 'amount',
-      key: 'amount',
-      align: 'right' as const,
+      title: 'Tutar',
+      dataIndex: 'lineTotal',
+      key: 'lineTotal',
+      align: 'right',
       render: (total) => (
         <span className="font-medium">
-          {formatCurrency(total, invoice.currency)}
+          {total.toFixed(2)} {invoice.currency}
         </span>
       ),
     },
@@ -271,126 +149,109 @@ export const InvoiceDetail = () => {
 
   return (
     <div>
-      {/* Print için CSS */}
-      <style>{`
-        @media print {
-          .no-print {
-            display: none !important;
-          }
-          
-          .ant-page-header,
-          .ant-card-head {
-            background: white !important;
-            -webkit-print-color-adjust: exact;
-          }
-        }
-      `}</style>
-
       {/* Başlık ve Aksiyonlar */}
-      <div className="flex items-center justify-between mb-6 no-print">
+      <div className="flex items-center justify-between mb-6">
         <div>
-          <Button 
-            icon={<ArrowLeftOutlined />} 
-            onClick={() => navigate('/invoices')}
-            className="mr-4"
-          >
-            {t('invoice.buttons.back')}
-          </Button>
-          <h1 className="text-2xl font-bold inline">{t('invoice.detail')}</h1>
+          <h1 className="text-2xl font-bold">Fatura Detayı</h1>
           <p className="text-gray-500">{invoice.invoiceNumber}</p>
         </div>
         <Space>
-          <Button 
-            icon={<FilePdfOutlined />} 
-            onClick={handleGeneratePDF}
-          >
-            {t('invoice.buttons.downloadPdf')}
-          </Button>
-          <Button 
-            icon={<PrinterOutlined />} 
-            onClick={handlePrint}
-          >
-            {t('invoice.buttons.print')}
-          </Button>
-          <Button
-            icon={<EditOutlined />}
-            onClick={handleEdit}
-          >
-            {t('invoice.buttons.edit')}
-          </Button>
-          <Button
-            danger
-            icon={<DeleteOutlined />}
-            onClick={handleDelete}
-          >
-            {t('invoice.buttons.delete')}
-          </Button>
+          <Button icon={<FilePdfOutlined />}>PDF İndir</Button>
+          <Button icon={<PrinterOutlined />}>Yazdır</Button>
+          {invoice.status === InvoiceStatus.Draft && (
+            <>
+              <Button
+                icon={<EditOutlined />}
+                onClick={() => navigate(`/invoices/edit/${invoice.id}`)}
+              >
+                Düzenle
+              </Button>
+              <Button
+                type="primary"
+                icon={<CheckCircleOutlined />}
+                onClick={handleApprove}
+              >
+                Onayla
+              </Button>
+            </>
+          )}
+          {invoice.status !== InvoiceStatus.Cancelled && (
+            <Button
+              danger
+              icon={<CloseCircleOutlined />}
+              onClick={handleCancel}
+            >
+              İptal Et
+            </Button>
+          )}
         </Space>
       </div>
 
       {/* Fatura Bilgileri */}
-      <Card 
-        title={
-          <Space>
-            <FileTextOutlined />
-            {t('invoice.titleSingle')} Bilgileri
-          </Space>
-        } 
-        className="mb-4"
-      >
-        <Descriptions column={3} bordered>
-          <Descriptions.Item label={t('invoice.labels.invoiceNumber')}>
-            <span className="font-mono font-medium text-lg">
+      <Card title="Fatura Bilgileri" className="mb-4">
+        <Descriptions column={3}>
+          <Descriptions.Item label="Fatura No">
+            <span className="font-mono font-medium">
               {invoice.invoiceNumber}
             </span>
           </Descriptions.Item>
-          <Descriptions.Item label={t('invoice.labels.invoiceType')}>
-            <Tag color={invoice.invoiceType === 'sales' ? 'green' : 'blue'}>
-              {invoice.invoiceType === 'sales' ? t('invoice.type.sales') : t('invoice.type.purchase')}
-            </Tag>
+          <Descriptions.Item label="Tür">
+            {INVOICE_TYPE_LABELS[invoice.type]}
           </Descriptions.Item>
-          <Descriptions.Item label={t('invoice.labels.invoiceDate')}>
-            <Space>
-              <CalendarOutlined />
-              {formatDate(invoice.invoiceDate)}
-            </Space>
+          <Descriptions.Item label="Tarih">
+            {dayjs(invoice.invoiceDate).format('DD.MM.YYYY')}
           </Descriptions.Item>
-          <Descriptions.Item label={t('invoice.labels.customer')}>
+          <Descriptions.Item label="Müşteri">
             <div>
-              <div className="font-medium flex items-center">
-                <UserOutlined className="mr-2" />
-                {invoice.partnerName}
-              </div>
+              <div className="font-medium">{invoice.customer?.name}</div>
               <div className="text-xs text-gray-500">
-                {invoice.partnerCode}
+                {invoice.customer?.code}
               </div>
             </div>
           </Descriptions.Item>
-          <Descriptions.Item label={t('invoice.labels.dueDate')}>
-            {invoice.dueDate ? formatDate(invoice.dueDate) : '-'}
+          <Descriptions.Item label="Vade Tarihi">
+            {invoice.dueDate
+              ? dayjs(invoice.dueDate).format('DD.MM.YYYY')
+              : '-'}
           </Descriptions.Item>
-          <Descriptions.Item label={t('invoice.labels.currency')}>
-            <Tag>{invoice.currency}</Tag>
+          <Descriptions.Item label="Para Birimi">
+            {invoice.currency}
           </Descriptions.Item>
-          <Descriptions.Item label={t('invoice.labels.status')}>
-            <Badge 
-              status={getStatusConfig(invoice.status).color as any} 
-              text={getStatusConfig(invoice.status).text}
-            />
+          <Descriptions.Item label="Fatura Tipi">
+            <Tag color={invoice.isOfficial ? 'blue' : 'orange'}>
+              {invoice.isOfficial ? 'Resmi' : 'Gayriresmi'}
+            </Tag>
           </Descriptions.Item>
-          <Descriptions.Item label="Kur">
-            {invoice.exchangeRate}
+          <Descriptions.Item label="Durum">
+            <Tag
+              color={
+                invoice.status === InvoiceStatus.Approved
+                  ? 'success'
+                  : invoice.status === InvoiceStatus.Cancelled
+                  ? 'error'
+                  : invoice.status === InvoiceStatus.Sent
+                  ? 'processing'
+                  : 'default'
+              }
+            >
+              {INVOICE_STATUS_LABELS[invoice.status]}
+            </Tag>
           </Descriptions.Item>
-          <Descriptions.Item label={t('invoice.labels.createdAt')}>
-            {formatDate(invoice.createdAt)}
+          <Descriptions.Item label="Ödeme Durumu">
+            <Tag
+              color={
+                invoice.paymentStatus === 2
+                  ? 'success'
+                  : invoice.paymentStatus === 1
+                  ? 'warning'
+                  : 'error'
+              }
+            >
+              {PAYMENT_STATUS_LABELS[invoice.paymentStatus]}
+            </Tag>
           </Descriptions.Item>
-          {invoice.description && (
-            <Descriptions.Item label="Açıklama" span={3}>
-              {invoice.description}
-            </Descriptions.Item>
-          )}
           {invoice.notes && (
-            <Descriptions.Item label={t('invoice.labels.notes')} span={3}>
+            <Descriptions.Item label="Not" span={3}>
               {invoice.notes}
             </Descriptions.Item>
           )}
@@ -398,56 +259,44 @@ export const InvoiceDetail = () => {
       </Card>
 
       {/* Fatura Kalemleri */}
-      <Card 
-        title={
-          <Space>
-            <FileTextOutlined />
-            {t('invoice.labels.items')}
-          </Space>
-        } 
-        className="mb-4"
-      >
+      <Card title="Fatura Kalemleri" className="mb-4">
         <Table
           columns={itemColumns}
           dataSource={invoice.items || []}
           rowKey="id"
           pagination={false}
-          size="small"
         />
       </Card>
 
       {/* Fatura Özeti */}
-      <Card 
-        title={
-          <Space>
-            <DollarOutlined />
-            {t('invoice.titleSingle')} Özeti
-          </Space>
-        }
-        className="mb-4"
-      >
-        <div className="max-w-md ml-auto">
-          <Descriptions bordered column={1}>
-            <Descriptions.Item label={t('invoice.labels.subtotal')}>
-              <strong>{formatCurrency(invoice.subtotal, invoice.currency)}</strong>
-            </Descriptions.Item>
-            {invoice.discountAmount > 0 && (
-              <Descriptions.Item label={t('invoice.labels.discount')}>
-                <strong style={{ color: '#ff4d4f' }}>
-                  -{formatCurrency(invoice.discountAmount, invoice.currency)}
-                </strong>
-              </Descriptions.Item>
-            )}
-            <Descriptions.Item label={t('invoice.labels.taxRate')}>
-              <strong>{formatCurrency(invoice.taxAmount, invoice.currency)}</strong>
-            </Descriptions.Item>
-            <Divider />
-            <Descriptions.Item label={t('invoice.labels.grandTotal')}>
-              <strong style={{ fontSize: '18px', color: '#1890ff' }}>
-                {formatCurrency(invoice.totalAmount, invoice.currency)}
-              </strong>
-            </Descriptions.Item>
-          </Descriptions>
+      <Card className="mb-4">
+        <div className="max-w-md ml-auto space-y-2">
+          <div className="flex justify-between py-2">
+            <span className="text-gray-600">Ara Toplam:</span>
+            <span className="font-medium">
+              {invoice.subTotal.toFixed(2)} {invoice.currency}
+            </span>
+          </div>
+          {invoice.totalDiscount > 0 && (
+            <div className="flex justify-between py-2 text-red-600">
+              <span>Toplam İndirim:</span>
+              <span className="font-medium">
+                -{invoice.totalDiscount.toFixed(2)} {invoice.currency}
+              </span>
+            </div>
+          )}
+          <div className="flex justify-between py-2">
+            <span className="text-gray-600">Toplam KDV:</span>
+            <span className="font-medium">
+              {invoice.totalVat.toFixed(2)} {invoice.currency}
+            </span>
+          </div>
+          <div className="border-t pt-3 flex justify-between">
+            <span className="text-xl font-medium">Genel Toplam:</span>
+            <span className="text-2xl font-bold text-primary">
+              {invoice.grandTotal.toFixed(2)} {invoice.currency}
+            </span>
+          </div>
         </div>
       </Card>
     </div>

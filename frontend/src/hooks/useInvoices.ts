@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { message } from 'antd';
+import { App } from 'antd';
 import { useTranslation } from 'react-i18next';
 import axiosInstance from '@/utils/axios';
 import type { Invoice } from '@/types/invoice';
@@ -24,6 +24,7 @@ export const useInvoices = (params?: any) => {
 export const useDeleteInvoice = () => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { message } = App.useApp();
 
   return useMutation({
     mutationFn: async (id: string) => {
@@ -47,6 +48,7 @@ export const useDeleteInvoice = () => {
 export const useApproveInvoice = () => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
+  const { message } = App.useApp();
 
   return useMutation({
     mutationFn: async (id: string) => {
