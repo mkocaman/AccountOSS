@@ -211,7 +211,8 @@
       "amount": "Tutar",
       "quantity": "Miktar",
       "month": "Ay",
-      "lastMonths": "Son {{count}} Ay"
+      "lastMonths": "Son {{count}} Ay",
+      "percent": "Yüzde"
     },
     
     "cashFlow": {

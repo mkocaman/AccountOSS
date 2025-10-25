@@ -22,6 +22,10 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { StatisticsCard } from './dashboard/StatisticsCard';
+import { SalesChart } from './dashboard/SalesChart';
+import { TopProductsChart } from './dashboard/TopProductsChart';
+import { RevenueByCustomerChart } from './dashboard/RevenueByCustomerChart';
+import { CashFlowChart } from './dashboard/CashFlowChart';
 import { dashboardService } from '@/services/dashboardService';
 import type { DashboardData, DashboardFilter } from '@/types/dashboard';
 
@@ -290,35 +294,88 @@ export const Dashboard: React.FC = () => {
         </Col>
       </Row>
 
-      {/* Grafikler ve Diğer Bileşenler buraya eklenecek (Task 6, 7, 8) */}
-      
-      {/* Placeholder for Charts */}
+      {/* Grafikler */}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+        {/* Satış Trendi */}
         <Col xs={24} lg={16}>
           <Card
             title={t('dashboard.charts.salesTrend')}
+            extra={
+              <span style={{ fontSize: 12, color: '#8c8c8c' }}>
+                {t('dashboard.charts.lastMonths', { count: 6 })}
+              </span>
+            }
             loading={isLoading}
             bordered={false}
-            style={{ height: 400 }}
           >
-            {/* SalesChart component buraya gelecek */}
-            <div style={{ textAlign: 'center', padding: '100px 0', color: '#8c8c8c' }}>
-              📊 {t('dashboard.charts.salesTrend')} - Coming in Task 6
-            </div>
+            <SalesChart
+              data={dashboardData?.salesChart || []}
+              loading={isLoading}
+              height={350}
+            />
           </Card>
         </Col>
 
+        {/* En Çok Satan Ürünler */}
         <Col xs={24} lg={8}>
           <Card
             title={t('dashboard.charts.topProducts')}
+            extra={
+              <span style={{ fontSize: 12, color: '#8c8c8c' }}>
+                Top 5
+              </span>
+            }
             loading={isLoading}
             bordered={false}
-            style={{ height: 400 }}
           >
-            {/* TopProductsChart component buraya gelecek */}
-            <div style={{ textAlign: 'center', padding: '100px 0', color: '#8c8c8c' }}>
-              📈 {t('dashboard.charts.topProducts')} - Coming in Task 6
-            </div>
+            <TopProductsChart
+              data={dashboardData?.topProducts || []}
+              loading={isLoading}
+              height={350}
+            />
+          </Card>
+        </Col>
+      </Row>
+
+      {/* Müşteri Geliri ve Nakit Akışı */}
+      <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+        {/* Müşteri Bazlı Gelir */}
+        <Col xs={24} lg={8}>
+          <Card
+            title={t('dashboard.charts.revenueByCustomer')}
+            extra={
+              <span style={{ fontSize: 12, color: '#8c8c8c' }}>
+                Top 5
+              </span>
+            }
+            loading={isLoading}
+            bordered={false}
+          >
+            <RevenueByCustomerChart
+              data={dashboardData?.customerRevenue || []}
+              loading={isLoading}
+              height={350}
+            />
+          </Card>
+        </Col>
+
+        {/* Nakit Akışı */}
+        <Col xs={24} lg={16}>
+          <Card
+            title={t('dashboard.cashFlow.title')}
+            extra={
+              <span style={{ fontSize: 12, color: '#8c8c8c' }}>
+                {t('dashboard.charts.lastMonths', { count: 1 })}
+              </span>
+            }
+            loading={isLoading}
+            bordered={false}
+          >
+            <CashFlowChart
+              data={dashboardData?.cashFlow || []}
+              loading={isLoading}
+              height={350}
+            />
           </Card>
         </Col>
       </Row>

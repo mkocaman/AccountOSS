@@ -363,7 +363,8 @@
       "amount": "Amount",
       "quantity": "Quantity",
       "month": "Month",
-      "lastMonths": "Last {{count}} Months"
+      "lastMonths": "Last {{count}} Months",
+      "percent": "Percent"
     },
     
     "cashFlow": {
