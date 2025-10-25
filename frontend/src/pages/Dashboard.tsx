@@ -34,10 +34,15 @@ const { RangePicker } = DatePicker;
 export const Dashboard: React.FC = () => {
   const { t } = useTranslation();
 
+  // CRITICAL: Render log
+  console.log('🔴🔴🔴 Dashboard component rendering NOW!');
+
   // Filtre state
   const [filter, setFilter] = useState<DashboardFilter>({
     period: 'thisMonth',
   });
+
+  console.log('🔴 Filter:', filter);
 
   // Dashboard verilerini getir
   const {
@@ -47,9 +52,27 @@ export const Dashboard: React.FC = () => {
     refetch,
   } = useQuery<DashboardData>({
     queryKey: ['dashboard', filter],
-    queryFn: () => dashboardService.getDashboardData(filter),
+    queryFn: () => {
+      console.log('🔴🔴🔴 useQuery queryFn executing...');
+      return dashboardService.getDashboardData(filter);
+    },
     staleTime: 5 * 60 * 1000, // 5 dakika
     retry: 1,
+  });
+
+  console.log('🔴 useQuery state:', {
+    hasData: !!dashboardData,
+    isLoading,
+    hasError: !!error,
+    dataStructure: dashboardData ? {
+      hasStatistics: !!dashboardData.statistics,
+      hasSalesChart: !!dashboardData.salesChart,
+      salesChartLength: dashboardData.salesChart?.length,
+      hasTopProducts: !!dashboardData.topProducts,
+      topProductsLength: dashboardData.topProducts?.length,
+      hasCustomerRevenue: !!dashboardData.customerRevenue,
+      hasCashFlow: !!dashboardData.cashFlow,
+    } : 'NO DATA'
   });
 
   // Dashboard verilerini console'a yazdır (debug için)
@@ -125,6 +148,14 @@ export const Dashboard: React.FC = () => {
   }
 
   const stats = dashboardData?.statistics;
+
+  console.log('🟣 Rendering Dashboard JSX with stats:', stats ? 'HAS DATA' : 'NO DATA');
+  console.log('🟣 Will render charts:', {
+    salesChart: !!dashboardData?.salesChart,
+    topProducts: !!dashboardData?.topProducts,
+    customerRevenue: !!dashboardData?.customerRevenue,
+    cashFlow: !!dashboardData?.cashFlow,
+  });
 
   return (
     <div style={{ padding: '24px' }}>

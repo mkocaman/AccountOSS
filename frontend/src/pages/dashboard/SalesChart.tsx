@@ -33,6 +33,15 @@ export const SalesChart: React.FC<SalesChartProps> = ({
 }) => {
   const { t, i18n } = useTranslation();
 
+  console.log('🔵🔵🔵 SalesChart component rendering!');
+  console.log('🔵 SalesChart props:', { 
+    dataLength: data?.length, 
+    loading, 
+    height,
+    hasData: !!data && data.length > 0 
+  });
+  console.log('🔵 SalesChart data:', data);
+
   // Grafik verisi formatla
   const chartData = useMemo(() => {
     if (!data || data.length === 0) return [];

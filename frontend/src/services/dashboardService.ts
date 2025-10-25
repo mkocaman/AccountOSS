@@ -19,6 +19,8 @@ const BASE_URL = '/dashboard';
 class DashboardService {
   // Tam dashboard verilerini getir
   async getDashboardData(filter?: DashboardFilter): Promise<DashboardData> {
+    console.log('🟢🟢🟢 dashboardService.getDashboardData called with filter:', filter);
+    
     try {
       const params = filter ? {
         period: filter.period,
@@ -26,15 +28,22 @@ class DashboardService {
         endDate: filter.endDate,
       } : undefined;
 
+      console.log('🟢 Calling API with params:', params);
       const response = await apiClient.get<DashboardData>(BASE_URL, { params });
-      console.log('✅ Dashboard data loaded:', response.data);
+      console.log('✅ Dashboard data from API:', response.data);
       return response.data;
     } catch (error) {
-      console.error('❌ Dashboard data load error:', error);
+      console.error('❌ Dashboard API error:', error);
+      console.warn('⚠️ Falling back to MOCK data');
       
-      // Backend hazır değilse mock data dön
-      console.warn('⚠️ Using MOCK dashboard data');
-      return this.getMockDashboardData();
+      const mockData = this.getMockDashboardData();
+      console.log('🟡 Returning MOCK dashboard data:', {
+        hasStatistics: !!mockData.statistics,
+        salesChartLength: mockData.salesChart?.length,
+        topProductsLength: mockData.topProducts?.length,
+      });
+      
+      return mockData;
     }
   }
 
