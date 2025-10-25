@@ -401,3 +401,5 @@ export const SalesReport: React.FC = () => {
     </PageContainer>
   );
 };
+
+export default SalesReport;

@@ -329,62 +329,6 @@ class StockService {
     return filtered;
   }
 
-  /**
-   * Mock stok hareketleri verisi
-   * Mock data for stock movements
-   */
-  private getMockStockMovements(_filter?: StockMovementFilter): StockMovement[] {
-    console.log('📦 Using MOCK stock movements data');
-
-    return [
-      {
-        id: '1',
-        movementNumber: 'MOV-2024-0001',
-        type: 'purchase',
-        direction: 'in',
-        productId: 'PROD-001',
-        productCode: 'LAP-DELL-001',
-        productName: 'Laptop Dell XPS 15',
-        warehouseId: 'WH-001',
-        warehouseName: 'Ana Depo',
-        quantity: 10,
-        unitCost: 25000,
-        totalCost: 250000,
-        referenceType: 'purchase',
-        referenceId: 'PUR-2024-001',
-        referenceNumber: 'PUR-2024-001',
-        notes: 'Aylık rutin alım',
-        createdBy: 'Admin User',
-        createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-        approvedBy: 'Manager',
-        approvedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-        status: 'approved',
-      },
-      {
-        id: '2',
-        movementNumber: 'MOV-2024-0002',
-        type: 'sale',
-        direction: 'out',
-        productId: 'PROD-002',
-        productCode: 'PHN-IPH14-001',
-        productName: 'iPhone 14 Pro 256GB',
-        warehouseId: 'WH-001',
-        warehouseName: 'Ana Depo',
-        quantity: 5,
-        unitCost: 35000,
-        totalCost: 175000,
-        referenceType: 'invoice',
-        referenceId: 'INV-2024-045',
-        referenceNumber: 'SALES-2024-045',
-        notes: 'Kurumsal satış',
-        createdBy: 'Sales Team',
-        createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-        approvedBy: 'Sales Manager',
-        approvedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-        status: 'approved',
-      },
-    ];
-  }
 
   /**
    * Mock istatistik verisi

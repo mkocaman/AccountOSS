@@ -46,8 +46,8 @@ const CompanySettings = lazy(() => import('../pages/settings/CompanySettings').t
 const ApiTestPage = lazy(() => import('../pages/debug/ApiTestPage').then(m => ({ default: m.ApiTestPage })));
 const Error403 = lazy(() => import('../pages/errors/403').then(m => ({ default: m.Error403 })));
 const Error404 = lazy(() => import('../pages/errors/404').then(m => ({ default: m.Error404 })));
-const NotFoundPage = lazy(() => import('../pages/errors/404'));
-const ServerErrorPage = lazy(() => import('../pages/500'));
+const NotFoundPage = lazy(() => import('../pages/errors/404').then(m => ({ default: m.Error404 })));
+const ServerErrorPage = lazy(() => import('../pages/500').then(m => ({ default: m.default })));
 const CompanyList = lazy(() => import('../features/companies/CompanyList').then(m => ({ default: m.CompanyList })));
 const CompanyForm = lazy(() => import('../features/companies/CompanyForm').then(m => ({ default: m.CompanyForm })));
 const CategoryList = lazy(() => import('../features/categories/CategoryList'));
@@ -94,7 +94,7 @@ const JournalEntryDetail = lazy(() => import('@/features/journalEntries/JournalE
 const LedgerView = lazy(() => import('@/features/journalEntries/LedgerView'));
 const ReportsDashboard = lazy(() => import('@/features/reports/ReportsDashboard'));
 const IncomeStatementReport = lazy(() => import('@/features/reports/IncomeStatementReport'));
-const SalesReport = lazy(() => import('@/pages/reports/SalesReport'));
+const SalesReport = lazy(() => import('@/pages/reports/SalesReport').then(m => ({ default: m.default })));
 const InventoryReport = lazy(() => import('@/features/reports/InventoryReport'));
 const AgingReport = lazy(() => import('@/features/reports/AgingReport'));
 
