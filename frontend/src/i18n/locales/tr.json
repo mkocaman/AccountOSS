@@ -61,13 +61,24 @@
   },
   "menu": {
     "dashboard": "Dashboard",
+    "home": "Anasayfa",
     "partners": "Müşteri/Tedarikçi",
     "currentAccounts": "Cari Hesaplar",
     "customers": "Müşteriler",
+    "customerList": "Müşteri Listesi",
+    "createCustomer": "Yeni Müşteri",
     "suppliers": "Tedarikçiler",
     "products": "Ürünler",
     "productList": "Ürün Listesi",
+    "createProduct": "Yeni Ürün",
     "invoices": "Faturalar",
+    "invoiceList": "Fatura Listesi",
+    "createInvoice": "Yeni Fatura",
+    "newInvoice": "Yeni Fatura",
+    "editInvoice": "Fatura Düzenle",
+    "invoiceDetail": "Fatura Detayı",
+    "partnerList": "Partner Listesi",
+    "createPartner": "Yeni Partner",
     "profile": "Profil",
     "categories": "Kategoriler",
     "stock": "Stok",
@@ -78,13 +89,8 @@
     "sales": "Satış",
     "quotations": "Teklifler",
     "salesOrders": "Satış Siparişleri",
-    "invoices": "Faturalar",
-    "invoiceList": "Fatura Listesi",
-    "newInvoice": "Yeni Fatura",
-    "createInvoice": "Yeni Fatura",
-    "editInvoice": "Fatura Düzenle",
-    "invoiceDetail": "Fatura Detayı",
     "payments": "Ödemeler",
+    "paymentList": "Ödeme Listesi",
     "paymentsReceivables": "Tahsilat/Ödeme",
     "bankAccounts": "Banka Hesapları",
     "bank": "Banka",
@@ -118,6 +124,7 @@
     "users": "Kullanıcılar",
     "preferences": "Tercihler",
     "companies": "Şirketler",
+    "createCompany": "Yeni Şirket Ekle",
     "notifications": "Bildirimler",
     "profile": "Profilim",
     "accountSettings": "Hesap Ayarları",
@@ -158,36 +165,143 @@
     "loginSubtitle": "Modern ERP & Muhasebe Sistemi"
   },
   "dashboard": {
-    "title": "Dashboard",
-    "subtitle": "İşletmenizin genel durumu",
-    "apiIntegrationComplete": "Dashboard API Entegrasyonu Tamamlandı",
-    "apiIntegrationDescription": "Dashboard API'leri frontend'e entegre edildi. Backend Report implementation'ı tamamlandığında veriler otomatik olarak gösterilecektir.",
-    "totalSales": "Toplam Satış",
-    "totalRevenue": "Toplam Tahsilat",
-    "totalCollections": "Toplam Tahsilat",
-    "totalProfit": "Toplam Kâr",
-    "pendingReceivables": "Bekleyen Alacaklar",
-    "thisMonth": "bu ay",
-    "netCash": "Net Nakit",
-    "totalCustomers": "müşteri",
-    "salesTrend": "Satış Trendi",
-    "monthlyRevenue": "Aylık Gelir Analizi",
-    "customerDistribution": "Müşteri Dağılımı",
-    "stockStatus": "Stok Durumu",
-    "totalProducts": "Toplam Ürün",
-    "lowStock": "Düşük Stok",
-    "outOfStock": "Stokta Yok",
-    "recentActivities": "Son Faaliyetler",
-    "newInvoice": "Yeni Fatura",
-    "paymentReceived": "Ödeme Alındı",
-    "stockEntry": "Stok Girişi",
-    "newCustomer": "Yeni Müşteri",
-    "invoiceSent": "Fatura Gönderildi",
-    "activeCustomers": "Aktif Müşteriler",
-    "newCustomers": "Yeni Müşteriler",
-    "inactiveCustomers": "Pasif Müşteriler",
-    "hoursAgo": "saat önce",
-    "daysAgo": "gün önce"
+    "title": "Anasayfa",
+    "welcome": "Hoş Geldiniz",
+    "overview": "İş Durumu Özeti",
+    
+    "periods": {
+      "today": "Bugün",
+      "thisWeek": "Bu Hafta",
+      "thisMonth": "Bu Ay",
+      "thisQuarter": "Bu Çeyrek",
+      "thisYear": "Bu Yıl",
+      "custom": "Özel Tarih"
+    },
+    
+    "stats": {
+      "totalSales": "Toplam Satış",
+      "totalPurchases": "Toplam Alış",
+      "netProfit": "Net Kâr",
+      "profitMargin": "Kâr Marjı",
+      "totalInvoices": "Toplam Fatura",
+      "paidInvoices": "Ödenen Faturalar",
+      "pendingInvoices": "Bekleyen Faturalar",
+      "overdueInvoices": "Vadesi Geçen Faturalar",
+      "activeCustomers": "Aktif Müşteriler",
+      "activeSuppliers": "Aktif Tedarikçiler",
+      "totalProducts": "Toplam Ürün",
+      "lowStockProducts": "Düşük Stoklu Ürün",
+      "recentInvoices": "Son 7 Gün",
+      "vsLastPeriod": "önceki döneme göre",
+      "increase": "artış",
+      "decrease": "azalma"
+    },
+    
+    "charts": {
+      "salesTrend": "Satış Trendi",
+      "salesVsPurchases": "Satış / Alış Karşılaştırması",
+      "revenueByCustomer": "Müşteri Bazlı Gelir",
+      "topProducts": "En Çok Satan Ürünler",
+      "monthlyRevenue": "Aylık Gelir",
+      "categoryDistribution": "Kategori Dağılımı",
+      "sales": "Satış",
+      "purchases": "Alış",
+      "profit": "Kâr",
+      "revenue": "Gelir",
+      "amount": "Tutar",
+      "quantity": "Miktar",
+      "month": "Ay",
+      "lastMonths": "Son {{count}} Ay"
+    },
+    
+    "cashFlow": {
+      "title": "Nakit Akışı",
+      "collections": "Tahsilatlar",
+      "payments": "Ödemeler",
+      "netCashFlow": "Net Nakit Akışı",
+      "cashBalance": "Kasa Bakiyesi",
+      "bankBalance": "Banka Bakiyesi"
+    },
+    
+    "quickStats": {
+      "title": "Hızlı İstatistikler",
+      "description": "Önemli iş metriklerine hızlı erişim",
+      "activePartners": "Aktif Cari Hesap",
+      "recentInvoices": "Son Faturalar",
+      "lowStock": "Düşük Stok"
+    },
+    
+    "quickActions": {
+      "title": "Hızlı İşlemler",
+      "description": "Sık kullanılan işlemlere hızlı erişim",
+      "newInvoice": "Yeni Fatura",
+      "newCustomer": "Yeni Müşteri",
+      "newProduct": "Yeni Ürün",
+      "newPayment": "Yeni Ödeme",
+      "viewReports": "Raporları Görüntüle",
+      "manageStock": "Stok Yönetimi"
+    },
+    
+    "recentActivities": {
+      "title": "Son Aktiviteler",
+      "description": "Son işlemler ve güncellemeler",
+      "viewAll": "Tümünü Görüntüle",
+      "noActivities": "Henüz aktivite yok",
+      "columns": {
+        "type": "Tip",
+        "description": "Açıklama",
+        "amount": "Tutar",
+        "date": "Tarih",
+        "user": "Kullanıcı"
+      },
+      "types": {
+        "invoice": "Fatura",
+        "payment": "Ödeme",
+        "customer": "Müşteri",
+        "product": "Ürün",
+        "stock": "Stok"
+      },
+      "actions": {
+        "created": "oluşturuldu",
+        "updated": "güncellendi",
+        "deleted": "silindi",
+        "paid": "ödendi"
+      }
+    },
+    
+    "lowStockAlerts": {
+      "title": "Düşük Stok Uyarıları",
+      "description": "Minimum stok seviyesinin altındaki ürünler",
+      "viewAll": "Tümünü Görüntüle",
+      "noAlerts": "Düşük stoklu ürün yok",
+      "columns": {
+        "product": "Ürün",
+        "currentStock": "Mevcut Stok",
+        "minStock": "Minimum Stok",
+        "status": "Durum"
+      },
+      "status": {
+        "critical": "Kritik",
+        "low": "Düşük",
+        "warning": "Uyarı"
+      },
+      "orderNow": "Sipariş Ver"
+    },
+    
+    "messages": {
+      "loadError": "Dashboard verileri yüklenirken hata oluştu",
+      "noData": "Henüz veri yok",
+      "dataUpdated": "Veriler güncellendi"
+    },
+    
+    "filters": {
+      "period": "Dönem",
+      "dateRange": "Tarih Aralığı",
+      "from": "Başlangıç",
+      "to": "Bitiş",
+      "apply": "Uygula",
+      "reset": "Sıfırla"
+    }
   },
   "partners": {
     "title": "Cari Hesaplar",
@@ -259,6 +373,69 @@
       "tip3": "Fatura ve ödemelerde cari hesapları kolayca seçebilirsiniz"
     }
   },
+  "customer": {
+    "title": "Müşteriler",
+    "titleSingle": "Müşteri",
+    "createTitle": "Yeni Müşteri",
+    "editTitle": "Müşteri Düzenle",
+    "detail": "Müşteri Detayı",
+    
+    "buttons": {
+      "new": "Yeni Müşteri",
+      "save": "Kaydet",
+      "cancel": "İptal",
+      "back": "Geri",
+      "edit": "Düzenle",
+      "delete": "Sil"
+    },
+    
+    "labels": {
+      "code": "Müşteri Kodu",
+      "name": "Müşteri Adı",
+      "type": "Tür",
+      "taxNumber": "Vergi No",
+      "phone": "Telefon",
+      "email": "E-posta",
+      "address": "Adres",
+      "balance": "Bakiye",
+      "status": "Durum",
+      "actions": "İşlemler"
+    },
+    
+    "types": {
+      "customer": "Müşteri",
+      "supplier": "Tedarikçi",
+      "both": "Her İkisi"
+    },
+    
+    "status": {
+      "active": "Aktif",
+      "inactive": "Pasif"
+    },
+    
+    "placeholders": {
+      "search": "Müşteri ara...",
+      "selectType": "Tür seçin",
+      "enterName": "Müşteri adı",
+      "enterPhone": "Telefon numarası"
+    },
+    
+    "messages": {
+      "createSuccess": "Müşteri başarıyla oluşturuldu",
+      "updateSuccess": "Müşteri başarıyla güncellendi",
+      "deleteSuccess": "Müşteri başarıyla silindi",
+      "deleteConfirmTitle": "Müşteriyi Sil",
+      "deleteConfirmContent": "Bu müşteriyi silmek istediğinizden emin misiniz?",
+      "noData": "Müşteri bulunamadı"
+    },
+    
+    "errors": {
+      "loadFailed": "Müşteriler yüklenirken hata oluştu",
+      "createFailed": "Müşteri oluşturulurken hata oluştu",
+      "updateFailed": "Müşteri güncellenirken hata oluştu",
+      "deleteFailed": "Müşteri silinirken hata oluştu"
+    }
+  },
   "products": {
     "title": "Ürün Listesi",
     "subtitle": "Ürün listesi ve stok yönetimi",
@@ -290,6 +467,89 @@
     "createSuccess": "Ürün başarıyla oluşturuldu",
     "updateSuccess": "Ürün başarıyla güncellendi",
     "saveError": "Ürün kaydedilirken hata oluştu"
+  },
+  "product": {
+    "title": "Ürünler",
+    "titleSingle": "Ürün",
+    "createTitle": "Yeni Ürün",
+    "editTitle": "Ürün Düzenle",
+    "detail": "Ürün Detayı",
+    
+    "buttons": {
+      "new": "Yeni Ürün",
+      "save": "Kaydet",
+      "cancel": "İptal",
+      "back": "Geri",
+      "edit": "Düzenle",
+      "delete": "Sil"
+    },
+    
+    "labels": {
+      "code": "Ürün Kodu",
+      "name": "Ürün Adı",
+      "category": "Kategori",
+      "type": "Tür",
+      "unit": "Birim",
+      "price": "Fiyat",
+      "taxRate": "KDV %",
+      "stock": "Stok",
+      "minStock": "Min Stok",
+      "status": "Durum",
+      "actions": "İşlemler",
+      "barcode": "Barkod",
+      "purchasePrice": "Alış Fiyatı",
+      "salePrice": "Satış Fiyatı"
+    },
+    
+    "types": {
+      "product": "Mal",
+      "service": "Hizmet"
+    },
+    
+    "units": {
+      "piece": "Adet",
+      "kg": "Kilogram",
+      "meter": "Metre",
+      "liter": "Litre"
+    },
+    
+    "status": {
+      "active": "Aktif",
+      "inactive": "Pasif"
+    },
+    
+    "placeholders": {
+      "search": "Ürün ara...",
+      "selectCategory": "Kategori seçin",
+      "enterName": "Ürün adı",
+      "enterCode": "Ürün kodu"
+    },
+    
+    "messages": {
+      "createSuccess": "Ürün başarıyla oluşturuldu",
+      "updateSuccess": "Ürün başarıyla güncellendi",
+      "deleteSuccess": "Ürün başarıyla silindi",
+      "deleteConfirmTitle": "Ürünü Sil",
+      "deleteConfirmContent": "Bu ürünü silmek istediğinizden emin misiniz?",
+      "noData": "Ürün bulunamadı",
+      "lowStock": "Düşük stok!"
+    },
+    
+    "errors": {
+      "loadFailed": "Ürünler yüklenirken hata oluştu",
+      "createFailed": "Ürün oluşturulurken hata oluştu",
+      "updateFailed": "Ürün güncellenirken hata oluştu",
+      "deleteFailed": "Ürün silinirken hata oluştu"
+    },
+    
+    "stats": {
+      "total": "Toplam Ürün",
+      "lowStock": "Düşük Stok",
+      "totalValue": "Toplam Değer",
+      "active": "Aktif Ürün"
+    },
+    
+    "subtitle": "Ürün listesi ve stok yönetimi"
   },
   "categories": {
     "title": "Ürün Kategorileri",
@@ -338,7 +598,8 @@
       "search": "Ara",
       "reset": "Sıfırla",
       "filter": "Filtrele",
-      "reload": "Yenile"
+      "reload": "Yenile",
+      "approve": "Onayla"
     },
     
     "labels": {
@@ -354,6 +615,7 @@
       "currency": "Para Birimi",
       "notes": "Notlar",
       "items": "Fatura Kalemleri",
+      "information": "Fatura Bilgileri",
       "product": "Ürün",
       "quantity": "Miktar",
       "unitPrice": "Birim Fiyat",
@@ -366,7 +628,12 @@
       "totalTax": "Toplam KDV",
       "grandTotal": "Genel Toplam",
       "createdAt": "Oluşturma Tarihi",
-      "updatedAt": "Güncelleme Tarihi"
+      "updatedAt": "Güncelleme Tarihi",
+      "date": "Tarih",
+      "type": "Tür",
+      "paymentStatus": "Ödeme Durumu",
+      "description": "Açıklama",
+      "summary": "Özet"
     },
     
     "status": {
@@ -392,7 +659,8 @@
       "enterNotes": "Notlar giriniz",
       "selectDate": "Tarih seçiniz",
       "enterQuantity": "Miktar",
-      "enterPrice": "Fiyat"
+      "enterPrice": "Fiyat",
+      "invoiceNumber": "Fatura numarası"
     },
     
     "filters": {
@@ -411,6 +679,13 @@
       "deleteSuccess": "Fatura başarıyla silindi",
       "deleteConfirmTitle": "Faturayı Sil",
       "deleteConfirmContent": "Bu faturayı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
+      "cancelConfirmTitle": "Faturayı İptal Et",
+      "cancelConfirmMessage": "Faturayı iptal etmek istediğinize emin misiniz? Bu işlem geri alınamaz!",
+      "cancelReason": "Kullanıcı tarafından iptal edildi",
+      "cancelSuccess": "Fatura iptal edildi",
+      "cancelError": "Fatura iptal edilemedi",
+      "approveSuccess": "Fatura onaylandı",
+      "approveError": "Fatura onaylanamadı",
       "pdfGenerating": "PDF oluşturuluyor...",
       "pdfSuccess": "PDF başarıyla oluşturuldu",
       "loading": "Yükleniyor...",
@@ -448,7 +723,10 @@
       "quantityRequired": "Miktar girilmelidir",
       "quantityMin": "Miktar en az 1 olmalıdır",
       "priceRequired": "Fiyat girilmelidir",
-      "priceMin": "Fiyat 0'dan büyük olmalıdır"
+      "priceMin": "Fiyat 0'dan büyük olmalıdır",
+      "invoiceNumberRequired": "Fatura numarası zorunludur",
+      "invoiceTypeRequired": "Fatura tipi seçimi zorunludur",
+      "taxRateRequired": "KDV oranı zorunludur"
     },
     
     "statistics": {
@@ -1022,6 +1300,79 @@
     },
     "createSuccess": "Ödeme başarıyla kaydedildi",
     "deleteSuccess": "Ödeme başarıyla silindi"
+  },
+  "payment": {
+    "title": "Ödemeler",
+    "titleSingle": "Ödeme",
+    "createTitle": "Yeni Ödeme",
+    "editTitle": "Ödeme Düzenle",
+    "collection": "Tahsilat",
+    "payment": "Ödeme",
+    
+    "buttons": {
+      "new": "Yeni Ödeme",
+      "newCollection": "Yeni Tahsilat",
+      "save": "Kaydet",
+      "cancel": "İptal",
+      "back": "Geri"
+    },
+    
+    "labels": {
+      "type": "Tür",
+      "customer": "Müşteri",
+      "amount": "Tutar",
+      "date": "Tarih",
+      "method": "Ödeme Yöntemi",
+      "account": "Hesap",
+      "reference": "Referans",
+      "notes": "Notlar",
+      "status": "Durum",
+      "actions": "İşlemler",
+      "startDate": "Başlangıç Tarihi",
+      "endDate": "Bitiş Tarihi"
+    },
+    
+    "types": {
+      "collection": "Tahsilat",
+      "payment": "Ödeme"
+    },
+    
+    "methods": {
+      "cash": "Nakit",
+      "bank": "Banka",
+      "creditCard": "Kredi Kartı",
+      "check": "Çek"
+    },
+    
+    "placeholders": {
+      "search": "Ödeme ara...",
+      "selectCustomer": "Müşteri seçin",
+      "selectMethod": "Ödeme yöntemi",
+      "selectAccount": "Hesap seçin",
+      "enterAmount": "Tutar"
+    },
+    
+    "messages": {
+      "createSuccess": "Ödeme başarıyla oluşturuldu",
+      "updateSuccess": "Ödeme başarıyla güncellendi",
+      "deleteSuccess": "Ödeme başarıyla silindi",
+      "noData": "Ödeme bulunamadı"
+    },
+    
+    "subtitle": "Tahsilat ve ödeme kayıtları"
+  },
+  
+  "cashAccount": {
+    "title": "Kasa Hesapları",
+    "new": "Yeni Kasa",
+    "balance": "Bakiye"
+  },
+  
+  "bankAccount": {
+    "title": "Banka Hesapları",
+    "new": "Yeni Banka Hesabı",
+    "iban": "IBAN",
+    "balance": "Bakiye"
   }
 }
 

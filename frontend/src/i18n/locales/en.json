@@ -42,12 +42,24 @@
   },
   "menu": {
     "dashboard": "Dashboard",
+    "home": "Home",
     "partners": "Customers/Suppliers",
     "currentAccounts": "Current Accounts",
     "customers": "Customers",
+    "customerList": "Customer List",
+    "createCustomer": "New Customer",
     "suppliers": "Suppliers",
     "products": "Products",
     "productList": "Product List",
+    "createProduct": "New Product",
+    "invoices": "Invoices",
+    "invoiceList": "Invoice List",
+    "createInvoice": "New Invoice",
+    "newInvoice": "New Invoice",
+    "editInvoice": "Edit Invoice",
+    "invoiceDetail": "Invoice Detail",
+    "partnerList": "Partner List",
+    "createPartner": "New Partner",
     "categories": "Categories",
     "stock": "Stock",
     "stockMovements": "Stock Movements",
@@ -81,7 +93,8 @@
         "search": "Search",
         "reset": "Reset",
         "filter": "Filter",
-        "reload": "Reload"
+        "reload": "Reload",
+        "approve": "Approve"
       },
       
       "labels": {
@@ -97,6 +110,7 @@
         "currency": "Currency",
         "notes": "Notes",
         "items": "Invoice Items",
+        "information": "Invoice Information",
         "product": "Product",
         "quantity": "Quantity",
         "unitPrice": "Unit Price",
@@ -109,7 +123,12 @@
         "totalTax": "Total Tax",
         "grandTotal": "Grand Total",
         "createdAt": "Created At",
-        "updatedAt": "Updated At"
+        "updatedAt": "Updated At",
+        "date": "Date",
+        "type": "Type",
+        "paymentStatus": "Payment Status",
+        "description": "Description",
+        "summary": "Summary"
       },
       
       "status": {
@@ -135,7 +154,8 @@
         "enterNotes": "Enter notes",
         "selectDate": "Select date",
         "enterQuantity": "Quantity",
-        "enterPrice": "Price"
+        "enterPrice": "Price",
+        "invoiceNumber": "Invoice number"
       },
       
       "filters": {
@@ -154,6 +174,13 @@
         "deleteSuccess": "Invoice deleted successfully",
         "deleteConfirmTitle": "Delete Invoice",
         "deleteConfirmContent": "Are you sure you want to delete this invoice? This action cannot be undone.",
+        "cancelConfirmTitle": "Cancel Invoice",
+        "cancelConfirmMessage": "Are you sure you want to cancel this invoice? This action cannot be undone!",
+        "cancelReason": "Cancelled by user",
+        "cancelSuccess": "Invoice cancelled",
+        "cancelError": "Invoice could not be cancelled",
+        "approveSuccess": "Invoice approved",
+        "approveError": "Invoice could not be approved",
         "pdfGenerating": "Generating PDF...",
         "pdfSuccess": "PDF generated successfully",
         "loading": "Loading...",
@@ -191,7 +218,10 @@
         "quantityRequired": "Quantity is required",
         "quantityMin": "Quantity must be at least 1",
         "priceRequired": "Price is required",
-        "priceMin": "Price must be greater than 0"
+        "priceMin": "Price must be greater than 0",
+        "invoiceNumberRequired": "Invoice number is required",
+        "invoiceTypeRequired": "Invoice type selection is required",
+        "taxRateRequired": "Tax rate is required"
       },
       
       "statistics": {
@@ -212,6 +242,7 @@
       }
     },
     "payments": "Payments",
+    "paymentList": "Payment List",
     "paymentsReceivables": "Payments/Receivables",
     "bankAccounts": "Bank Accounts",
     "bank": "Bank",
@@ -245,6 +276,7 @@
     "users": "Users",
     "preferences": "Preferences",
     "companies": "Companies",
+    "createCompany": "Add New Company",
     "notifications": "Notifications",
     "profile": "My Profile",
     "accountSettings": "Account Settings",
@@ -286,35 +318,142 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "subtitle": "Overview of your business",
-    "apiIntegrationComplete": "Dashboard API Integration Complete",
-    "apiIntegrationDescription": "Dashboard APIs have been integrated into the frontend. Data will be automatically displayed when Backend Report implementation is completed.",
-    "totalSales": "Total Sales",
-    "totalRevenue": "Total Revenue",
-    "totalCollections": "Total Collections",
-    "totalProfit": "Total Profit",
-    "pendingReceivables": "Pending Receivables",
-    "thisMonth": "this month",
-    "netCash": "Net Cash",
-    "totalCustomers": "customers",
-    "salesTrend": "Sales Trend",
-    "monthlyRevenue": "Monthly Revenue Analysis",
-    "customerDistribution": "Customer Distribution",
-    "stockStatus": "Stock Status",
-    "totalProducts": "Total Products",
-    "lowStock": "Low Stock",
-    "outOfStock": "Out of Stock",
-    "recentActivities": "Recent Activities",
-    "newInvoice": "New Invoice",
-    "paymentReceived": "Payment Received",
-    "stockEntry": "Stock Entry",
-    "newCustomer": "New Customer",
-    "invoiceSent": "Invoice Sent",
-    "activeCustomers": "Active Customers",
-    "newCustomers": "New Customers",
-    "inactiveCustomers": "Inactive Customers",
-    "hoursAgo": "hours ago",
-    "daysAgo": "days ago"
+    "welcome": "Welcome",
+    "overview": "Business Overview",
+    
+    "periods": {
+      "today": "Today",
+      "thisWeek": "This Week",
+      "thisMonth": "This Month",
+      "thisQuarter": "This Quarter",
+      "thisYear": "This Year",
+      "custom": "Custom Date"
+    },
+    
+    "stats": {
+      "totalSales": "Total Sales",
+      "totalPurchases": "Total Purchases",
+      "netProfit": "Net Profit",
+      "profitMargin": "Profit Margin",
+      "totalInvoices": "Total Invoices",
+      "paidInvoices": "Paid Invoices",
+      "pendingInvoices": "Pending Invoices",
+      "overdueInvoices": "Overdue Invoices",
+      "activeCustomers": "Active Customers",
+      "activeSuppliers": "Active Suppliers",
+      "totalProducts": "Total Products",
+      "lowStockProducts": "Low Stock Products",
+      "recentInvoices": "Last 7 Days",
+      "vsLastPeriod": "vs previous period",
+      "increase": "increase",
+      "decrease": "decrease"
+    },
+    
+    "charts": {
+      "salesTrend": "Sales Trend",
+      "salesVsPurchases": "Sales vs Purchases",
+      "revenueByCustomer": "Revenue by Customer",
+      "topProducts": "Top Selling Products",
+      "monthlyRevenue": "Monthly Revenue",
+      "categoryDistribution": "Category Distribution",
+      "sales": "Sales",
+      "purchases": "Purchases",
+      "profit": "Profit",
+      "revenue": "Revenue",
+      "amount": "Amount",
+      "quantity": "Quantity",
+      "month": "Month",
+      "lastMonths": "Last {{count}} Months"
+    },
+    
+    "cashFlow": {
+      "title": "Cash Flow",
+      "collections": "Collections",
+      "payments": "Payments",
+      "netCashFlow": "Net Cash Flow",
+      "cashBalance": "Cash Balance",
+      "bankBalance": "Bank Balance"
+    },
+    
+    "quickStats": {
+      "title": "Quick Statistics",
+      "description": "Quick access to important business metrics",
+      "activePartners": "Active Current Accounts",
+      "recentInvoices": "Recent Invoices",
+      "lowStock": "Low Stock"
+    },
+    
+    "quickActions": {
+      "title": "Quick Actions",
+      "description": "Quick access to frequently used operations",
+      "newInvoice": "New Invoice",
+      "newCustomer": "New Customer",
+      "newProduct": "New Product",
+      "newPayment": "New Payment",
+      "viewReports": "View Reports",
+      "manageStock": "Manage Stock"
+    },
+    
+    "recentActivities": {
+      "title": "Recent Activities",
+      "description": "Recent transactions and updates",
+      "viewAll": "View All",
+      "noActivities": "No activities yet",
+      "columns": {
+        "type": "Type",
+        "description": "Description",
+        "amount": "Amount",
+        "date": "Date",
+        "user": "User"
+      },
+      "types": {
+        "invoice": "Invoice",
+        "payment": "Payment",
+        "customer": "Customer",
+        "product": "Product",
+        "stock": "Stock"
+      },
+      "actions": {
+        "created": "created",
+        "updated": "updated",
+        "deleted": "deleted",
+        "paid": "paid"
+      }
+    },
+    
+    "lowStockAlerts": {
+      "title": "Low Stock Alerts",
+      "description": "Products below minimum stock level",
+      "viewAll": "View All",
+      "noAlerts": "No low stock products",
+      "columns": {
+        "product": "Product",
+        "currentStock": "Current Stock",
+        "minStock": "Min Stock",
+        "status": "Status"
+      },
+      "status": {
+        "critical": "Critical",
+        "low": "Low",
+        "warning": "Warning"
+      },
+      "orderNow": "Order Now"
+    },
+    
+    "messages": {
+      "loadError": "Failed to load dashboard data",
+      "noData": "No data available yet",
+      "dataUpdated": "Data updated"
+    },
+    
+    "filters": {
+      "period": "Period",
+      "dateRange": "Date Range",
+      "from": "From",
+      "to": "To",
+      "apply": "Apply",
+      "reset": "Reset"
+    }
   },
   "partners": {
     "title": "Current Accounts",
@@ -650,6 +789,228 @@
     "500Message": "Sorry, a server error occurred. Please try again later.",
     "backToHome": "Back to Home",
     "reload": "Reload Page"
+  },
+  
+  "customer": {
+    "title": "Customers",
+    "titleSingle": "Customer",
+    "createTitle": "New Customer",
+    "editTitle": "Edit Customer",
+    "detail": "Customer Detail",
+    
+    "buttons": {
+      "new": "New Customer",
+      "save": "Save",
+      "cancel": "Cancel",
+      "back": "Back",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    
+    "labels": {
+      "code": "Customer Code",
+      "name": "Customer Name",
+      "type": "Type",
+      "taxNumber": "Tax Number",
+      "phone": "Phone",
+      "email": "Email",
+      "address": "Address",
+      "balance": "Balance",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    
+    "types": {
+      "customer": "Customer",
+      "supplier": "Supplier",
+      "both": "Both"
+    },
+    
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    
+    "placeholders": {
+      "search": "Search customers...",
+      "selectType": "Select type",
+      "enterName": "Customer name",
+      "enterPhone": "Phone number"
+    },
+    
+    "messages": {
+      "createSuccess": "Customer created successfully",
+      "updateSuccess": "Customer updated successfully",
+      "deleteSuccess": "Customer deleted successfully",
+      "deleteConfirmTitle": "Delete Customer",
+      "deleteConfirmContent": "Are you sure you want to delete this customer?",
+      "noData": "No customers found"
+    },
+    
+    "errors": {
+      "loadFailed": "Failed to load customers",
+      "createFailed": "Failed to create customer",
+      "updateFailed": "Failed to update customer",
+      "deleteFailed": "Failed to delete customer"
+    }
+  },
+  
+  "product": {
+    "title": "Products",
+    "titleSingle": "Product",
+    "createTitle": "New Product",
+    "editTitle": "Edit Product",
+    "detail": "Product Detail",
+    
+    "buttons": {
+      "new": "New Product",
+      "save": "Save",
+      "cancel": "Cancel",
+      "back": "Back",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    
+    "labels": {
+      "code": "Product Code",
+      "name": "Product Name",
+      "category": "Category",
+      "type": "Type",
+      "unit": "Unit",
+      "price": "Price",
+      "taxRate": "Tax %",
+      "stock": "Stock",
+      "minStock": "Min Stock",
+      "status": "Status",
+      "actions": "Actions",
+      "barcode": "Barcode",
+      "purchasePrice": "Purchase Price",
+      "salePrice": "Sale Price"
+    },
+    
+    "types": {
+      "product": "Product",
+      "service": "Service"
+    },
+    
+    "units": {
+      "piece": "Piece",
+      "kg": "Kilogram",
+      "meter": "Meter",
+      "liter": "Liter"
+    },
+    
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    
+    "placeholders": {
+      "search": "Search products...",
+      "selectCategory": "Select category",
+      "enterName": "Product name",
+      "enterCode": "Product code"
+    },
+    
+    "messages": {
+      "createSuccess": "Product created successfully",
+      "updateSuccess": "Product updated successfully",
+      "deleteSuccess": "Product deleted successfully",
+      "deleteConfirmTitle": "Delete Product",
+      "deleteConfirmContent": "Are you sure you want to delete this product?",
+      "noData": "No products found",
+      "lowStock": "Low stock!"
+    },
+    
+    "errors": {
+      "loadFailed": "Failed to load products",
+      "createFailed": "Failed to create product",
+      "updateFailed": "Failed to update product",
+      "deleteFailed": "Failed to delete product"
+    },
+    
+    "stats": {
+      "total": "Total Products",
+      "lowStock": "Low Stock",
+      "totalValue": "Total Value",
+      "active": "Active Products"
+    },
+    
+    "subtitle": "Product list and stock management"
+  },
+  
+  "payment": {
+    "title": "Payments",
+    "titleSingle": "Payment",
+    "createTitle": "New Payment",
+    "editTitle": "Edit Payment",
+    "collection": "Collection",
+    "payment": "Payment",
+    
+    "buttons": {
+      "new": "New Payment",
+      "newCollection": "New Collection",
+      "save": "Save",
+      "cancel": "Cancel",
+      "back": "Back"
+    },
+    
+    "labels": {
+      "type": "Type",
+      "customer": "Customer",
+      "amount": "Amount",
+      "date": "Date",
+      "method": "Payment Method",
+      "account": "Account",
+      "reference": "Reference",
+      "notes": "Notes",
+      "status": "Status",
+      "actions": "Actions",
+      "startDate": "Start Date",
+      "endDate": "End Date"
+    },
+    
+    "types": {
+      "collection": "Collection",
+      "payment": "Payment"
+    },
+    
+    "methods": {
+      "cash": "Cash",
+      "bank": "Bank",
+      "creditCard": "Credit Card",
+      "check": "Check"
+    },
+    
+    "placeholders": {
+      "search": "Search payments...",
+      "selectCustomer": "Select customer",
+      "selectMethod": "Payment method",
+      "selectAccount": "Select account",
+      "enterAmount": "Amount"
+    },
+    
+    "messages": {
+      "createSuccess": "Payment created successfully",
+      "updateSuccess": "Payment updated successfully",
+      "deleteSuccess": "Payment deleted successfully",
+      "noData": "No payments found"
+    },
+    
+    "subtitle": "Collection and payment records"
+  },
+  
+  "cashAccount": {
+    "title": "Cash Accounts",
+    "new": "New Cash Account",
+    "balance": "Balance"
+  },
+  
+  "bankAccount": {
+    "title": "Bank Accounts",
+    "new": "New Bank Account",
+    "iban": "IBAN",
+    "balance": "Balance"
   }
 }
 
