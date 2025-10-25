@@ -358,6 +358,12 @@ export const Dashboard: React.FC = () => {
       </Row>
 
       {/* Grafikler */}
+      {(() => {
+        console.log('🟣🟣🟣 About to render CHARTS section');
+        console.log('🟣 Dashboard data exists:', !!dashboardData);
+        console.log('🟣 Sales chart data length:', dashboardData?.salesChart?.length || 0);
+        return null;
+      })()}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
         {/* Satış Trendi */}
         <Col xs={24} lg={16}>
