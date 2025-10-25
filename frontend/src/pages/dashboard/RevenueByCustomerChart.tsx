@@ -29,6 +29,8 @@ export const RevenueByCustomerChart: React.FC<RevenueByCustomerChartProps> = ({
 }) => {
   const { t, i18n } = useTranslation();
 
+  console.log('🟣🟣🟣 RevenueByCustomerChart rendering!', { dataLength: data?.length, loading });
+
   // Grafik verisi formatla ve yüzde hesapla
   const chartData = useMemo(() => {
     if (!data || data.length === 0) return [];

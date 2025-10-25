@@ -42,7 +42,7 @@ const CompanySettings = lazy(() => import('../pages/settings/CompanySettings').t
 const ApiTestPage = lazy(() => import('../pages/debug/ApiTestPage').then(m => ({ default: m.ApiTestPage })));
 const Error403 = lazy(() => import('../pages/errors/403').then(m => ({ default: m.Error403 })));
 const Error404 = lazy(() => import('../pages/errors/404').then(m => ({ default: m.Error404 })));
-const NotFoundPage = lazy(() => import('../pages/404'));
+const NotFoundPage = lazy(() => import('../pages/errors/404'));
 const ServerErrorPage = lazy(() => import('../pages/500'));
 const CompanyList = lazy(() => import('../features/companies/CompanyList').then(m => ({ default: m.CompanyList })));
 const CompanyForm = lazy(() => import('../features/companies/CompanyForm').then(m => ({ default: m.CompanyForm })));
@@ -51,7 +51,7 @@ const PartnerList = lazy(() => import('../pages/common/ComingSoon'));
 const PartnerDetail = lazy(() => import('../pages/common/ComingSoon'));
 const ProductList = lazy(() => import('../pages/common/ComingSoon'));
 const ProductForm = lazy(() => import('../features/products/ProductForm').then(m => ({ default: m.ProductForm })));
-const ProductCategoryList = lazy(() => import('../features/products/CategoryList'));
+const ProductCategoryList = lazy(() => import('../features/categories/CategoryList'));
 // Invoice routes moved to pages/invoices
 const PaymentList = lazy(() => import('../features/payments/PaymentList').then(m => ({ default: m.PaymentList })));
 const PaymentForm = lazy(() => import('../features/payments/PaymentForm').then(m => ({ default: m.PaymentForm })));

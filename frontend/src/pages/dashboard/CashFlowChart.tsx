@@ -33,6 +33,8 @@ export const CashFlowChart: React.FC<CashFlowChartProps> = ({
 }) => {
   const { t, i18n } = useTranslation();
 
+  console.log('🟠🟠🟠 CashFlowChart rendering!', { dataLength: data?.length, loading });
+
   // Grafik verisi formatla
   const chartData = useMemo(() => {
     if (!data || data.length === 0) return [];
