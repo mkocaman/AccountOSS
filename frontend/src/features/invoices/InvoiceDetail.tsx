@@ -8,6 +8,7 @@ import {
   CloseCircleOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { invoicesApi } from '@/api/invoices';
 import type { Invoice } from '@/types/invoice';
@@ -23,9 +24,21 @@ import type { ColumnsType } from 'antd/es/table';
 export const InvoiceDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [loading, setLoading] = useState(true);
   const { modal } = App.useApp();
+
+  // Debug log - dil değişikliklerini takip et
+  useEffect(() => {
+    console.log('🌐 InvoiceDetail - Current language:', i18n.language);
+    console.log('🔑 Translation test:', {
+      title: t('invoice.title'),
+      detail: t('invoice.detail'),
+      information: t('invoice.labels.information'),
+      items: t('invoice.labels.items'),
+    });
+  }, [i18n.language, t]);
 
   useEffect(() => {
     if (id) {
@@ -41,7 +54,7 @@ export const InvoiceDetail = () => {
         setInvoice(response.data);
       }
     } catch (error) {
-      message.error('Fatura yüklenemedi');
+      message.error(t('invoice.errors.loadDetailFailed'));
       navigate('/invoices');
     } finally {
       setLoading(false);
@@ -51,27 +64,27 @@ export const InvoiceDetail = () => {
   const handleApprove = async () => {
     try {
       await invoicesApi.approve(id!);
-      message.success('Fatura onaylandı');
+      message.success(t('invoice.messages.approveSuccess'));
       loadInvoice();
     } catch (error) {
-      message.error('Fatura onaylanamadı');
+      message.error(t('invoice.messages.approveError'));
     }
   };
 
   const handleCancel = () => {
     modal.confirm({
-      title: 'Faturayı İptal Et',
-      content: 'Faturayı iptal etmek istediğinize emin misiniz? Bu işlem geri alınamaz!',
-      okText: 'İptal Et',
+      title: t('invoice.messages.cancelConfirmTitle'),
+      content: t('invoice.messages.cancelConfirmMessage'),
+      okText: t('invoice.buttons.cancel'),
       okType: 'danger',
-      cancelText: 'Vazgeç',
+      cancelText: t('common.cancel'),
       onOk: async () => {
         try {
-          await invoicesApi.cancel(id!, 'Kullanıcı tarafından iptal edildi');
-          message.success('Fatura iptal edildi');
+          await invoicesApi.cancel(id!, t('invoice.messages.cancelReason'));
+          message.success(t('invoice.messages.cancelSuccess'));
           loadInvoice();
         } catch (error) {
-          message.error('Fatura iptal edilemedi');
+          message.error(t('invoice.messages.cancelError'));
         }
       },
     });
@@ -93,7 +106,7 @@ export const InvoiceDetail = () => {
       width: 50,
     },
     {
-      title: 'Ürün',
+      title: t('invoice.labels.product'),
       key: 'product',
       render: (_, record) => (
         <div>
@@ -103,24 +116,24 @@ export const InvoiceDetail = () => {
       ),
     },
     {
-      title: 'Açıklama',
+      title: t('invoice.labels.description'),
       dataIndex: 'description',
       key: 'description',
     },
     {
-      title: 'Miktar',
+      title: t('invoice.labels.quantity'),
       key: 'quantity',
       render: (_, record) => `${record.quantity} ${record.unit}`,
     },
     {
-      title: 'Birim Fiyat',
+      title: t('invoice.labels.unitPrice'),
       dataIndex: 'unitPrice',
       key: 'unitPrice',
       align: 'right',
       render: (price) => `${price.toFixed(2)} ${invoice.currency}`,
     },
     {
-      title: 'İndirim',
+      title: t('invoice.labels.discount'),
       key: 'discount',
       align: 'right',
       render: (_, record) =>
@@ -129,13 +142,13 @@ export const InvoiceDetail = () => {
           : '-',
     },
     {
-      title: 'KDV',
+      title: t('invoice.labels.taxRate'),
       key: 'vat',
       align: 'right',
       render: (_, record) => `%${record.vatRate} (${record.vatAmount.toFixed(2)})`,
     },
     {
-      title: 'Tutar',
+      title: t('invoice.labels.amount'),
       dataIndex: 'lineTotal',
       key: 'lineTotal',
       align: 'right',
@@ -152,26 +165,26 @@ export const InvoiceDetail = () => {
       {/* Başlık ve Aksiyonlar */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Fatura Detayı</h1>
+          <h1 className="text-2xl font-bold">{t('invoice.detail')}</h1>
           <p className="text-gray-500">{invoice.invoiceNumber}</p>
         </div>
         <Space>
-          <Button icon={<FilePdfOutlined />}>PDF İndir</Button>
-          <Button icon={<PrinterOutlined />}>Yazdır</Button>
+          <Button icon={<FilePdfOutlined />}>{t('invoice.buttons.downloadPdf')}</Button>
+          <Button icon={<PrinterOutlined />}>{t('invoice.buttons.print')}</Button>
           {invoice.status === InvoiceStatus.Draft && (
             <>
               <Button
                 icon={<EditOutlined />}
                 onClick={() => navigate(`/invoices/edit/${invoice.id}`)}
               >
-                Düzenle
+                {t('common.edit')}
               </Button>
               <Button
                 type="primary"
                 icon={<CheckCircleOutlined />}
                 onClick={handleApprove}
               >
-                Onayla
+                {t('invoice.buttons.approve')}
               </Button>
             </>
           )}
@@ -181,27 +194,27 @@ export const InvoiceDetail = () => {
               icon={<CloseCircleOutlined />}
               onClick={handleCancel}
             >
-              İptal Et
+              {t('invoice.buttons.cancel')}
             </Button>
           )}
         </Space>
       </div>
 
       {/* Fatura Bilgileri */}
-      <Card title="Fatura Bilgileri" className="mb-4">
+      <Card title={t('invoice.labels.information')} className="mb-4">
         <Descriptions column={3}>
-          <Descriptions.Item label="Fatura No">
+          <Descriptions.Item label={t('invoice.labels.invoiceNumber')}>
             <span className="font-mono font-medium">
               {invoice.invoiceNumber}
             </span>
           </Descriptions.Item>
-          <Descriptions.Item label="Tür">
+          <Descriptions.Item label={t('invoice.labels.type')}>
             {INVOICE_TYPE_LABELS[invoice.type]}
           </Descriptions.Item>
-          <Descriptions.Item label="Tarih">
+          <Descriptions.Item label={t('invoice.labels.date')}>
             {dayjs(invoice.invoiceDate).format('DD.MM.YYYY')}
           </Descriptions.Item>
-          <Descriptions.Item label="Müşteri">
+          <Descriptions.Item label={t('invoice.labels.customer')}>
             <div>
               <div className="font-medium">{invoice.customer?.name}</div>
               <div className="text-xs text-gray-500">
@@ -209,20 +222,20 @@ export const InvoiceDetail = () => {
               </div>
             </div>
           </Descriptions.Item>
-          <Descriptions.Item label="Vade Tarihi">
+          <Descriptions.Item label={t('invoice.labels.dueDate')}>
             {invoice.dueDate
               ? dayjs(invoice.dueDate).format('DD.MM.YYYY')
               : '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="Para Birimi">
+          <Descriptions.Item label={t('invoice.labels.currency')}>
             {invoice.currency}
           </Descriptions.Item>
-          <Descriptions.Item label="Fatura Tipi">
+          <Descriptions.Item label={t('invoice.labels.invoiceType')}>
             <Tag color={invoice.isOfficial ? 'blue' : 'orange'}>
-              {invoice.isOfficial ? 'Resmi' : 'Gayriresmi'}
+              {invoice.isOfficial ? t('invoice.labels.official') : t('invoice.labels.unofficial')}
             </Tag>
           </Descriptions.Item>
-          <Descriptions.Item label="Durum">
+          <Descriptions.Item label={t('invoice.labels.status')}>
             <Tag
               color={
                 invoice.status === InvoiceStatus.Approved
@@ -237,7 +250,7 @@ export const InvoiceDetail = () => {
               {INVOICE_STATUS_LABELS[invoice.status]}
             </Tag>
           </Descriptions.Item>
-          <Descriptions.Item label="Ödeme Durumu">
+          <Descriptions.Item label={t('invoice.labels.paymentStatus')}>
             <Tag
               color={
                 invoice.paymentStatus === 2
@@ -251,7 +264,7 @@ export const InvoiceDetail = () => {
             </Tag>
           </Descriptions.Item>
           {invoice.notes && (
-            <Descriptions.Item label="Not" span={3}>
+            <Descriptions.Item label={t('invoice.labels.notes')} span={3}>
               {invoice.notes}
             </Descriptions.Item>
           )}
@@ -259,7 +272,7 @@ export const InvoiceDetail = () => {
       </Card>
 
       {/* Fatura Kalemleri */}
-      <Card title="Fatura Kalemleri" className="mb-4">
+      <Card title={t('invoice.labels.items')} className="mb-4">
         <Table
           columns={itemColumns}
           dataSource={invoice.items || []}
@@ -272,27 +285,27 @@ export const InvoiceDetail = () => {
       <Card className="mb-4">
         <div className="max-w-md ml-auto space-y-2">
           <div className="flex justify-between py-2">
-            <span className="text-gray-600">Ara Toplam:</span>
+            <span className="text-gray-600">{t('invoice.labels.subtotal')}:</span>
             <span className="font-medium">
               {invoice.subTotal.toFixed(2)} {invoice.currency}
             </span>
           </div>
           {invoice.totalDiscount > 0 && (
             <div className="flex justify-between py-2 text-red-600">
-              <span>Toplam İndirim:</span>
+              <span>{t('invoice.labels.totalDiscount')}:</span>
               <span className="font-medium">
                 -{invoice.totalDiscount.toFixed(2)} {invoice.currency}
               </span>
             </div>
           )}
           <div className="flex justify-between py-2">
-            <span className="text-gray-600">Toplam KDV:</span>
+            <span className="text-gray-600">{t('invoice.labels.totalTax')}:</span>
             <span className="font-medium">
               {invoice.totalVat.toFixed(2)} {invoice.currency}
             </span>
           </div>
           <div className="border-t pt-3 flex justify-between">
-            <span className="text-xl font-medium">Genel Toplam:</span>
+            <span className="text-xl font-medium">{t('invoice.labels.grandTotal')}:</span>
             <span className="text-2xl font-bold text-primary">
               {invoice.grandTotal.toFixed(2)} {invoice.currency}
             </span>

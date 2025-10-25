@@ -11,9 +11,11 @@ import {
   PlusOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '@/store/authStore';
 import { useCompanyStore } from '@/store/companyStore';
 import { companiesApi } from '@/api/companies';
+import { LanguageSelector } from '@/components/common/LanguageSelector';
 
 interface HeaderProps {
   collapsed: boolean;
@@ -23,6 +25,7 @@ interface HeaderProps {
 // Header bileşeni
 export const Header = ({ collapsed, onToggle }: HeaderProps) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { user, clearAuth } = useAuthStore();
   const { companies, currentCompany, setCompanies, setCurrentCompany } =
     useCompanyStore();
@@ -76,13 +79,13 @@ export const Header = ({ collapsed, onToggle }: HeaderProps) => {
     {
       key: 'profile',
       icon: <UserOutlined />,
-      label: 'Profilim',
+      label: t('menu.profile'),
       onClick: () => navigate('/profile'),
     },
     {
       key: 'settings',
       icon: <SettingOutlined />,
-      label: 'Ayarlar',
+      label: t('menu.settings'),
       onClick: () => navigate('/settings'),
     },
     {
@@ -91,7 +94,7 @@ export const Header = ({ collapsed, onToggle }: HeaderProps) => {
     {
       key: 'logout',
       icon: <LogoutOutlined />,
-      label: 'Çıkış Yap',
+      label: t('auth.logout'),
       onClick: handleLogout,
       danger: true,
     },
@@ -128,7 +131,7 @@ export const Header = ({ collapsed, onToggle }: HeaderProps) => {
           onChange={handleCompanyChange}
           style={{ width: 220 }}
           loading={companies.length === 0}
-          placeholder="Şirket seçin"
+          placeholder={t('menu.companies')}
           popupRender={(menu) => (
             <>
               {menu}
@@ -139,7 +142,7 @@ export const Header = ({ collapsed, onToggle }: HeaderProps) => {
                   onClick={() => navigate('/companies/create')}
                   block
                 >
-                  Yeni Şirket Ekle
+                  {t('menu.createCompany')}
                 </Button>
               </div>
             </>
@@ -165,18 +168,8 @@ export const Header = ({ collapsed, onToggle }: HeaderProps) => {
           ))}
         </Select>
 
-        {/* Dil Seçici */}
-        <Dropdown
-          menu={{
-            items: [
-              { key: 'tr', label: '🇹🇷 Türkçe' },
-              { key: 'en', label: '🇬🇧 English' },
-              { key: 'ru', label: '🇷🇺 Русский' },
-            ],
-          }}
-        >
-          <Button type="text" icon={<GlobalOutlined />} />
-        </Dropdown>
+        {/* Dil Seçici - API'den dilleri getirir */}
+        <LanguageSelector />
 
         {/* Bildirimler */}
         <Badge count={5} size="small">

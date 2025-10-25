@@ -22,7 +22,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
-import { paymentsApi, type PaymentListParams } from '@/api/payments';
+import { paymentsApi } from '@/api/payments';
 import type { Payment } from '@/types/payment';
 import {
   PaymentType,
@@ -45,7 +45,7 @@ export const PaymentList = () => {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
-  const [params, setParams] = useState<PaymentListParams>({
+  const [params, setParams] = useState<any>({
     pageNumber: 1,
     pageSize: 50,
   });
@@ -58,9 +58,9 @@ export const PaymentList = () => {
     setLoading(true);
     try {
       const response = await paymentsApi.getAll(params);
-      if (response.success) {
-        setPayments(response.data.items);
-        setTotalCount(response.data.totalCount);
+      if (response) {
+        setPayments(response as any);
+        setTotalCount(response.length);
       }
     } catch (error) {
       message.error('Ödemeler yüklenemedi');
@@ -136,9 +136,9 @@ export const PaymentList = () => {
       dataIndex: 'type',
       key: 'type',
       width: 100,
-      render: (type) => (
-        <Tag color={type === PaymentType.Receipt ? 'green' : 'orange'}>
-          {PAYMENT_TYPE_LABELS[type]}
+      render: (_, record) => (
+        <Tag color={record.type === PaymentType.Receipt ? 'green' : 'orange'}>
+          {PAYMENT_TYPE_LABELS[record.type as PaymentType]}
         </Tag>
       ),
     },
@@ -147,7 +147,7 @@ export const PaymentList = () => {
       dataIndex: 'method',
       key: 'method',
       width: 130,
-      render: (method) => PAYMENT_METHOD_LABELS[method],
+      render: (_, record) => PAYMENT_METHOD_LABELS[record.method as PaymentMethod],
     },
     {
       title: 'Hesap',
@@ -186,17 +186,17 @@ export const PaymentList = () => {
       dataIndex: 'status',
       key: 'status',
       width: 120,
-      render: (status) => (
+      render: (_, record) => (
         <Tag
           color={
-            status === PaymentStatus.Completed
+            record.status === PaymentStatus.Completed
               ? 'success'
-              : status === PaymentStatus.Cancelled
+              : record.status === PaymentStatus.Cancelled
               ? 'error'
               : 'default'
           }
         >
-          {PAYMENT_STATUS_LABELS[status]}
+          {PAYMENT_STATUS_LABELS[record.status as PaymentStatus]}
         </Tag>
       ),
     },
@@ -236,8 +236,8 @@ export const PaymentList = () => {
       {/* Başlık */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold">{t('payments.title')}</h1>
-          <p className="text-gray-500">{t('payments.subtitle')}</p>
+          <h1 className="text-2xl font-bold">{t('payment.title')}</h1>
+          <p className="text-gray-500">{t('payment.subtitle')}</p>
         </div>
         <Space>
           <Button
@@ -258,7 +258,7 @@ export const PaymentList = () => {
             onClick={() => navigate('/payments/create')}
             size="large"
           >
-            {t('payments.newPayment')}
+            {t('payment.buttons.new')}
           </Button>
         </Space>
       </div>
@@ -268,14 +268,14 @@ export const PaymentList = () => {
         <SearchBar
           onSearch={handleSearch}
           onRefresh={loadPayments}
-          placeholder={t('payments.searchPlaceholder')}
+          placeholder={t('payment.placeholders.search')}
         />
 
         <Row gutter={16} className="mt-4">
           <Col span={6}>
             <RangePicker
               style={{ width: '100%' }}
-              placeholder={[t('payments.startDate'), t('payments.endDate')]}
+              placeholder={[t('payment.labels.startDate'), t('payment.labels.endDate')]}
               onChange={(dates) => {
                 setParams({
                   ...params,
@@ -289,21 +289,21 @@ export const PaymentList = () => {
 
           <Col span={4}>
             <Select
-              placeholder={t('payments.type')}
+              placeholder={t('payment.labels.type')}
               style={{ width: '100%' }}
               allowClear
               onChange={(value) =>
                 setParams({ ...params, type: value, pageNumber: 1 })
               }
             >
-              <Select.Option value={PaymentType.Receipt}>{t('payments.receipt')}</Select.Option>
-              <Select.Option value={PaymentType.Payment}>{t('payments.payment')}</Select.Option>
+              <Select.Option value={PaymentType.Receipt}>{t('payment.types.collection')}</Select.Option>
+              <Select.Option value={PaymentType.Payment}>{t('payment.types.payment')}</Select.Option>
             </Select>
           </Col>
 
           <Col span={5}>
             <Select
-              placeholder={t('payments.method')}
+              placeholder={t('payment.labels.method')}
               style={{ width: '100%' }}
               allowClear
               onChange={(value) =>
@@ -326,7 +326,7 @@ export const PaymentList = () => {
 
           <Col span={4}>
             <Select
-              placeholder={t('payments.status')}
+              placeholder={t('payment.labels.status')}
               style={{ width: '100%' }}
               allowClear
               onChange={(value) =>

@@ -2,19 +2,18 @@ import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PageContainer, ProTable, ProCard } from '@ant-design/pro-components';
 import type { ProColumns, ActionType } from '@ant-design/pro-components';
-import { Button, Tag, Space, Tooltip, message, Modal, Statistic, Row, Col } from 'antd';
+import { Button, Space, Tooltip, Statistic, Row, Col } from 'antd';
 import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
   BarcodeOutlined,
   WarningOutlined,
-  ShoppingOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { formatCurrency } from '@/utils/formatters';
 import type { Product } from '@/types/product';
-import { useProducts, useDeleteProduct } from '@/hooks/useProducts';
+import { useProducts } from '@/hooks/useProducts';
 
 /**
  * Ürün listesi sayfası - ProTable ile
@@ -25,15 +24,14 @@ export const ProductList: React.FC = () => {
   const actionRef = useRef<ActionType>();
   
   // API hooks
-  const { data: productsData, isLoading } = useProducts();
-  const deleteProduct = useDeleteProduct();
+  const { data: productsData } = useProducts();
 
   /**
    * ProTable kolonları
    */
   const columns: ProColumns<Product>[] = [
     {
-      title: t('products.columns.code'),
+      title: t('product.labels.code'),
       dataIndex: 'code',
       key: 'code',
       width: 120,
@@ -41,7 +39,7 @@ export const ProductList: React.FC = () => {
       copyable: true
     },
     {
-      title: t('products.columns.name'),
+      title: t('product.labels.name'),
       dataIndex: 'name',
       key: 'name',
       width: 200,
@@ -50,7 +48,7 @@ export const ProductList: React.FC = () => {
       copyable: true
     },
     {
-      title: t('products.columns.category'),
+      title: t('product.labels.category'),
       dataIndex: 'categoryName',
       key: 'categoryName',
       width: 150,
@@ -58,36 +56,36 @@ export const ProductList: React.FC = () => {
       request: async () => {
         // Kategorileri API'den çek
         return [
-          { label: t('products.categories.electronics'), value: 'cat1' },
-          { label: t('products.categories.food'), value: 'cat2' },
-          { label: t('products.categories.clothing'), value: 'cat3' }
+          { label: 'Electronics', value: 'cat1' },
+          { label: 'Food', value: 'cat2' },
+          { label: 'Clothing', value: 'cat3' }
         ];
       }
     },
     {
-      title: t('products.columns.barcode'),
+      title: t('product.labels.barcode'),
       dataIndex: 'barcode',
       key: 'barcode',
       width: 130,
-      render: (barcode: string) =>
-        barcode ? (
+      render: (_, record) =>
+        record.barcode ? (
           <Space>
             <BarcodeOutlined />
-            {barcode}
+            {record.barcode}
           </Space>
         ) : (
           '-'
         )
     },
     {
-      title: t('products.columns.unit'),
+      title: t('product.labels.unit'),
       dataIndex: 'unit',
       key: 'unit',
       width: 80,
       align: 'center'
     },
     {
-      title: t('products.columns.purchasePrice'),
+      title: t('product.labels.purchasePrice'),
       dataIndex: 'purchasePrice',
       key: 'purchasePrice',
       width: 120,
@@ -96,7 +94,7 @@ export const ProductList: React.FC = () => {
       render: (_, record) => formatCurrency(record.purchasePrice)
     },
     {
-      title: t('products.columns.salePrice'),
+      title: t('product.labels.salePrice'),
       dataIndex: 'salePrice',
       key: 'salePrice',
       width: 120,
@@ -105,34 +103,34 @@ export const ProductList: React.FC = () => {
       render: (_, record) => formatCurrency(record.salePrice)
     },
     {
-      title: t('products.columns.taxRate'),
+      title: t('product.labels.taxRate'),
       dataIndex: 'taxRate',
       key: 'taxRate',
       width: 100,
       align: 'center',
-      render: (rate: number) => `%${rate}`
+      render: (_, record) => `%${record.taxRate}`
     },
     {
-      title: t('products.columns.currentStock'),
+      title: t('product.labels.stock'),
       dataIndex: 'currentStock',
       key: 'currentStock',
       width: 120,
       align: 'right',
-      render: (stock: number, record: Product) => (
+      render: (_, record) => (
         <Space>
           {record.isLowStock && (
-            <Tooltip title={t('products.lowStockWarning')}>
+            <Tooltip title={t('product.messages.lowStock')}>
               <WarningOutlined style={{ color: '#ff4d4f' }} />
             </Tooltip>
           )}
           <span style={{ color: record.isLowStock ? '#ff4d4f' : undefined }}>
-            {stock?.toFixed(2) || '0.00'} {record.unit}
+            {record.currentStock?.toFixed(2) || '0.00'} {record.unit}
           </span>
         </Space>
       )
     },
     {
-      title: t('products.columns.status'),
+      title: t('product.labels.status'),
       dataIndex: 'isActive',
       key: 'isActive',
       width: 100,
@@ -144,13 +142,13 @@ export const ProductList: React.FC = () => {
       }
     },
     {
-      title: t('products.columns.actions'),
+      title: t('product.labels.actions'),
       key: 'actions',
       width: 120,
       fixed: 'right',
       align: 'center',
       valueType: 'option',
-      render: (_, record) => [
+      render: () => [
         <Tooltip key="edit" title={t('common.edit')}>
           <Button type="text" icon={<EditOutlined />} />
         </Tooltip>,
@@ -164,8 +162,8 @@ export const ProductList: React.FC = () => {
   return (
     <PageContainer
       header={{
-        title: t('products.title'),
-        subTitle: t('products.subtitle'),
+        title: t('product.title'),
+        subTitle: t('product.subtitle'),
         breadcrumb: {
           items: [
             { title: t('menu.home') },
@@ -179,7 +177,7 @@ export const ProductList: React.FC = () => {
           key="categories"
           onClick={() => navigate('/products/categories')}
         >
-          {t('products.categories')}
+          {t('product.labels.category')}
         </Button>
       ]}
     >
@@ -187,13 +185,13 @@ export const ProductList: React.FC = () => {
       <Row gutter={16} style={{ marginBottom: 16 }}>
         <Col span={6}>
           <ProCard>
-            <Statistic title={t('products.stats.total')} value={1234} />
+            <Statistic title={t('product.stats.total')} value={1234} />
           </ProCard>
         </Col>
         <Col span={6}>
           <ProCard>
             <Statistic
-              title={t('products.stats.lowStock')}
+              title={t('product.stats.lowStock')}
               value={45}
               valueStyle={{ color: '#cf1322' }}
             />
@@ -202,7 +200,7 @@ export const ProductList: React.FC = () => {
         <Col span={6}>
           <ProCard>
             <Statistic
-              title={t('products.stats.totalValue')}
+              title={t('product.stats.totalValue')}
               value={1234567}
               prefix="₺"
             />
@@ -211,7 +209,7 @@ export const ProductList: React.FC = () => {
         <Col span={6}>
           <ProCard>
             <Statistic
-              title={t('products.stats.active')}
+              title={t('product.stats.active')}
               value={1189}
               valueStyle={{ color: '#3f8600' }}
             />
@@ -224,7 +222,7 @@ export const ProductList: React.FC = () => {
         columns={columns}
         actionRef={actionRef}
         cardBordered
-        request={async (params) => {
+        request={async () => {
           // Backend API henüz hazır değil, boş data döndür
           return {
             data: [],
@@ -244,7 +242,7 @@ export const ProductList: React.FC = () => {
         }}
         toolBarRender={() => [
           <Button key="add" type="primary" icon={<PlusOutlined />}>
-            {t('products.addProduct')}
+            {t('product.buttons.new')}
           </Button>
         ]}
         options={{

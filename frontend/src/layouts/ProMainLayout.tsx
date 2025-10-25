@@ -116,6 +116,14 @@ export const ProMainLayout: React.FC = () => {
         {
           path: '/partners/create',
           name: t('menu.createPartner')
+        },
+        {
+          path: '/customers',
+          name: t('menu.customerList')
+        },
+        {
+          path: '/customers/create',
+          name: t('menu.createCustomer')
         }
       ]
     },
@@ -127,6 +135,10 @@ export const ProMainLayout: React.FC = () => {
         {
           path: '/products/list',
           name: t('menu.productList')
+        },
+        {
+          path: '/products/create',
+          name: t('menu.createProduct')
         },
         {
           path: '/products/categories',

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PageContainer, ProTable, ProCard } from '@ant-design/pro-components';
 import type { ProColumns, ActionType } from '@ant-design/pro-components';
@@ -21,11 +21,22 @@ import type { Invoice } from '@/types/invoice';
  * Sayfalama, sıralama, filtreleme, arama otomatik yönetilir
  */
 export const InvoiceList: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const actionRef = useRef<ActionType>();
   const { message } = App.useApp();
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+
+  // Debug log - dil değişikliklerini takip et
+  useEffect(() => {
+    console.log('🌐 InvoiceList - Current language:', i18n.language);
+    console.log('🔑 Translation test:', {
+      title: t('invoice.title'),
+      newButton: t('invoice.buttons.new'),
+      invoiceNo: t('invoice.labels.invoiceNumber'),
+      customer: t('invoice.labels.customer'),
+    });
+  }, [i18n.language, t]);
 
   // Fatura silme mutation'ı - Mock implementation
   const deleteInvoice = {
@@ -297,7 +308,7 @@ export const InvoiceList: React.FC = () => {
         columns={columns}
         actionRef={actionRef}
         cardBordered
-        request={async (params, sort, filter) => {
+        request={async () => {
           // Backend API henüz hazır değil, boş data döndür
           return {
             data: [],
