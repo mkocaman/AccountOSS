@@ -1,5 +1,5 @@
-import { apiClient } from '../api/client';
-import type { Notification, NotificationStats } from '../types/notification';
+import { apiClient } from '@/api/client';
+import type { Notification, NotificationStats } from '@/types/notification';
 
 /**
  * Bildirim servisi

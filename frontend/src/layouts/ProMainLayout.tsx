@@ -31,6 +31,7 @@ import { SettingsButton } from '../components/header/SettingsButton';
 import { GlobalSearch } from '../components/header/GlobalSearch';
 import { useTheme } from '../hooks/useTheme';
 import { useSignalR } from '../hooks/useSignalR';
+import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
 
 /**
  * Ana layout bileşeni - Ant Design Pro Layout kullanır
@@ -80,7 +81,7 @@ export const ProMainLayout: React.FC = () => {
       icon: <FileTextOutlined />,
       routes: [
         {
-          path: '/invoices/list',
+          path: '/invoices',
           name: t('menu.invoiceList')
         },
         {
@@ -396,6 +397,9 @@ export const ProMainLayout: React.FC = () => {
     >
       {/* İçerik alanı - Outlet ile child route'lar render edilir */}
       <Outlet />
+      
+      {/* Mobil alt navigasyon - Router context içinde olduğu için useNavigate çalışır */}
+      <MobileBottomNav />
     </ProLayout>
   );
 };

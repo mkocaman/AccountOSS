@@ -1,5 +1,5 @@
-import { apiClient } from '../api/client';
-import type { Language } from '../types/language';
+import { apiClient } from '@/api/client';
+import type { Language } from '@/types/language';
 
 /**
  * Dil ayarları servisi

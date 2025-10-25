@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --force --clearScreen false",
+    "dev:clean": "rm -rf node_modules/.vite && vite --force",
     "build": "tsc && vite build",
     "build:prod": "tsc && vite build --mode production",
     "build:staging": "tsc && vite build --mode staging",

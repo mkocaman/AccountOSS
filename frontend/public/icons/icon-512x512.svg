@@ -1,6 +1,0 @@
-<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="512" height="512" fill="#1890ff"/>
-<path d="M256 141C303.555 141 344 181.445 344 229V256C344 303.555 303.555 344 256 344H200C152.445 344 112 303.555 112 256V229C112 181.445 152.445 141 200 141H256Z" fill="white"/>
-<path d="M228 185C228.552 185 229 185.448 229 186V256C229 256.552 228.552 257 228 257H200C199.448 257 199 256.552 199 256V186C199 185.448 199.448 185 200 185H228Z" fill="#1890ff"/>
-<text x="256" y="427" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="48" font-weight="bold">AccountOS</text>
-</svg>

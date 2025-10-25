@@ -11,8 +11,8 @@
   <link rel="manifest" href="/manifest.json" />
   
   <!-- Apple Touch Icons -->
-  <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="apple-touch-icon" href="/icon.svg" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="AccountOS" />
   
@@ -32,14 +32,14 @@
   <meta property="og:url" content="https://accountos.com/" />
   <meta property="og:title" content="AccountOS - Muhasebe Yönetim Sistemi" />
   <meta property="og:description" content="Profesyonel muhasebe ve fatura yönetim sistemi" />
-  <meta property="og:image" content="/og-image.png" />
+  <meta property="og:image" content="/icon.svg" />
   
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image" />
   <meta property="twitter:url" content="https://accountos.com/" />
   <meta property="twitter:title" content="AccountOS - Muhasebe Yönetim Sistemi" />
   <meta property="twitter:description" content="Profesyonel muhasebe ve fatura yönetim sistemi" />
-  <meta property="twitter:image" content="/og-image.png" />
+  <meta property="twitter:image" content="/icon.svg" />
   
   <title>AccountOS - Muhasebe Yönetim Sistemi</title>
 </head>
@@ -47,7 +47,8 @@
   <div id="root"></div>
   <script type="module" src="/src/main.tsx"></script>
   
-  <!-- Register Service Worker -->
+  <!-- Service Worker - TEMPORARILY DISABLED -->
+  <!--
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -57,5 +58,6 @@
       });
     }
   </script>
+  -->
 </body>
 </html>

@@ -1,654 +1,479 @@
 import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
-  PageContainer,
-  ProForm,
-  ProFormText,
-  ProFormSelect,
-  ProFormDatePicker,
-  ProFormTextArea
-} from '@ant-design/pro-components';
-import {
+  Form,
+  Input,
+  Button,
+  DatePicker,
+  Select,
+  Table,
+  Space,
+  Typography,
   Card,
   Row,
   Col,
-  Divider,
-  Button,
-  Space,
   InputNumber,
-  Select,
-  Alert
+  message,
+  Divider
 } from 'antd';
 import {
   PlusOutlined,
   DeleteOutlined,
-  SearchOutlined,
   SaveOutlined,
-  CheckOutlined
+  SendOutlined
 } from '@ant-design/icons';
-import { useMessage } from '../../hooks/useMessage';
-import { usePartners } from '../../hooks/usePartners';
-import { useProducts } from '../../hooks/useProducts';
-import { invoiceService, CreateInvoiceDto, InvoiceItem } from '../../services/invoiceService';
-import { formatCurrency } from '../../utils/formatters';
+import { useCreateInvoice, useUpdateInvoice, useInvoice, useSuggestInvoiceNumber } from '@/hooks/useInvoice';
+import type { CreateInvoiceRequest, UpdateInvoiceRequest, InvoiceItem } from '@/types/invoice';
 import dayjs from 'dayjs';
-import './InvoiceForm.css';
+
+const { Title } = Typography;
+const { Option } = Select;
 
 /**
- * Fatura oluşturma/düzenleme formu
- * Line item'ları dinamik olarak ekle/çıkar
- * Real-time hesaplamalar (iskonto, KDV, toplam)
+ * Fatura formu - Oluşturma ve düzenleme
  */
-export const InvoiceForm: React.FC = () => {
-  const { t } = useTranslation();
+const InvoiceForm: React.FC = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
-  const message = useMessage();
-  const [form] = ProForm.useForm();
+  const { id } = useParams<{ id: string }>();
+  const isEdit = !!id;
 
-  // State
-  const [invoiceType, setInvoiceType] = useState<'sales' | 'purchase'>('sales');
-  const [items, setItems] = useState<Partial<InvoiceItem>[]>([]);
-  const [subtotal, setSubtotal] = useState(0);
-  const [totalDiscount, setTotalDiscount] = useState(0);
-  const [totalTax, setTotalTax] = useState(0);
-  const [grandTotal, setGrandTotal] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [form] = Form.useForm();
+  const [items, setItems] = useState<InvoiceItem[]>([]);
 
-  // Hooks
-  const { data: partnersData } = usePartners({ pageSize: 100 });
-  const { data: productsData } = useProducts({ pageSize: 100, isActive: true });
+  const createMutation = useCreateInvoice();
+  const updateMutation = useUpdateInvoice();
+  const { data: invoiceData } = useInvoice(id || '');
+  const { data: suggestedNumber } = useSuggestInvoiceNumber('sales');
 
-  /**
-   * Fatura numarası oluştur
-   */
+  // Form yüklendiğinde veri doldur
   useEffect(() => {
-    const generateNumber = async () => {
-      try {
-        const number = await invoiceService.generateInvoiceNumber(invoiceType);
-        form.setFieldValue('invoiceNumber', number);
-      } catch (error) {
-        console.error('Invoice number generation failed:', error);
-      }
-    };
-
-    if (!id) {
-      generateNumber();
+    if (isEdit && invoiceData) {
+      form.setFieldsValue({
+        invoiceNumber: invoiceData.invoiceNumber,
+        invoiceType: invoiceData.invoiceType,
+        partnerId: invoiceData.partnerId,
+        partnerName: invoiceData.partnerName,
+        invoiceDate: dayjs(invoiceData.invoiceDate),
+        dueDate: invoiceData.dueDate ? dayjs(invoiceData.dueDate) : null,
+        currency: invoiceData.currency,
+        description: invoiceData.description,
+        notes: invoiceData.notes
+      });
+      setItems(invoiceData.items || []);
+    } else if (!isEdit && suggestedNumber) {
+      form.setFieldValue('invoiceNumber', suggestedNumber);
     }
-  }, [invoiceType, id, form]);
+  }, [isEdit, invoiceData, suggestedNumber, form]);
 
   /**
-   * Düzenleme modundaysa mevcut faturayı yükle
+   * Kalem ekle
    */
-  useEffect(() => {
-    const loadInvoice = async () => {
-      if (id) {
-        try {
-          const invoice = await invoiceService.getInvoiceById(id);
-          form.setFieldsValue({
-            invoiceNumber: invoice.invoiceNumber,
-            type: invoice.type,
-            partnerId: invoice.partnerId,
-            invoiceDate: dayjs(invoice.invoiceDate),
-            dueDate: invoice.dueDate ? dayjs(invoice.dueDate) : undefined,
-            notes: invoice.notes
-          });
-          setInvoiceType(invoice.type);
-          setItems(invoice.items);
-        } catch (error) {
-          message.error(t('invoices.loadError'));
-          navigate('/invoices/list');
-        }
-      }
+  const addItem = () => {
+    const newItem: Partial<InvoiceItem> = {
+      id: `temp_${Date.now()}`,
+      productId: '',
+      productCode: '',
+      productName: '',
+      quantity: 1,
+      unitPrice: 0,
+      discountRate: 0,
+      taxRate: 18, // KDV
+      lineNumber: items.length + 1
     };
-
-    loadInvoice();
-  }, [id, form, message, navigate, t]);
+    setItems([...items, newItem as InvoiceItem]);
+  };
 
   /**
-   * Line item hesaplamaları
-   * Her satır değiştiğinde toplam hesapla
+   * Kalem sil
    */
-  const calculateLineItem = (item: Partial<InvoiceItem>): Partial<InvoiceItem> => {
-    const quantity = item.quantity || 0;
-    const unitPrice = item.unitPrice || 0;
-    const discount = item.discount || 0;
-    const taxRate = item.taxRate || 0;
-
-    // Ara toplam (iskonto öncesi)
-    const lineTotal = quantity * unitPrice;
-
-    // İskonto tutarı
-    const discountAmount = (lineTotal * discount) / 100;
-
-    // Vergi matrahı (iskonto sonrası)
-    const taxableAmount = lineTotal - discountAmount;
-
-    // KDV tutarı
-    const taxAmount = (taxableAmount * taxRate) / 100;
-
-    // Toplam tutar (KDV dahil)
-    const totalAmount = taxableAmount + taxAmount;
-
-    return {
+  const removeItem = (index: number) => {
+    const newItems = items.filter((_, i) => i !== index);
+    // Sıra numaralarını yeniden düzenle
+    const reorderedItems = newItems.map((item, i) => ({
       ...item,
+      lineNumber: i + 1
+    }));
+    setItems(reorderedItems);
+  };
+
+  /**
+   * Kalem güncelle
+   */
+  const updateItem = (index: number, field: string, value: any) => {
+    const newItems = [...items];
+    newItems[index] = { ...newItems[index], [field]: value };
+    
+    // Hesaplamaları güncelle
+    const item = newItems[index];
+    const subtotal = item.quantity * item.unitPrice;
+    const discountAmount = subtotal * (item.discountRate / 100);
+    const afterDiscount = subtotal - discountAmount;
+    const taxAmount = afterDiscount * (item.taxRate / 100);
+    const totalAmount = afterDiscount + taxAmount;
+
+    newItems[index] = {
+      ...item,
+      subtotal,
       discountAmount,
       taxAmount,
       totalAmount
     };
-  };
 
-  /**
-   * Tüm fatura toplamlarını hesapla
-   */
-  const calculateTotals = (itemsList: Partial<InvoiceItem>[]) => {
-    let sub = 0;
-    let disc = 0;
-    let tax = 0;
-
-    itemsList.forEach(item => {
-      const quantity = item.quantity || 0;
-      const unitPrice = item.unitPrice || 0;
-      
-      sub += quantity * unitPrice;
-      disc += item.discountAmount || 0;
-      tax += item.taxAmount || 0;
-    });
-
-    const total = sub - disc + tax;
-
-    setSubtotal(sub);
-    setTotalDiscount(disc);
-    setTotalTax(tax);
-    setGrandTotal(total);
-  };
-
-  /**
-   * Ürün seçildiğinde satır bilgilerini doldur
-   */
-  const handleProductSelect = (productId: string, index: number) => {
-    const product = productsData?.items.find(p => p.id === productId);
-    if (product) {
-      const newItems = [...items];
-      newItems[index] = {
-        ...newItems[index],
-        productId: product.id,
-        productCode: product.code,
-        productName: product.name,
-        unit: product.unit,
-        unitPrice: invoiceType === 'sales' ? product.salePrice : product.purchasePrice,
-        taxRate: product.taxRate,
-        quantity: newItems[index]?.quantity || 1,
-        discount: 0
-      };
-
-      // Hesapla
-      newItems[index] = calculateLineItem(newItems[index]);
-      setItems(newItems);
-      calculateTotals(newItems);
-    }
-  };
-
-  /**
-   * Satır değeri değiştiğinde
-   */
-  const handleLineChange = (index: number, field: string, value: any) => {
-    const newItems = [...items];
-    newItems[index] = {
-      ...newItems[index],
-      [field]: value
-    };
-
-    // Yeniden hesapla
-    newItems[index] = calculateLineItem(newItems[index]);
     setItems(newItems);
-    calculateTotals(newItems);
   };
 
   /**
-   * Satır sil
+   * Toplam hesapla
    */
-  const handleRemoveLine = (index: number) => {
-    const newItems = items.filter((_, i) => i !== index);
-    setItems(newItems);
-    calculateTotals(newItems);
+  const calculateTotals = () => {
+    const subtotal = items.reduce((sum, item) => sum + item.subtotal, 0);
+    const totalDiscount = items.reduce((sum, item) => sum + item.discountAmount, 0);
+    const totalTax = items.reduce((sum, item) => sum + item.taxAmount, 0);
+    const totalAmount = items.reduce((sum, item) => sum + item.totalAmount, 0);
+
+    return { subtotal, totalDiscount, totalTax, totalAmount };
   };
 
   /**
-   * Yeni satır ekle
-   */
-  const handleAddLine = () => {
-    setItems([
-      ...items,
-      {
-        quantity: 1,
-        discount: 0,
-        taxRate: 18
-      }
-    ]);
-  };
-
-  /**
-   * Form submit - Fatura kaydet
+   * Form gönder
    */
   const handleSubmit = async (values: any) => {
     if (items.length === 0) {
-      message.error(t('invoices.validation.noItems'));
+      message.error('En az bir kalem eklemelisiniz');
       return;
     }
 
-    // Tüm satırlarda ürün seçilmiş mi kontrol et
-    const hasEmptyItems = items.some(item => !item.productId);
-    if (hasEmptyItems) {
-      message.error(t('invoices.validation.emptyItems'));
-      return;
-    }
-
-    setLoading(true);
+    const formData = {
+      ...values,
+      invoiceDate: values.invoiceDate.format('YYYY-MM-DD'),
+      dueDate: values.dueDate?.format('YYYY-MM-DD'),
+      items: items.map(item => ({
+        productId: item.productId,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        discountRate: item.discountRate,
+        taxRate: item.taxRate,
+        description: item.description
+      }))
+    };
 
     try {
-      const invoiceData: CreateInvoiceDto = {
-        invoiceNumber: values.invoiceNumber,
-        type: invoiceType,
-        partnerId: values.partnerId,
-        invoiceDate: values.invoiceDate.format('YYYY-MM-DD'),
-        dueDate: values.dueDate?.format('YYYY-MM-DD'),
-        items: items as InvoiceItem[],
-        notes: values.notes
-      };
-
-      if (id) {
-        await invoiceService.updateInvoice(id, { ...invoiceData, id });
-        message.success(t('invoices.updateSuccess'));
+      if (isEdit) {
+        await updateMutation.mutateAsync({ ...formData, id });
       } else {
-        await invoiceService.createInvoice(invoiceData);
-        message.success(t('invoices.createSuccess'));
+        await createMutation.mutateAsync(formData);
       }
-
-      navigate('/invoices/list');
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || t('invoices.saveError');
-      message.error(errorMessage);
-    } finally {
-      setLoading(false);
+      navigate('/invoices');
+    } catch (error) {
+      console.error('Form submission error:', error);
     }
   };
 
-  /**
-   * Faturayı kaydet ve onayla
-   */
-  const handleSaveAndApprove = async () => {
-    try {
-      await form.validateFields();
-      const values = form.getFieldsValue();
-
-      // Önce kaydet
-      const invoiceData: CreateInvoiceDto = {
-        invoiceNumber: values.invoiceNumber,
-        type: invoiceType,
-        partnerId: values.partnerId,
-        invoiceDate: values.invoiceDate.format('YYYY-MM-DD'),
-        dueDate: values.dueDate?.format('YYYY-MM-DD'),
-        items: items as InvoiceItem[],
-        notes: values.notes
-      };
-
-      let invoiceId = id;
-
-      if (!id) {
-        const newInvoice = await invoiceService.createInvoice(invoiceData);
-        invoiceId = newInvoice.id;
-      }
-
-      // Sonra onayla
-      if (invoiceId) {
-        await invoiceService.approveInvoice(invoiceId);
-        message.success(t('invoices.approveSuccess'));
-        navigate('/invoices/list');
-      }
-    } catch (error: any) {
-      const errorMessage = error?.response?.data?.message || t('invoices.approveError');
-      message.error(errorMessage);
-    }
-  };
+  const totals = calculateTotals();
+  const isLoading = createMutation.isPending || updateMutation.isPending;
 
   return (
-    <PageContainer
-      header={{
-        title: id ? t('invoices.edit') : t('invoices.create'),
-        breadcrumb: {
-          items: [
-            { title: t('menu.home'), path: '/' },
-            { title: t('menu.invoices'), path: '/invoices/list' },
-            { title: id ? t('common.edit') : t('common.create') }
-          ]
-        }
-      }}
-    >
-      <ProForm
-        form={form}
-        onFinish={handleSubmit}
-        submitter={{
-          render: (_, dom) => (
-            <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
-              <Button onClick={() => navigate('/invoices/list')}>
-                {t('common.cancel')}
-              </Button>
-              <Button
-                type="primary"
-                loading={loading}
-                onClick={() => form.submit()}
-                icon={<SaveOutlined />}
-              >
-                {t('common.save')}
-              </Button>
-              <Button
-                type="primary"
-                loading={loading}
-                onClick={handleSaveAndApprove}
-                icon={<CheckOutlined />}
-                style={{ background: '#52c41a', borderColor: '#52c41a' }}
-              >
-                {t('invoices.saveAndApprove')}
-              </Button>
-            </Space>
-          )
-        }}
-      >
-        <Card title={t('invoices.basicInfo')} style={{ marginBottom: 16 }}>
-          <Row gutter={16}>
-            <Col xs={24} md={6}>
-              <ProFormText
-                name="invoiceNumber"
-                label={t('invoices.fields.invoiceNumber')}
-                rules={[{ required: true }]}
-                disabled
-              />
-            </Col>
+    <div style={{ padding: 24 }}>
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <Title level={2}>
+          {isEdit ? 'Fatura Düzenle' : 'Yeni Fatura'}
+        </Title>
 
-            <Col xs={24} md={6}>
-              <ProFormSelect
-                name="type"
-                label={t('invoices.fields.type')}
-                valueEnum={{
-                  sales: t('invoices.types.sales'),
-                  purchase: t('invoices.types.purchase')
-                }}
-                initialValue="sales"
-                rules={[{ required: true }]}
-                fieldProps={{
-                  onChange: (value) => setInvoiceType(value as 'sales' | 'purchase')
-                }}
-              />
-            </Col>
-
-            <Col xs={24} md={6}>
-              <ProFormDatePicker
-                name="invoiceDate"
-                label={t('invoices.fields.date')}
-                rules={[{ required: true }]}
-                initialValue={dayjs()}
-                width="100%"
-              />
-            </Col>
-
-            <Col xs={24} md={6}>
-              <ProFormDatePicker
-                name="dueDate"
-                label={t('invoices.fields.dueDate')}
-                width="100%"
-              />
-            </Col>
-          </Row>
-
-          <Row gutter={16}>
-            <Col xs={24} md={12}>
-              <ProFormSelect
-                name="partnerId"
-                label={
-                  invoiceType === 'sales'
-                    ? t('invoices.fields.customer')
-                    : t('invoices.fields.supplier')
-                }
-                showSearch
-                rules={[{ required: true }]}
-                options={partnersData?.items
-                  .filter(p =>
-                    invoiceType === 'sales'
-                      ? p.type === 'customer' || p.type === 'both'
-                      : p.type === 'supplier' || p.type === 'both'
-                  )
-                  .map(p => ({
-                    label: `${p.code} - ${p.name}`,
-                    value: p.id
-                  }))}
-                fieldProps={{
-                  placeholder: t('invoices.placeholders.selectPartner'),
-                  filterOption: (input, option) =>
-                    (option?.label?.toString() || '')
-                      .toLowerCase()
-                      .includes(input.toLowerCase())
-                }}
-              />
-            </Col>
-
-            <Col xs={24} md={12}>
-              <ProFormTextArea
-                name="notes"
-                label={t('invoices.fields.notes')}
-                fieldProps={{
-                  rows: 1,
-                  placeholder: t('invoices.placeholders.notes')
-                }}
-              />
-            </Col>
-          </Row>
-        </Card>
-
-        {/* Line Items */}
-        <Card title={t('invoices.items')} style={{ marginBottom: 16 }}>
-          {items.length === 0 && (
-            <Alert
-              message={t('invoices.noItems')}
-              description={t('invoices.noItemsDesc')}
-              type="info"
-              showIcon
-              style={{ marginBottom: 16 }}
-            />
-          )}
-
-          <div className="invoice-items-table">
-            {/* Table Header */}
-            <Row gutter={8} className="invoice-items-header">
-              <Col span={8}>{t('invoices.columns.product')}</Col>
-              <Col span={2}>{t('invoices.columns.quantity')}</Col>
-              <Col span={2}>{t('invoices.columns.unit')}</Col>
-              <Col span={3}>{t('invoices.columns.unitPrice')}</Col>
-              <Col span={2}>{t('invoices.columns.discount')}</Col>
-              <Col span={2}>{t('invoices.columns.taxRate')}</Col>
-              <Col span={3}>{t('invoices.columns.total')}</Col>
-              <Col span={2} style={{ textAlign: 'center' }}>
-                {t('common.actions')}
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleSubmit}
+          initialValues={{
+            invoiceType: 'sales',
+            currency: 'TRY',
+            exchangeRate: 1,
+            invoiceDate: dayjs()
+          }}
+        >
+          <Card title="Fatura Bilgileri">
+            <Row gutter={16}>
+              <Col xs={24} sm={12} md={6}>
+                <Form.Item
+                  name="invoiceNumber"
+                  label="Fatura No"
+                  rules={[{ required: true, message: 'Fatura numarası gerekli' }]}
+                >
+                  <Input placeholder="Fatura numarası" />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12} md={6}>
+                <Form.Item
+                  name="invoiceType"
+                  label="Fatura Tipi"
+                  rules={[{ required: true }]}
+                >
+                  <Select>
+                    <Option value="sales">Satış Faturası</Option>
+                    <Option value="purchase">Alış Faturası</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12} md={6}>
+                <Form.Item
+                  name="invoiceDate"
+                  label="Fatura Tarihi"
+                  rules={[{ required: true }]}
+                >
+                  <DatePicker style={{ width: '100%' }} />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12} md={6}>
+                <Form.Item
+                  name="dueDate"
+                  label="Vade Tarihi"
+                >
+                  <DatePicker style={{ width: '100%' }} />
+                </Form.Item>
               </Col>
             </Row>
 
-            {/* Table Rows */}
-            {items.map((item, index) => (
-              <Row
-                key={index}
-                gutter={8}
-                className="invoice-items-row"
-                align="middle"
-              >
-                {/* Ürün */}
-                <Col span={8}>
+            <Row gutter={16}>
+              <Col xs={24} sm={12}>
+                <Form.Item
+                  name="partnerId"
+                  label="Cari"
+                  rules={[{ required: true, message: 'Cari seçimi gerekli' }]}
+                >
                   <Select
+                    placeholder="Cari seçin"
                     showSearch
-                    value={item.productId}
-                    onChange={(value) => handleProductSelect(value, index)}
-                    options={productsData?.items.map(p => ({
-                      label: `${p.code} - ${p.name}`,
-                      value: p.id
-                    }))}
-                    placeholder={t('invoices.placeholders.selectProduct')}
-                    style={{ width: '100%' }}
-                    filterOption={(input, option) =>
-                      (option?.label?.toString() || '')
-                        .toLowerCase()
-                        .includes(input.toLowerCase())
-                    }
-                    suffixIcon={<SearchOutlined />}
-                  />
-                </Col>
+                    optionFilterProp="children"
+                  >
+                    {/* TODO: Partner listesi */}
+                    <Option value="1">Test Cari 1</Option>
+                    <Option value="2">Test Cari 2</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12}>
+                <Form.Item
+                  name="currency"
+                  label="Para Birimi"
+                >
+                  <Select>
+                    <Option value="TRY">Türk Lirası</Option>
+                    <Option value="USD">Amerikan Doları</Option>
+                    <Option value="EUR">Euro</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>
 
-                {/* Miktar */}
-                <Col span={2}>
-                  <InputNumber
-                    min={0.01}
-                    step={1}
-                    value={item.quantity}
-                    onChange={(value) => handleLineChange(index, 'quantity', value)}
-                    style={{ width: '100%' }}
-                    precision={2}
-                  />
-                </Col>
+            <Row gutter={16}>
+              <Col xs={24}>
+                <Form.Item
+                  name="description"
+                  label="Açıklama"
+                >
+                  <Input.TextArea rows={3} placeholder="Fatura açıklaması" />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Card>
 
-                {/* Birim */}
-                <Col span={2}>
-                  <span>{item.unit}</span>
-                </Col>
-
-                {/* Birim Fiyat */}
-                <Col span={3}>
-                  <InputNumber
-                    min={0}
-                    step={0.01}
-                    value={item.unitPrice}
-                    onChange={(value) => handleLineChange(index, 'unitPrice', value)}
-                    style={{ width: '100%' }}
-                    precision={2}
-                    formatter={value => `₺ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-                    parser={value => value!.replace(/₺\s?|(,*)/g, '')}
-                  />
-                </Col>
-
-                {/* İskonto % */}
-                <Col span={2}>
-                  <InputNumber
-                    min={0}
-                    max={100}
-                    value={item.discount}
-                    onChange={(value) => handleLineChange(index, 'discount', value)}
-                    style={{ width: '100%' }}
-                    precision={0}
-                    formatter={value => `${value}%`}
-                    parser={value => value!.replace('%', '')}
-                  />
-                </Col>
-
-                {/* KDV % */}
-                <Col span={2}>
-                  <Select
-                    value={item.taxRate}
-                    onChange={(value) => handleLineChange(index, 'taxRate', value)}
-                    options={[
-                      { label: '%0', value: 0 },
-                      { label: '%1', value: 1 },
-                      { label: '%8', value: 8 },
-                      { label: '%18', value: 18 }
-                    ]}
-                    style={{ width: '100%' }}
-                  />
-                </Col>
-
-                {/* Toplam */}
-                <Col span={3}>
-                  <strong>{formatCurrency(item.totalAmount || 0)}</strong>
-                </Col>
-
-                {/* Sil butonu */}
-                <Col span={2} style={{ textAlign: 'center' }}>
-                  <Button
-                    type="text"
-                    danger
-                    icon={<DeleteOutlined />}
-                    onClick={() => handleRemoveLine(index)}
-                  />
-                </Col>
-              </Row>
-            ))}
-
-            {/* Yeni Satır Ekle Butonu */}
-            <Button
-              type="dashed"
-              block
-              icon={<PlusOutlined />}
-              onClick={handleAddLine}
-              style={{ marginTop: 16 }}
-            >
-              {t('invoices.addItem')}
-            </Button>
-          </div>
-        </Card>
-
-        {/* Toplamlar */}
-        <Card>
-          <Row gutter={16}>
-            <Col xs={24} md={12}>
-              {/* Sol taraf - Notlar vs. için boş alan */}
-            </Col>
-
-            <Col xs={24} md={12}>
-              <div className="invoice-totals">
-                <Row justify="space-between" style={{ marginBottom: 8 }}>
-                  <Col>
-                    <strong>{t('invoices.totals.subtotal')}:</strong>
-                  </Col>
-                  <Col>
-                    <span>{formatCurrency(subtotal)}</span>
-                  </Col>
-                </Row>
-
-                <Row justify="space-between" style={{ marginBottom: 8 }}>
-                  <Col>
-                    <strong>{t('invoices.totals.discount')}:</strong>
-                  </Col>
-                  <Col>
-                    <span style={{ color: '#ff4d4f' }}>
-                      -{formatCurrency(totalDiscount)}
+          <Card 
+            title="Fatura Kalemleri"
+            extra={
+              <Button
+                type="dashed"
+                icon={<PlusOutlined />}
+                onClick={addItem}
+              >
+                Kalem Ekle
+              </Button>
+            }
+          >
+            <Table
+              dataSource={items}
+              pagination={false}
+              size="small"
+              columns={[
+                {
+                  title: 'Ürün',
+                  dataIndex: 'productName',
+                  key: 'productName',
+                  width: 200,
+                  render: (_, record, index) => (
+                    <Input
+                      value={record.productName}
+                      onChange={(e) => updateItem(index, 'productName', e.target.value)}
+                      placeholder="Ürün adı"
+                    />
+                  )
+                },
+                {
+                  title: 'Miktar',
+                  dataIndex: 'quantity',
+                  key: 'quantity',
+                  width: 100,
+                  render: (_, record, index) => (
+                    <InputNumber
+                      value={record.quantity}
+                      onChange={(value) => updateItem(index, 'quantity', value || 0)}
+                      min={0}
+                      style={{ width: '100%' }}
+                    />
+                  )
+                },
+                {
+                  title: 'Birim Fiyat',
+                  dataIndex: 'unitPrice',
+                  key: 'unitPrice',
+                  width: 120,
+                  render: (_, record, index) => (
+                    <InputNumber
+                      value={record.unitPrice}
+                      onChange={(value) => updateItem(index, 'unitPrice', value || 0)}
+                      min={0}
+                      precision={2}
+                      style={{ width: '100%' }}
+                    />
+                  )
+                },
+                {
+                  title: 'İndirim %',
+                  dataIndex: 'discountRate',
+                  key: 'discountRate',
+                  width: 100,
+                  render: (_, record, index) => (
+                    <InputNumber
+                      value={record.discountRate}
+                      onChange={(value) => updateItem(index, 'discountRate', value || 0)}
+                      min={0}
+                      max={100}
+                      style={{ width: '100%' }}
+                    />
+                  )
+                },
+                {
+                  title: 'KDV %',
+                  dataIndex: 'taxRate',
+                  key: 'taxRate',
+                  width: 100,
+                  render: (_, record, index) => (
+                    <InputNumber
+                      value={record.taxRate}
+                      onChange={(value) => updateItem(index, 'taxRate', value || 0)}
+                      min={0}
+                      style={{ width: '100%' }}
+                    />
+                  )
+                },
+                {
+                  title: 'Toplam',
+                  dataIndex: 'totalAmount',
+                  key: 'totalAmount',
+                  width: 120,
+                  align: 'right',
+                  render: (amount) => (
+                    <span style={{ fontWeight: 500 }}>
+                      {new Intl.NumberFormat('tr-TR', {
+                        style: 'currency',
+                        currency: 'TRY'
+                      }).format(amount)}
                     </span>
-                  </Col>
-                </Row>
+                  )
+                },
+                {
+                  title: 'İşlem',
+                  key: 'action',
+                  width: 80,
+                  render: (_, __, index) => (
+                    <Button
+                      type="text"
+                      danger
+                      icon={<DeleteOutlined />}
+                      onClick={() => removeItem(index)}
+                    />
+                  )
+                }
+              ]}
+            />
+          </Card>
 
-                <Row justify="space-between" style={{ marginBottom: 8 }}>
-                  <Col>
-                    <strong>{t('invoices.totals.tax')}:</strong>
-                  </Col>
-                  <Col>
-                    <span>{formatCurrency(totalTax)}</span>
-                  </Col>
-                </Row>
+          <Card title="Özet">
+            <Row gutter={16}>
+              <Col xs={24} sm={6}>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 14, color: '#666' }}>Ara Toplam</div>
+                  <div style={{ fontSize: 18, fontWeight: 500 }}>
+                    {new Intl.NumberFormat('tr-TR', {
+                      style: 'currency',
+                      currency: 'TRY'
+                    }).format(totals.subtotal)}
+                  </div>
+                </div>
+              </Col>
+              <Col xs={24} sm={6}>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 14, color: '#666' }}>İndirim</div>
+                  <div style={{ fontSize: 18, fontWeight: 500, color: '#cf1322' }}>
+                    -{new Intl.NumberFormat('tr-TR', {
+                      style: 'currency',
+                      currency: 'TRY'
+                    }).format(totals.totalDiscount)}
+                  </div>
+                </div>
+              </Col>
+              <Col xs={24} sm={6}>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 14, color: '#666' }}>KDV</div>
+                  <div style={{ fontSize: 18, fontWeight: 500 }}>
+                    {new Intl.NumberFormat('tr-TR', {
+                      style: 'currency',
+                      currency: 'TRY'
+                    }).format(totals.totalTax)}
+                  </div>
+                </div>
+              </Col>
+              <Col xs={24} sm={6}>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 14, color: '#666' }}>Genel Toplam</div>
+                  <div style={{ fontSize: 20, fontWeight: 600, color: '#1890ff' }}>
+                    {new Intl.NumberFormat('tr-TR', {
+                      style: 'currency',
+                      currency: 'TRY'
+                    }).format(totals.totalAmount)}
+                  </div>
+                </div>
+              </Col>
+            </Row>
+          </Card>
 
-                <Divider style={{ margin: '12px 0' }} />
-
-                <Row justify="space-between">
-                  <Col>
-                    <strong style={{ fontSize: 18 }}>
-                      {t('invoices.totals.grandTotal')}:
-                    </strong>
-                  </Col>
-                  <Col>
-                    <strong style={{ fontSize: 18, color: '#1890ff' }}>
-                      {formatCurrency(grandTotal)}
-                    </strong>
-                  </Col>
-                </Row>
-              </div>
-            </Col>
-          </Row>
-        </Card>
-      </ProForm>
-    </PageContainer>
+          <div style={{ textAlign: 'right', marginTop: 24 }}>
+            <Space>
+              <Button onClick={() => navigate('/invoices')}>
+                İptal
+              </Button>
+              <Button
+                type="primary"
+                htmlType="submit"
+                loading={isLoading}
+                icon={<SaveOutlined />}
+              >
+                {isEdit ? 'Güncelle' : 'Kaydet'}
+              </Button>
+              {!isEdit && (
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={isLoading}
+                  icon={<SendOutlined />}
+                >
+                  Kaydet ve Gönder
+                </Button>
+              )}
+            </Space>
+          </div>
+        </Form>
+      </Space>
+    </div>
   );
 };
+
+export default InvoiceForm;

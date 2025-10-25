@@ -40,7 +40,7 @@ export const MobileBottomNav: React.FC = () => {
     },
     {
       key: 'invoices',
-      path: '/invoices/list',
+      path: '/invoices',
       icon: <FileTextOutlined />,
       label: t('menu.invoices')
     },

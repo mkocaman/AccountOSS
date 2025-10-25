@@ -29,6 +29,10 @@ const Login = lazy(() => import('../features/auth/Login').then(m => ({ default: 
 const Register = lazy(() => import('../features/auth/Register').then(m => ({ default: m.Register })));
 const ForgotPassword = lazy(() => import('../features/auth/ForgotPassword').then(m => ({ default: m.ForgotPassword })));
 const Dashboard = lazy(() => import('../features/dashboard/Dashboard'));
+const ComingSoon = lazy(() => import('../pages/common/ComingSoon'));
+const InvoiceList = lazy(() => import('../pages/invoices/InvoiceList'));
+const InvoiceForm = lazy(() => import('../pages/invoices/InvoiceForm'));
+const InvoiceDetail = lazy(() => import('../pages/invoices/InvoiceDetail'));
 const ProMainLayout = lazy(() => import('../layouts/ProMainLayout').then(m => ({ default: m.ProMainLayout })));
 const ProtectedRoute = lazy(() => import('../components/auth/ProtectedRoute').then(m => ({ default: m.ProtectedRoute })));
 const ProfilePage = lazy(() => import('../pages/profile/ProfilePage').then(m => ({ default: m.ProfilePage })));
@@ -43,14 +47,12 @@ const ServerErrorPage = lazy(() => import('../pages/500'));
 const CompanyList = lazy(() => import('../features/companies/CompanyList').then(m => ({ default: m.CompanyList })));
 const CompanyForm = lazy(() => import('../features/companies/CompanyForm').then(m => ({ default: m.CompanyForm })));
 const CategoryList = lazy(() => import('../features/categories/CategoryList'));
-const PartnerList = lazy(() => import('../features/partners/PartnerList'));
-const PartnerDetail = lazy(() => import('../features/partners/PartnerDetail'));
-const ProductList = lazy(() => import('../features/products/ProductList'));
+const PartnerList = lazy(() => import('../pages/common/ComingSoon'));
+const PartnerDetail = lazy(() => import('../pages/common/ComingSoon'));
+const ProductList = lazy(() => import('../pages/common/ComingSoon'));
 const ProductForm = lazy(() => import('../features/products/ProductForm').then(m => ({ default: m.ProductForm })));
 const ProductCategoryList = lazy(() => import('../features/products/CategoryList'));
-const InvoiceList = lazy(() => import('../features/invoices/InvoiceList'));
-const InvoiceForm = lazy(() => import('../features/invoices/InvoiceForm').then(m => ({ default: m.InvoiceForm })));
-const InvoiceDetail = lazy(() => import('../features/invoices/InvoiceDetail').then(m => ({ default: m.InvoiceDetail })));
+// Invoice routes moved to pages/invoices
 const PaymentList = lazy(() => import('../features/payments/PaymentList').then(m => ({ default: m.PaymentList })));
 const PaymentForm = lazy(() => import('../features/payments/PaymentForm').then(m => ({ default: m.PaymentForm })));
 const CashAccountList = lazy(() => import('../features/payments/CashAccountList').then(m => ({ default: m.CashAccountList })));
@@ -65,9 +67,9 @@ const PurchaseOrderDetail = lazy(() => import('@/features/purchaseOrders/Purchas
 const GoodsReceiptList = lazy(() => import('@/features/goodsReceipts/GoodsReceiptList'));
 const GoodsReceiptForm = lazy(() => import('@/features/goodsReceipts/GoodsReceiptForm'));
 const GoodsReceiptDetail = lazy(() => import('@/features/goodsReceipts/GoodsReceiptDetail'));
-const QuotationList = lazy(() => import('@/features/quotations/QuotationList'));
-const QuotationForm = lazy(() => import('@/features/quotations/QuotationForm'));
-const QuotationDetail = lazy(() => import('@/features/quotations/QuotationDetail'));
+const QuotationList = lazy(() => import('../pages/common/ComingSoon'));
+const QuotationForm = lazy(() => import('../pages/common/ComingSoon'));
+const QuotationDetail = lazy(() => import('../pages/common/ComingSoon'));
 const SalesOrderList = lazy(() => import('@/features/salesOrders/SalesOrderList'));
 const SalesOrderForm = lazy(() => import('@/features/salesOrders/SalesOrderForm'));
 const SalesOrderDetail = lazy(() => import('@/features/salesOrders/SalesOrderDetail'));
@@ -111,13 +113,13 @@ export const router = createBrowserRouter([
   },
 
   // Protected routes (Layout içinde)
-          {
-            path: '/',
-            element: (
-              <ProtectedRoute>
-                <ProMainLayout />
-              </ProtectedRoute>
-            ),
+  {
+    path: '/',
+    element: (
+      <ProtectedRoute>
+        <ProMainLayout />
+      </ProtectedRoute>
+    ),
     children: [
       {
         index: true,

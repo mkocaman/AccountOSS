@@ -25,17 +25,24 @@ export const measureRenderTime = (componentName: string) => {
 };
 
 /**
- * Report Web Vitals
+ * Web Vitals'ı raporla
  */
 export const reportWebVitals = (onPerfEntry?: (metric: any) => void) => {
   if (onPerfEntry && onPerfEntry instanceof Function) {
-    import('web-vitals').then(({ getCLS, getFID, getFCP, getLCP, getTTFB }) => {
-      getCLS(onPerfEntry);
-      getFID(onPerfEntry);
-      getFCP(onPerfEntry);
-      getLCP(onPerfEntry);
-      getTTFB(onPerfEntry);
-    });
+    // Türkçe yorum: web-vitals dinamik import - eğer paket yoksa hata vermez
+    import('web-vitals')
+      .then(({ onCLS, onFID, onFCP, onLCP, onTTFB }) => {
+        // Türkçe yorum: web-vitals v4 API - on prefix kullanıyor
+        onCLS(onPerfEntry);
+        onFID(onPerfEntry);
+        onFCP(onPerfEntry);
+        onLCP(onPerfEntry);
+        onTTFB(onPerfEntry);
+      })
+      .catch((error) => {
+        // Türkçe yorum: web-vitals paketi yoksa veya eski versiyonsa sessizce atla
+        console.warn('web-vitals paketi yüklenemedi:', error.message);
+      });
   }
 };
 

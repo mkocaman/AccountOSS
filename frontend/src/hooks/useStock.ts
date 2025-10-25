@@ -1,99 +1,65 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { stockService, StockFilters } from '../services/stockService';
-import type { StockAdjustment } from '../services/stockService';
-import { transformToProTableResponse } from '../utils/api-helpers';
-import { useMessage } from './useMessage';
+import { useQuery } from '@tanstack/react-query';
+import { 
+  getStockMovements, 
+  getStockLevels, 
+  calculateFifoCost,
+  StockMovement,
+  StockLevel
+} from '../services/stockService';
 
-/**
- * Stock movements hook
- */
-export const useStockMovements = (filters: StockFilters = {}) => {
-  const query = useQuery({
-    queryKey: ['stockMovements', filters],
-    queryFn: () => stockService.getMovements(filters),
-    staleTime: 10000 // 10 saniye
-  });
-
-  const proTableData = query.data ? transformToProTableResponse(query.data) : undefined;
-
-  return {
-    ...query,
-    proTableData
-  };
-};
-
-/**
- * Stock levels hook
- */
-export const useStockLevels = () => {
-  const query = useQuery({
-    queryKey: ['stockLevels'],
-    queryFn: () => stockService.getStockLevels(),
-    staleTime: 30000 // 30 saniye
-  });
-
-  const proTableData = query.data ? transformToProTableResponse(query.data) : undefined;
-
-  return {
-    ...query,
-    proTableData
-  };
-};
-
-/**
- * FIFO calculation hook
- */
-export const useFIFOCalculation = (productId: string) => {
+export const useStockMovements = (params?: any) => {
   return useQuery({
-    queryKey: ['fifo', productId],
-    queryFn: () => stockService.calculateFIFO(productId),
-    enabled: !!productId,
-    staleTime: 60000 // 1 dakika
+    queryKey: ['stockMovements', params],
+    queryFn: () => getStockMovements(params || {}),
+    enabled: true
   });
 };
 
-/**
- * Low stock alerts hook
- */
+export const useStockLevels = (params?: any) => {
+  return useQuery({
+    queryKey: ['stockLevels', params],
+    queryFn: () => getStockLevels(params || {}),
+    enabled: true
+  });
+};
+
 export const useLowStockAlerts = () => {
   return useQuery({
     queryKey: ['lowStockAlerts'],
-    queryFn: stockService.getLowStockAlerts,
-    staleTime: 60000, // 1 dakika
-    refetchInterval: 5 * 60 * 1000 // 5 dakikada bir otomatik yenile
-  });
-};
-
-/**
- * Product stock hook
- */
-export const useProductStock = (productId: string) => {
-  return useQuery({
-    queryKey: ['productStock', productId],
-    queryFn: () => stockService.getProductStock(productId),
-    enabled: !!productId,
-    staleTime: 30000
-  });
-};
-
-/**
- * Stock adjustment mutation
- */
-export const useStockAdjustment = () => {
-  const queryClient = useQueryClient();
-  const message = useMessage();
-
-  return useMutation({
-    mutationFn: stockService.adjustStock,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['stockMovements'] });
-      queryClient.invalidateQueries({ queryKey: ['stockLevels'] });
-      queryClient.invalidateQueries({ queryKey: ['lowStockAlerts'] });
-      message.success('Stok ayarlaması başarıyla yapıldı');
-    },
-    onError: (error: any) => {
-      const errorMessage = error?.response?.data?.message || 'Stok ayarlaması yapılamadı';
-      message.error(errorMessage);
+    queryFn: () => getStockLevels({ lowStock: true, pageSize: 100 }),
+    refetchInterval: 60000,
+    select: (data) => {
+      return data.items?.filter(
+        (item: StockLevel) => item.currentStock <= item.minStock
+      ) || [];
     }
   });
+};
+
+export const useFifoCost = (productId: string, quantity: number) => {
+  return useQuery({
+    queryKey: ['fifoCost', productId, quantity],
+    queryFn: () => calculateFifoCost(productId, quantity),
+    enabled: !!productId && quantity > 0
+  });
+};
+
+/**
+ * Stock level status
+ */
+export const getStockLevelStatus = (current: number, min: number, max: number) => {
+  if (current <= min) return 'low';
+  if (current >= max) return 'high';
+  return 'normal';
+};
+
+/**
+ * Stock level status colors
+ */
+export const getStockLevelColor = (status: string) => {
+  switch (status) {
+    case 'low': return '#ff4d4f';
+    case 'high': return '#52c41a';
+    default: return '#1890ff';
+  }
 };

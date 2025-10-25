@@ -6,7 +6,7 @@ import enUS from 'antd/locale/en_US';
 import { useTranslation } from 'react-i18next';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { PWAInstallPrompt } from '@/components/common/PWAInstallPrompt';
-import { MobileBottomNav } from '@/components/mobile/MobileBottomNav';
+// import { MobileBottomNav } from '@/components/mobile/MobileBottomNav'; // ❌ KALDIR - Router dışında kullanılamaz
 import { useEffect } from 'react';
 
 function App() {
@@ -43,13 +43,13 @@ function App() {
         }}
       >
         <AntApp>
+          {/* Router provider - tüm navigation context'i burada */}
           <RouterProvider router={router} />
           
-          {/* PWA Install Prompt */}
+          {/* PWA Install Prompt - Router'a ihtiyaç duymaz, burada kalabilir */}
           <PWAInstallPrompt />
           
-          {/* Mobile Bottom Navigation */}
-          <MobileBottomNav />
+          {/* ❌ MobileBottomNav KALDIRILDI - ProMainLayout'a taşınacak */}
         </AntApp>
       </ConfigProvider>
     </ErrorBoundary>

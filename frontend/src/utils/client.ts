@@ -1,21 +1,10 @@
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
+import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
 
-/**
- * API Client - Backend ile iletişim için Axios instance
- * JWT token yönetimi, error handling ve retry logic içerir
- */
-
-// API Base URL - environment'a göre
 const getBaseURL = () => {
-  // Development'ta MSW mock API kullan
-  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK_API === 'true') {
-    return 'http://localhost:7043/api/v1';
-  }
-  // Production veya real API
-  return import.meta.env.VITE_API_URL || 'http://localhost:7043/api/v1';
+  return import.meta.env.VITE_API_URL || 'https://localhost:7043/api/v1';
 };
 
-// Axios instance oluştur
 const client = axios.create({
   baseURL: getBaseURL(),
   timeout: 30000,
@@ -25,127 +14,84 @@ const client = axios.create({
   }
 });
 
-// Request interceptor - Token ve language header ekle
 client.interceptors.request.use(
-  (config) => {
-    // JWT token ekle
-    const token = localStorage.getItem('token');
+  (config: InternalAxiosRequestConfig) => {
+    const token = localStorage.getItem('accessToken');
+    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log('🔑 Added token to request:', config.url);
+    } else {
+      console.warn('⚠️ No token found for request:', config.url);
     }
-
-    // Dil bilgisi ekle
+    
     const language = localStorage.getItem('language') || 'tr';
     config.headers['Accept-Language'] = language;
-
-    // Request ID ekle (debugging için)
-    config.headers['X-Request-ID'] = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-
-    // Log request (development only)
+    
+    // Log request in development
     if (import.meta.env.DEV) {
-      console.log(`🔵 API Request: ${config.method?.toUpperCase()} ${config.url}`, {
-        params: config.params,
-        data: config.data
-      });
+      console.log(`📤 API Request: ${config.method?.toUpperCase()} ${config.url}`);
     }
-
+    
     return config;
   },
   (error) => {
-    console.error('❌ Request Error:', error);
+    console.error('❌ Request interceptor error:', error);
     return Promise.reject(error);
   }
 );
 
-// Response interceptor - Error handling ve token refresh
 client.interceptors.response.use(
   (response) => {
-    // Log response (development only)
+    // Log response in development
     if (import.meta.env.DEV) {
-      console.log(`🟢 API Response: ${response.config.url}`, {
-        status: response.status,
-        data: response.data
-      });
+      console.log(`📥 API Response: ${response.config.url}`, response.status);
     }
     return response;
   },
   async (error: AxiosError) => {
-    const originalRequest = error.config as any & { _retry?: boolean };
+    // Log error details
+    console.error('❌ API Error:', {
+      url: error.config?.url,
+      method: error.config?.method,
+      status: error.response?.status,
+      message: error.message,
+      data: error.response?.data
+    });
 
-    // 401 - Token expired, try to refresh
+    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+    
+    // 401 - Token refresh
     if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
       originalRequest._retry = true;
-
-      try {
-        const refreshToken = localStorage.getItem('refreshToken');
-        if (refreshToken) {
-          // Token yenileme isteği
+      
+      const refreshToken = localStorage.getItem('refreshToken');
+      if (refreshToken) {
+        try {
           const response = await axios.post(
             `${getBaseURL()}/auth/refresh`,
-            { refreshToken },
-            { headers: { 'Content-Type': 'application/json' } }
+            { refreshToken }
           );
-
-          const { token, refreshToken: newRefreshToken } = response.data;
           
-          // Yeni token'ları kaydet
-          localStorage.setItem('token', token);
+          const { token, refreshToken: newRefreshToken } = response.data;
+          localStorage.setItem('accessToken', token);
           if (newRefreshToken) {
             localStorage.setItem('refreshToken', newRefreshToken);
           }
-
-          // Başarısız olan isteği yeni token ile tekrar dene
+          
           if (originalRequest.headers) {
             originalRequest.headers.Authorization = `Bearer ${token}`;
           }
           return client(originalRequest);
+        } catch (refreshError) {
+          console.error('❌ Token refresh failed');
+          localStorage.clear();
+          window.location.href = '/login';
+          return Promise.reject(refreshError);
         }
-      } catch (refreshError) {
-        // Refresh token da geçersizse, logout yap
-        console.error('❌ Token refresh failed:', refreshError);
-        localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
-        window.location.href = '/login';
-        return Promise.reject(refreshError);
       }
     }
-
-    // 403 - Forbidden
-    if (error.response?.status === 403) {
-      console.error('❌ API Error (403): Yetkisiz erişim');
-      // Kullanıcıyı bilgilendir ama redirect etme
-    }
-
-    // 404 - Not Found (silent log)
-    if (error.response?.status === 404) {
-      console.warn('⚠️ API Error (404):', error.config?.url);
-      // Empty state göster, hata mesajı gösterme
-      return Promise.reject({ 
-        ...error, 
-        silent: true,
-        message: 'Veri bulunamadı' 
-      });
-    }
-
-    // 422 - Validation Error
-    if (error.response?.status === 422) {
-      console.error('❌ API Error (422): Validation failed', error.response.data);
-      return Promise.reject({
-        ...error,
-        validationErrors: error.response.data
-      });
-    }
-
-    // 500 - Server Error
-    if (error.response?.status === 500) {
-      console.error('❌ API Error (500): Sunucu hatası');
-    }
-
-    // Network Error
-    if (!error.response) {
-      console.error('❌ Network Error:', error.message);
-    }
-
+    
     return Promise.reject(error);
   }
 );

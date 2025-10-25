@@ -1,14 +1,15 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { ProForm, ProFormText, ProFormCheckbox } from '@ant-design/pro-components';
-import { Card, Space, Divider, Button } from 'antd';
+import { Card, Space, Divider, Button, Tooltip } from 'antd';
 import { 
   UserOutlined, 
   LockOutlined, 
   GoogleOutlined, 
   FacebookOutlined,
-  GithubOutlined 
+  GithubOutlined,
+  RocketOutlined
 } from '@ant-design/icons';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -19,25 +20,109 @@ import { useAuth } from '@/hooks/useAuth';
 export const Login: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const location = useLocation();
   const { login, isAuthenticated } = useAuth();
+  const [form] = ProForm.useForm();
 
-  // Zaten giriş yapmış kullanıcıları dashboard'a yönlendir
+  // CRITICAL: Eğer zaten giriş yapılmışsa dashboard'a yönlendir
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard');
+      console.log('✅ Already authenticated, redirecting to dashboard');
+      navigate('/dashboard', { replace: true });
     }
   }, [isAuthenticated, navigate]);
+
+  // Eğer authenticated ise loading göster
+  if (isAuthenticated) {
+    return (
+      <div style={{ 
+        minHeight: '100vh',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+      }}>
+        <div style={{ 
+          color: 'white', 
+          fontSize: '18px',
+          textAlign: 'center'
+        }}>
+          Yönlendiriliyor...
+        </div>
+      </div>
+    );
+  }
 
   /**
    * Form submit handler
    */
   const handleSubmit = async (values: any) => {
-    try {
-      await login(values);
-    } catch (error) {
-      // Error handling useAuth hook'unda yapılıyor
+    console.log('📝 Login form submitted:', { email: values.email });
+    
+    login({
+      email: values.email,
+      password: values.password
+    });
+  };
+
+  /**
+   * Hızlı giriş - Test kullanıcı bilgilerini otomatik doldur
+   */
+  const handleQuickLogin = () => {
+    const testCredentials = {
+      email: 'test@accountos.com',
+      password: 'Test123!'
+    };
+    
+    console.log('⚡ Quick login with test credentials');
+    
+    // Form'u test bilgileriyle doldur
+    form.setFieldsValue(testCredentials);
+    
+    // Otomatik giriş yap
+    login(testCredentials);
+  };
+
+  /**
+   * Demo kullanıcı seçenekleri
+   */
+  const demoUsers = [
+    {
+      name: 'Admin',
+      email: 'admin@accountos.com',
+      password: 'Admin123!',
+      role: 'Yönetici'
+    },
+    {
+      name: 'Muhasebeci',
+      email: 'muhasebe@accountos.com', 
+      password: 'Muhasebe123!',
+      role: 'Muhasebeci'
+    },
+    {
+      name: 'Satış',
+      email: 'satis@accountos.com',
+      password: 'Satis123!',
+      role: 'Satış Temsilcisi'
     }
+  ];
+
+  /**
+   * Demo kullanıcı ile giriş
+   */
+  const handleDemoLogin = (user: typeof demoUsers[0]) => {
+    console.log(`⚡ Demo login with ${user.name}`);
+    
+    // Form'u demo kullanıcı bilgileriyle doldur
+    form.setFieldsValue({
+      email: user.email,
+      password: user.password
+    });
+    
+    // Otomatik giriş yap
+    login({
+      email: user.email,
+      password: user.password
+    });
   };
 
   /**
@@ -48,8 +133,8 @@ export const Login: React.FC = () => {
     console.log(`Social login with ${provider}`);
   };
 
-  // Login sayfasından gelinen yönlendirme
-  const from = location.state?.from?.pathname || '/dashboard';
+  // Login sayfasından gelinen yönlendirme (şimdilik kullanılmıyor)
+  // const from = location.state?.from?.pathname || '/dashboard';
 
   return (
     <div 
@@ -89,8 +174,47 @@ export const Login: React.FC = () => {
           </p>
         </div>
 
+        {/* Hızlı Giriş Butonları */}
+        <div style={{ marginBottom: '16px' }}>
+          <div style={{ 
+            display: 'flex', 
+            gap: '8px', 
+            marginBottom: '8px',
+            flexWrap: 'wrap'
+          }}>
+            {demoUsers.map((user, index) => (
+              <Tooltip key={index} title={`${user.role} olarak giriş yap`}>
+                <Button
+                  type="dashed"
+                  size="small"
+                  onClick={() => handleDemoLogin(user)}
+                  style={{ 
+                    flex: '1',
+                    minWidth: '80px',
+                    fontSize: '12px'
+                  }}
+                >
+                  {user.name}
+                </Button>
+              </Tooltip>
+            ))}
+          </div>
+          
+          <Tooltip title="Ana test kullanıcı bilgileriyle hızlı giriş">
+            <Button
+              type="primary"
+              icon={<RocketOutlined />}
+              onClick={handleQuickLogin}
+              style={{ width: '100%' }}
+            >
+              ⚡ Hızlı Giriş (test@accountos.com)
+            </Button>
+          </Tooltip>
+        </div>
+
         {/* Login Form */}
         <ProForm
+          form={form}
           onFinish={handleSubmit}
           submitter={{
             searchConfig: {

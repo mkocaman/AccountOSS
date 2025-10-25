@@ -1,5 +1,5 @@
-import client from '../utils/client';
-import { PaginatedResponse, PaginationParams, buildQueryString } from '../utils/api-helpers';
+import client from '@/utils/client';
+import { PaginatedResponse, PaginationParams, buildQueryString } from '@/utils/api-helpers';
 
 /**
  * Ödeme servisi

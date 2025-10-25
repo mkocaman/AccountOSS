@@ -1,72 +1,93 @@
-// Invoice API types
+/**
+ * Fatura tipleri ve interface'leri
+ */
+
+export type InvoiceType = 'sales' | 'purchase';
+export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'cancelled' | 'overdue';
+
 export interface Invoice {
   id: string;
   invoiceNumber: string;
-  type: InvoiceType;
+  invoiceType: InvoiceType;
   status: InvoiceStatus;
-  customerId: string;
-  customerName: string;
+  
+  // Cari bilgileri
+  partnerId: string;
+  partnerCode?: string;
+  partnerName: string;
+  partnerTaxNumber?: string;
+  partnerAddress?: string;
+  
+  // Tarih bilgileri
   invoiceDate: string;
-  dueDate: string;
-  currency: string;
+  dueDate?: string;
+  
+  // Finansal bilgiler
   subtotal: number;
   taxAmount: number;
   discountAmount: number;
-  grandTotal: number;
-  notes?: string;
-  isOfficial: boolean;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface InvoiceDetail extends Invoice {
+  totalAmount: number;
+  currency: string;
+  exchangeRate: number;
+  
+  // Kalemler
   items: InvoiceItem[];
-  payments: InvoicePayment[];
-  attachments: InvoiceAttachment[];
+  
+  // Notlar
+  description?: string;
+  notes?: string;
+  
+  // Sistem bilgileri
+  companyId: string;
+  createdAt: string;
+  createdBy: string;
+  updatedAt?: string;
+  updatedBy?: string;
+  deletedAt?: string;
 }
 
 export interface InvoiceItem {
   id: string;
+  invoiceId: string;
+  
+  // Ürün bilgileri
   productId: string;
-  productName: string;
   productCode: string;
+  productName: string;
   description?: string;
+  
+  // Miktar ve fiyat
   quantity: number;
   unitPrice: number;
   discountRate: number;
   discountAmount: number;
+  
+  // Vergi
   taxRate: number;
   taxAmount: number;
-  lineTotal: number;
-  unit: string;
-}
-
-export interface InvoicePayment {
-  id: string;
-  paymentDate: string;
-  amount: number;
-  paymentMethod: string;
-  reference: string;
-  notes?: string;
-}
-
-export interface InvoiceAttachment {
-  id: string;
-  fileName: string;
-  fileSize: number;
-  mimeType: string;
-  uploadedAt: string;
+  
+  // Toplam
+  subtotal: number;
+  totalAmount: number;
+  
+  // Stok maliyet (FIFO)
+  unitCost?: number;
+  totalCost?: number;
+  
+  // Sıralama
+  lineNumber: number;
 }
 
 export interface CreateInvoiceRequest {
-  type: InvoiceType;
-  customerId: string;
+  invoiceType: InvoiceType;
+  partnerId: string;
   invoiceDate: string;
-  dueDate: string;
-  currency: string;
-  items: CreateInvoiceItemRequest[];
+  dueDate?: string;
+  currency?: string;
+  exchangeRate?: number;
+  description?: string;
   notes?: string;
-  isOfficial: boolean;
+  items: CreateInvoiceItemRequest[];
 }
 
 export interface CreateInvoiceItemRequest {
@@ -74,72 +95,33 @@ export interface CreateInvoiceItemRequest {
   quantity: number;
   unitPrice: number;
   discountRate?: number;
-  taxRate: number;
+  taxRate?: number;
   description?: string;
 }
 
-export interface UpdateInvoiceRequest {
-  type?: InvoiceType;
-  customerId?: string;
-  invoiceDate?: string;
-  dueDate?: string;
-  currency?: string;
-  items?: CreateInvoiceItemRequest[];
-  notes?: string;
-  isOfficial?: boolean;
+export interface UpdateInvoiceRequest extends CreateInvoiceRequest {
+  id: string;
 }
 
 export interface InvoiceFilters {
-  type?: InvoiceType;
+  invoiceType?: InvoiceType;
   status?: InvoiceStatus;
-  customerId?: string;
-  dateFrom?: string;
-  dateTo?: string;
-  currency?: string;
-  isOfficial?: boolean;
-  search?: string;
+  partnerId?: string;
+  startDate?: string;
+  endDate?: string;
+  minAmount?: number;
+  maxAmount?: number;
+  searchTerm?: string;
 }
 
-export enum InvoiceType {
-  Sales = 0,
-  Purchase = 1
-}
-
-export enum InvoiceStatus {
-  Draft = 0,
-  Sent = 1,
-  Paid = 2,
-  Overdue = 3,
-  Cancelled = 4
-}
-
-export const invoiceStatusLabels = {
-  [InvoiceStatus.Draft]: 'Taslak',
-  [InvoiceStatus.Sent]: 'Gönderildi',
-  [InvoiceStatus.Paid]: 'Ödendi',
-  [InvoiceStatus.Overdue]: 'Vadesi Geçti',
-  [InvoiceStatus.Cancelled]: 'İptal Edildi'
-};
-
-export const invoiceTypeLabels = {
-  [InvoiceType.Sales]: 'Satış',
-  [InvoiceType.Purchase]: 'Alış'
-};
-
-// Uppercase exports for backward compatibility
-export const INVOICE_STATUS_LABELS = invoiceStatusLabels;
-export const INVOICE_TYPE_LABELS = invoiceTypeLabels;
-export const PAYMENT_STATUS_LABELS = {
-  Pending: 'Bekliyor',
-  Paid: 'Ödendi',
-  PartiallyPaid: 'Kısmi Ödendi',
-  Overdue: 'Vadesi Geçti',
-};
-
-// Enum types for backward compatibility
-export enum PaymentStatus {
-  Pending = 'Pending',
-  Paid = 'Paid',
-  PartiallyPaid = 'PartiallyPaid',
-  Overdue = 'Overdue',
+export interface InvoiceSummary {
+  totalCount: number;
+  draftCount: number;
+  sentCount: number;
+  paidCount: number;
+  overdueCount: number;
+  totalAmount: number;
+  paidAmount: number;
+  unpaidAmount: number;
+  overdueAmount: number;
 }

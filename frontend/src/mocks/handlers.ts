@@ -79,7 +79,7 @@ export const handlers = [
   }),
 
   // Invoices List
-  http.get(`${BASE_URL}/invoices/list`, () => {
+  http.get(`${BASE_URL}/invoices`, () => {
     return HttpResponse.json({
       items: [],
       totalCount: 0,

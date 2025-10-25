@@ -1,8 +1,7 @@
-import { useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useRef, useState, useEffect } from 'react';
 import { PageContainer, ProTable, ProCard } from '@ant-design/pro-components';
 import type { ProColumns, ActionType } from '@ant-design/pro-components';
-import { Button, Space, Modal, message, Tooltip, Statistic, Row, Col } from 'antd';
+import { Button, Space, Modal, message, Tooltip, Statistic, Row, Col, Tag, DatePicker, Select, Input } from 'antd';
 import {
   PlusOutlined,
   EditOutlined,
@@ -10,63 +9,228 @@ import {
   EyeOutlined,
   FileTextOutlined,
   CheckCircleOutlined,
-  ClockCircleOutlined
+  ClockCircleOutlined,
+  SearchOutlined,
+  ReloadOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { formatCurrency } from '@/utils/formatters';
-import type { Invoice } from '@/types/invoice';
+import type { Invoice, InvoiceStatus } from '@/types/invoice';
+import { getInvoices, deleteInvoice } from '@/services/invoiceService';
+import dayjs from 'dayjs';
+
+// Filtre tipleri
+interface InvoiceFilters {
+  searchTerm?: string;
+  customerId?: string;
+  isOfficial?: boolean;
+  status?: InvoiceStatus;
+  startDate?: string;
+  endDate?: string;
+}
+
+// Sayfalama tipleri
+interface PaginationState {
+  current: number;
+  pageSize: number;
+  total: number;
+}
+
+// API sorgu parametreleri
+interface InvoiceQueryParams {
+  pageNumber: number;
+  pageSize: number;
+  searchTerm?: string;
+  customerId?: string;
+  isOfficial?: boolean;
+  status?: InvoiceStatus;
+  startDate?: string;
+  endDate?: string;
+}
 
 /**
- * Fatura listesi sayfası - ProTable ile gelişmiş tablo özellikleri
- * Sayfalama, sıralama, filtreleme, arama otomatik yönetilir
+ * Fatura listesi sayfası - Gerçek API ile entegre edilmiş
+ * Sayfalama, sıralama, filtreleme, arama ve CRUD işlemleri
  */
 export const InvoiceList: React.FC = () => {
-  const { t } = useTranslation();
   const navigate = useNavigate();
   const actionRef = useRef<ActionType>();
+  
+  // State yönetimi
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [loading, setLoading] = useState(false);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  
+  // Sayfalama state'i
+  const [pagination, setPagination] = useState<PaginationState>({
+    current: 1,
+    pageSize: 10,
+    total: 0
+  });
+  
+  // Filtre state'i
+  const [filters, setFilters] = useState<InvoiceFilters>({
+    searchTerm: undefined,
+    customerId: undefined,
+    isOfficial: undefined,
+    status: undefined,
+    startDate: undefined,
+    endDate: undefined,
+  });
 
-  // Fatura silme mutation'ı - Mock implementation
-  const deleteInvoice = {
-    mutateAsync: async (id: string) => {
-      console.log('Delete invoice:', id);
-      return Promise.resolve();
+  /**
+   * API'den fatura listesini çek
+   */
+  const fetchInvoices = async () => {
+    try {
+      setLoading(true);
+      
+      // API parametrelerini hazırla
+      const params: InvoiceQueryParams = {
+        pageNumber: pagination.current,
+        pageSize: pagination.pageSize,
+        searchTerm: filters.searchTerm,
+        customerId: filters.customerId,
+        isOfficial: filters.isOfficial,
+        status: filters.status,
+        startDate: filters.startDate,
+        endDate: filters.endDate,
+      };
+      
+      // API çağrısı yap
+      const response = await getInvoices(params);
+      
+      // State'leri güncelle
+      setInvoices(response.items);
+      setPagination({
+        ...pagination,
+        total: response.totalCount,
+      });
+      
+      setLoading(false);
+    } catch (error: any) {
+      setLoading(false);
+      message.error(error.message || 'Faturalar yüklenirken hata oluştu');
+      console.error('❌ Fatura listesi hatası:', error);
+    }
+  };
+
+  /**
+   * Sayfa yüklendiğinde faturaları çek
+   */
+  useEffect(() => {
+    fetchInvoices();
+  }, []);
+
+  /**
+   * Filtreler veya sayfalama değiştiğinde yeniden çek
+   */
+  useEffect(() => {
+    fetchInvoices();
+  }, [pagination.current, pagination.pageSize, filters]);
+
+  /**
+   * Fatura silme işlemi
+   */
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteInvoice(id);
+      message.success('Fatura başarıyla silindi');
+      fetchInvoices(); // Listeyi yenile
+    } catch (error: any) {
+      message.error(error.message || 'Fatura silinirken hata oluştu');
     }
   };
 
   /**
    * Fatura silme onayı
    */
-  const handleDelete = (invoice: Invoice) => {
+  const confirmDelete = (invoice: Invoice) => {
     Modal.confirm({
-      title: t('invoices.deleteConfirmTitle'),
-      content: t('invoices.deleteConfirmMessage', { number: invoice.invoiceNumber }),
-      okText: t('common.yes'),
-      cancelText: t('common.no'),
-      okButtonProps: { danger: true },
-      onOk: async () => {
-        try {
-          await deleteInvoice.mutateAsync(invoice.id);
-          message.success(t('invoices.deleteSuccess'));
-          actionRef.current?.reload(); // Tabloyu yenile
-        } catch (error) {
-          message.error(t('invoices.deleteError'));
-        }
-      }
+      title: 'Faturayı Sil',
+      content: 'Bu faturayı silmek istediğinizden emin misiniz?',
+      okText: 'Evet',
+      okType: 'danger',
+      cancelText: 'İptal',
+      onOk: () => handleDelete(invoice.id),
     });
   };
 
   /**
-   * ProTable kolonları - gelişmiş özelliklerde
+   * Filtre değişikliği
+   */
+  const handleFilterChange = (key: string, value: any) => {
+    setFilters({
+      ...filters,
+      [key]: value,
+    });
+    // Pagination'ı resetle
+    setPagination({
+      ...pagination,
+      current: 1,
+    });
+  };
+
+  /**
+   * Filtreleri temizle
+   */
+  const handleResetFilters = () => {
+    setFilters({
+      searchTerm: undefined,
+      customerId: undefined,
+      isOfficial: undefined,
+      status: undefined,
+      startDate: undefined,
+      endDate: undefined,
+    });
+    setPagination({
+      ...pagination,
+      current: 1,
+    });
+  };
+
+  /**
+   * Sayfa değişikliği
+   */
+  const handleTableChange = (newPagination: any) => {
+    setPagination({
+      current: newPagination.current,
+      pageSize: newPagination.pageSize,
+      total: pagination.total,
+    });
+  };
+
+  /**
+   * Durum badge renkleri
+   */
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'draft':
+        return 'default';
+      case 'sent':
+        return 'processing';
+      case 'paid':
+        return 'success';
+      case 'overdue':
+        return 'error';
+      case 'cancelled':
+        return 'default';
+      default:
+        return 'default';
+    }
+  };
+
+  /**
+   * ProTable kolonları - gerçek API verileri ile
    */
   const columns: ProColumns<Invoice>[] = [
     {
-      title: t('invoices.columns.invoiceNumber'),
+      title: 'Fatura No',
       dataIndex: 'invoiceNumber',
       key: 'invoiceNumber',
       width: 140,
       fixed: 'left',
-      copyable: true, // Kopyalama butonu otomatik eklenir
+      copyable: true,
       render: (_, record) => (
         <Space>
           <FileTextOutlined />
@@ -77,15 +241,16 @@ export const InvoiceList: React.FC = () => {
       )
     },
     {
-      title: t('invoices.columns.date'),
+      title: 'Tarih',
       dataIndex: 'invoiceDate',
       key: 'invoiceDate',
       width: 120,
-      valueType: 'date', // ProTable otomatik tarih formatlar
-      sorter: true
+      valueType: 'date',
+      sorter: true,
+      render: (_, record) => dayjs(record.invoiceDate).format('DD.MM.YYYY')
     },
     {
-      title: t('invoices.columns.partner'),
+      title: 'Müşteri',
       dataIndex: 'partnerName',
       key: 'partnerName',
       width: 200,
@@ -93,41 +258,46 @@ export const InvoiceList: React.FC = () => {
       copyable: true
     },
     {
-      title: t('invoices.columns.type'),
+      title: 'Tip',
       dataIndex: 'invoiceType',
       key: 'invoiceType',
       width: 120,
       valueType: 'select',
       valueEnum: {
-        SALES: { text: t('invoices.types.sales'), status: 'Success' },
-        PURCHASE: { text: t('invoices.types.purchase'), status: 'Processing' }
+        SALES: { text: 'Satış', status: 'Success' },
+        PURCHASE: { text: 'Alış', status: 'Processing' }
       },
-      filters: true // Filtre otomatik eklenir
+      filters: true
     },
     {
-      title: t('invoices.columns.isOfficial'),
+      title: 'Resmi',
       dataIndex: 'isOfficial',
       key: 'isOfficial',
       width: 120,
       align: 'center',
       valueType: 'select',
       valueEnum: {
-        true: { text: t('invoices.official'), status: 'Success' },
-        false: { text: t('invoices.unofficial'), status: 'Default' }
-      }
+        true: { text: 'Resmi', status: 'Success' },
+        false: { text: 'Gayri Resmi', status: 'Default' }
+      },
+      render: (_, record) => (
+        <Tag color="default">
+          {record.invoiceType === 'sales' ? 'Satış' : 'Alış'}
+        </Tag>
+      )
     },
     {
-      title: t('invoices.columns.subtotal'),
+      title: 'Ara Toplam',
       dataIndex: 'subtotal',
       key: 'subtotal',
       width: 130,
       align: 'right',
-      valueType: 'money', // ProTable otomatik para formatı
+      valueType: 'money',
       sorter: true,
       render: (_, record) => formatCurrency(record.subtotal)
     },
     {
-      title: t('invoices.columns.taxAmount'),
+      title: 'KDV',
       dataIndex: 'taxAmount',
       key: 'taxAmount',
       width: 120,
@@ -136,7 +306,7 @@ export const InvoiceList: React.FC = () => {
       render: (_, record) => formatCurrency(record.taxAmount)
     },
     {
-      title: t('invoices.columns.total'),
+      title: 'Toplam',
       dataIndex: 'totalAmount',
       key: 'totalAmount',
       width: 140,
@@ -150,47 +320,54 @@ export const InvoiceList: React.FC = () => {
       )
     },
     {
-      title: t('invoices.columns.status'),
+      title: 'Durum',
       dataIndex: 'status',
       key: 'status',
       width: 120,
       align: 'center',
       valueType: 'select',
       valueEnum: {
-        DRAFT: { text: t('invoices.status.draft'), status: 'Default' },
-        APPROVED: { text: t('invoices.status.approved'), status: 'Success' },
-        CANCELLED: { text: t('invoices.status.cancelled'), status: 'Error' }
+        draft: { text: 'Taslak', status: 'Default' },
+        sent: { text: 'Gönderildi', status: 'Processing' },
+        paid: { text: 'Ödendi', status: 'Success' },
+        overdue: { text: 'Vadesi Geçti', status: 'Error' },
+        cancelled: { text: 'İptal', status: 'Default' }
       },
-      filters: true
+      filters: true,
+      render: (_, record) => (
+        <Tag color={getStatusColor(record.status)}>
+          {record.status}
+        </Tag>
+      )
     },
     {
-      title: t('invoices.columns.actions'),
+      title: 'İşlemler',
       key: 'actions',
       width: 150,
       fixed: 'right',
       align: 'center',
       valueType: 'option',
       render: (_, record) => [
-        <Tooltip key="view" title={t('common.view')}>
+        <Tooltip key="view" title="Görüntüle">
           <Button
             type="text"
             icon={<EyeOutlined />}
             onClick={() => navigate(`/invoices/${record.id}`)}
           />
         </Tooltip>,
-        <Tooltip key="edit" title={t('common.edit')}>
+        <Tooltip key="edit" title="Düzenle">
           <Button
             type="text"
             icon={<EditOutlined />}
             onClick={() => navigate(`/invoices/${record.id}/edit`)}
           />
         </Tooltip>,
-        <Tooltip key="delete" title={t('common.delete')}>
+        <Tooltip key="delete" title="Sil">
           <Button
             type="text"
             danger
             icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record)}
+            onClick={() => confirmDelete(record)}
           />
         </Tooltip>
       ]
@@ -207,7 +384,14 @@ export const InvoiceList: React.FC = () => {
       icon={<PlusOutlined />}
       onClick={() => navigate('/invoices/create')}
     >
-      {t('invoices.addInvoice')}
+      Yeni Fatura
+    </Button>,
+    <Button
+      key="refresh"
+      icon={<ReloadOutlined />}
+      onClick={fetchInvoices}
+    >
+      Yenile
     </Button>
   ];
 
@@ -217,10 +401,10 @@ export const InvoiceList: React.FC = () => {
   const tableAlertOptionRender = () => (
     <Space size={16}>
       <Button type="link" onClick={() => console.log('Toplu onayla')}>
-        {t('invoices.bulkApprove')}
+        Toplu Onayla
       </Button>
       <Button type="link" onClick={() => console.log('Toplu sil')}>
-        {t('invoices.bulkDelete')}
+        Toplu Sil
       </Button>
     </Space>
   );
@@ -228,13 +412,13 @@ export const InvoiceList: React.FC = () => {
   return (
     <PageContainer
       header={{
-        title: t('invoices.title'),
-        subTitle: t('invoices.subtitle'),
+        title: 'Fatura Listesi',
+        subTitle: 'Tüm faturaları görüntüleyin ve yönetin',
         breadcrumb: {
           items: [
-            { title: t('menu.home') },
-            { title: t('menu.invoices') },
-            { title: t('menu.invoiceList') }
+            { title: 'Ana Sayfa' },
+            { title: 'Faturalar' },
+            { title: 'Fatura Listesi' }
           ]
         }
       }}
@@ -243,7 +427,7 @@ export const InvoiceList: React.FC = () => {
           key="export"
           onClick={() => console.log('Export')}
         >
-          {t('common.export')}
+          Dışa Aktar
         </Button>
       ]}
     >
@@ -252,8 +436,8 @@ export const InvoiceList: React.FC = () => {
         <Col span={6}>
           <ProCard>
             <Statistic
-              title={t('invoices.stats.totalInvoices')}
-              value={1234}
+              title="Toplam Fatura"
+              value={pagination.total}
               prefix={<FileTextOutlined />}
             />
           </ProCard>
@@ -261,8 +445,8 @@ export const InvoiceList: React.FC = () => {
         <Col span={6}>
           <ProCard>
             <Statistic
-              title={t('invoices.stats.totalAmount')}
-              value={1234567.89}
+              title="Toplam Tutar"
+              value={invoices.reduce((sum, invoice) => sum + (invoice.totalAmount || 0), 0)}
               precision={2}
               prefix="₺"
               valueStyle={{ color: '#3f8600' }}
@@ -272,8 +456,8 @@ export const InvoiceList: React.FC = () => {
         <Col span={6}>
           <ProCard>
             <Statistic
-              title={t('invoices.stats.pending')}
-              value={45}
+              title="Bekleyen"
+              value={invoices.filter(inv => inv.status === 'sent').length}
               prefix={<ClockCircleOutlined />}
               valueStyle={{ color: '#faad14' }}
             />
@@ -282,8 +466,8 @@ export const InvoiceList: React.FC = () => {
         <Col span={6}>
           <ProCard>
             <Statistic
-              title={t('invoices.stats.approved')}
-              value={1189}
+              title="Onaylanan"
+              value={invoices.filter(inv => inv.status === 'paid').length}
               prefix={<CheckCircleOutlined />}
               valueStyle={{ color: '#52c41a' }}
             />
@@ -291,48 +475,90 @@ export const InvoiceList: React.FC = () => {
         </Col>
       </Row>
 
+      {/* Filtreler */}
+      <ProCard style={{ marginBottom: 16 }}>
+        <Row gutter={16}>
+          <Col span={6}>
+            <Input
+              placeholder="Fatura no veya müşteri ara..."
+              value={filters.searchTerm}
+              onChange={(e) => handleFilterChange('searchTerm', e.target.value)}
+              prefix={<SearchOutlined />}
+              allowClear
+            />
+          </Col>
+          <Col span={4}>
+            <Select
+              placeholder="Durum"
+              value={filters.status}
+              onChange={(value) => handleFilterChange('status', value)}
+              allowClear
+              style={{ width: '100%' }}
+            >
+              <Select.Option value="draft">Taslak</Select.Option>
+              <Select.Option value="sent">Gönderildi</Select.Option>
+              <Select.Option value="paid">Ödendi</Select.Option>
+              <Select.Option value="overdue">Vadesi Geçti</Select.Option>
+              <Select.Option value="cancelled">İptal</Select.Option>
+            </Select>
+          </Col>
+          <Col span={4}>
+            <Select
+              placeholder="Tip"
+              value={filters.isOfficial}
+              onChange={(value) => handleFilterChange('isOfficial', value)}
+              allowClear
+              style={{ width: '100%' }}
+            >
+              <Select.Option value={true}>Resmi</Select.Option>
+              <Select.Option value={false}>Gayri Resmi</Select.Option>
+            </Select>
+          </Col>
+          <Col span={5}>
+            <DatePicker.RangePicker
+              placeholder={['Başlangıç', 'Bitiş']}
+              onChange={(dates) => {
+                if (dates) {
+                  handleFilterChange('startDate', dates[0]?.format('YYYY-MM-DD'));
+                  handleFilterChange('endDate', dates[1]?.format('YYYY-MM-DD'));
+                } else {
+                  handleFilterChange('startDate', undefined);
+                  handleFilterChange('endDate', undefined);
+                }
+              }}
+              style={{ width: '100%' }}
+            />
+          </Col>
+          <Col span={5}>
+            <Space>
+              <Button onClick={handleResetFilters}>
+                Temizle
+              </Button>
+              <Button type="primary" onClick={fetchInvoices}>
+                Ara
+              </Button>
+            </Space>
+          </Col>
+        </Row>
+      </ProCard>
+
       {/* Gelişmiş Tablo */}
       <ProTable<Invoice>
         columns={columns}
         actionRef={actionRef}
         cardBordered
-        request={async (params, sort, filter) => {
-          // Backend API henüz hazır değil, boş data döndür
-          return {
-            data: [],
-            success: true,
-            total: 0
-          };
-        }}
+        dataSource={invoices}
+        loading={loading}
         rowKey="id"
-        search={{
-          labelWidth: 'auto',
-          defaultCollapsed: false, // Arama formu varsayılan açık
-          optionRender: ({ searchText, resetText }, { form }) => [
-            <Button
-              key="search"
-              type="primary"
-              onClick={() => form?.submit()}
-            >
-              {searchText}
-            </Button>,
-            <Button
-              key="reset"
-              onClick={() => {
-                form?.resetFields();
-                form?.submit();
-              }}
-            >
-              {resetText}
-            </Button>
-          ]
-        }}
         pagination={{
-          pageSize: 10,
+          current: pagination.current,
+          pageSize: pagination.pageSize,
+          total: pagination.total,
           showSizeChanger: true,
           showQuickJumper: true,
-          showTotal: (total) => t('common.totalItems', { total })
+          showTotal: (total) => `Toplam ${total} fatura`,
         }}
+        onChange={handleTableChange}
         rowSelection={{
           selectedRowKeys,
           onChange: setSelectedRowKeys
@@ -340,7 +566,7 @@ export const InvoiceList: React.FC = () => {
         tableAlertRender={({ selectedRowKeys }) => (
           <Space size={24}>
             <span>
-              {t('common.selected')} {selectedRowKeys.length} {t('common.items')}
+              Seçili {selectedRowKeys.length} öğe
             </span>
           </Space>
         )}
@@ -350,11 +576,11 @@ export const InvoiceList: React.FC = () => {
         sticky
         options={{
           reload: true,
-          density: true, // Yoğunluk ayarı
-          setting: true // Kolon göster/gizle
+          density: true,
+          setting: true
         }}
         dateFormatter="string"
-        headerTitle={t('invoices.tableTitle')}
+        headerTitle="Fatura Listesi"
       />
     </PageContainer>
   );

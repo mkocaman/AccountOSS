@@ -1,456 +1,128 @@
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { PageContainer, ProCard, StatisticCard } from '@ant-design/pro-components';
-import { Row, Col, Card, Select, Space, Button, Table, Tag } from 'antd';
+import React, { useEffect } from 'react';
+import { Card, Row, Col, Statistic, Typography, Space } from 'antd';
 import {
   DollarOutlined,
-  ShoppingCartOutlined,
   FileTextOutlined,
-  TeamOutlined,
-  WarningOutlined,
-  ReloadOutlined
+  ShoppingOutlined,
+  UserOutlined,
+  RiseOutlined,
+  FallOutlined
 } from '@ant-design/icons';
-import { Line, Column, Pie } from '@ant-design/plots';
-import { useQuery } from '@tanstack/react-query';
-import client from '../../utils/client';
-import { formatCurrency, formatDate } from '../../utils/formatters';
-import { useLowStockAlerts } from '../../hooks/useStock';
-import { usePaymentSummary } from '../../hooks/usePayments';
-import dayjs from 'dayjs';
-import './Dashboard.css';
+
+const { Title } = Typography;
 
 /**
- * Dashboard - Gerçek verilerle çalışan grafikler ve istatistikler
+ * Dashboard - Ana sayfa
+ * Özet istatistikler ve hızlı erişim
  */
+const Dashboard: React.FC = () => {
+  useEffect(() => {
+    console.log('📊 Dashboard yüklendi');
+  }, []);
 
-interface DashboardStats {
-  totalSales: number;
-  totalPurchases: number;
-  profit: number;
-  profitMargin: number;
-  invoiceCount: number;
-  recentInvoices: number;
-  lowStockProducts: number;
-  activePartners: number;
-  salesTrend: number; // Yüzde değişim
-  purchasesTrend: number;
-}
-
-interface SalesData {
-  date: string;
-  sales: number;
-  purchases: number;
-}
-
-interface RecentActivity {
-  id: string;
-  type: 'invoice' | 'payment' | 'partner';
-  title: string;
-  description: string;
-  amount?: number;
-  createdAt: string;
-}
-
-export const Dashboard: React.FC = () => {
-  const { t } = useTranslation();
-  const [dateRange, setDateRange] = useState<'week' | 'month' | 'quarter' | 'year'>('month');
-
-  // Dashboard istatistikleri
-  const { data: stats, isLoading: statsLoading, refetch: refetchStats } = useQuery({
-    queryKey: ['dashboardStats', dateRange],
-    queryFn: async () => {
-      const response = await client.get(`/dashboard/stats?period=${dateRange}`);
-      return response.data as DashboardStats;
-    },
-    staleTime: 60000 // 1 dakika
-  });
-
-  // Satış grafiği verileri
-  const { data: salesData } = useQuery({
-    queryKey: ['salesChart', dateRange],
-    queryFn: async () => {
-      const response = await client.get(`/dashboard/sales-chart?period=${dateRange}`);
-      return response.data as SalesData[];
-    },
-    staleTime: 60000
-  });
-
-  // Son aktiviteler
-  const { data: activities } = useQuery({
-    queryKey: ['recentActivities'],
-    queryFn: async () => {
-      const response = await client.get('/dashboard/recent-activities?limit=10');
-      return response.data as RecentActivity[];
-    },
-    staleTime: 30000 // 30 saniye
-  });
-
-  // Düşük stok uyarıları
-  const { data: lowStockAlerts } = useLowStockAlerts();
-
-  // Ödeme özeti
-  const { data: paymentSummary } = usePaymentSummary(
-    dayjs().startOf('month').format('YYYY-MM-DD'),
-    dayjs().endOf('month').format('YYYY-MM-DD')
-  );
-
-  /**
-   * Satış grafiği konfigürasyonu
-   */
-  const salesChartConfig = {
-    data: salesData || [],
-    xField: 'date',
-    yField: 'value',
-    seriesField: 'category',
-    smooth: true,
-    animation: {
-      appear: {
-        animation: 'path-in',
-        duration: 1000
-      }
-    },
-    color: ['#1890ff', '#52c41a'],
-    legend: {
-      position: 'top' as const
-    },
-    xAxis: {
-      label: {
-        formatter: (text: string) => dayjs(text).format('DD MMM')
-      }
-    },
-    yAxis: {
-      label: {
-        formatter: (value: number) => formatCurrency(value)
-      }
-    }
-  };
-
-  // Grafik için veri dönüşümü
-  const chartData = salesData?.flatMap(item => [
-    { date: item.date, category: t('dashboard.sales'), value: item.sales },
-    { date: item.date, category: t('dashboard.purchases'), value: item.purchases }
-  ]) || [];
-
-  /**
-   * Aktivite tipi ikonu
-   */
-  const getActivityIcon = (type: RecentActivity['type']) => {
-    switch (type) {
-      case 'invoice':
-        return <FileTextOutlined style={{ color: '#1890ff' }} />;
-      case 'payment':
-        return <DollarOutlined style={{ color: '#52c41a' }} />;
-      case 'partner':
-        return <TeamOutlined style={{ color: '#faad14' }} />;
-    }
+  // Geçici mock data - Backend hazır olunca useQuery ile değiştirilecek
+  const stats = {
+    totalRevenue: 125000,
+    revenueGrowth: 12.5,
+    totalInvoices: 48,
+    invoiceGrowth: 8,
+    totalProducts: 156,
+    lowStockCount: 12,
+    totalCustomers: 89,
+    customerGrowth: 15
   };
 
   return (
-    <PageContainer
-      header={{
-        title: t('dashboard.title'),
-        extra: [
-          <Select
-            key="dateRange"
-            value={dateRange}
-            onChange={setDateRange}
-            options={[
-              { label: t('dashboard.periods.week'), value: 'week' },
-              { label: t('dashboard.periods.month'), value: 'month' },
-              { label: t('dashboard.periods.quarter'), value: 'quarter' },
-              { label: t('dashboard.periods.year'), value: 'year' }
-            ]}
-            style={{ width: 120 }}
-          />,
-          <Button
-            key="refresh"
-            icon={<ReloadOutlined />}
-            onClick={() => refetchStats()}
-          >
-            {t('common.refresh')}
-          </Button>
-        ]
-      }}
-    >
-      {/* Ana İstatistikler */}
-      <Row gutter={[16, 16]}>
-        <Col xs={24} sm={12} lg={6}>
-          <StatisticCard
-            statistic={{
-              title: t('dashboard.stats.totalSales'),
-              value: stats?.totalSales || 0,
-              precision: 2,
-              prefix: '₺',
-              description: (
-                <Space>
-                  {stats && stats.salesTrend >= 0 ? (
-                    <>
-                      <TrendingUpOutlined style={{ color: '#52c41a' }} />
-                      <span style={{ color: '#52c41a' }}>
-                        +{stats.salesTrend}%
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <TrendingDownOutlined style={{ color: '#ff4d4f' }} />
-                      <span style={{ color: '#ff4d4f' }}>
-                        {stats?.salesTrend}%
-                      </span>
-                    </>
-                  )}
-                  <span>{t('dashboard.stats.vsLastPeriod')}</span>
-                </Space>
-              )
-            }}
-            chart={<div style={{ height: 50 }} />}
-            chartPlacement="bottom"
-            loading={statsLoading}
-          />
-        </Col>
+    <div style={{ padding: 24 }}>
+      <Space direction="vertical" size="large" style={{ width: '100%' }}>
+        <Title level={2}>Dashboard</Title>
 
-        <Col xs={24} sm={12} lg={6}>
-          <StatisticCard
-            statistic={{
-              title: t('dashboard.stats.totalPurchases'),
-              value: stats?.totalPurchases || 0,
-              precision: 2,
-              prefix: '₺',
-              description: (
-                <Space>
-                  {stats && stats.purchasesTrend >= 0 ? (
-                    <>
-                      <TrendingUpOutlined style={{ color: '#ff4d4f' }} />
-                      <span style={{ color: '#ff4d4f' }}>
-                        +{stats.purchasesTrend}%
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <TrendingDownOutlined style={{ color: '#52c41a' }} />
-                      <span style={{ color: '#52c41a' }}>
-                        {stats?.purchasesTrend}%
-                      </span>
-                    </>
-                  )}
-                  <span>{t('dashboard.stats.vsLastPeriod')}</span>
-                </Space>
-              )
-            }}
-            loading={statsLoading}
-          />
-        </Col>
-
-        <Col xs={24} sm={12} lg={6}>
-          <StatisticCard
-            statistic={{
-              title: t('dashboard.stats.profit'),
-              value: stats?.profit || 0,
-              precision: 2,
-              prefix: '₺',
-              description: (
-                <span>
-                  {t('dashboard.stats.profitMargin')}: {stats?.profitMargin}%
+        {/* İstatistik Kartları */}
+        <Row gutter={[16, 16]}>
+          {/* Toplam Gelir */}
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Toplam Gelir"
+                value={stats.totalRevenue}
+                precision={2}
+                valueStyle={{ color: '#3f8600' }}
+                prefix={<DollarOutlined />}
+                suffix="₺"
+              />
+              <div style={{ marginTop: 8 }}>
+                <RiseOutlined style={{ color: '#3f8600' }} />
+                <span style={{ marginLeft: 4, color: '#3f8600' }}>
+                  {stats.revenueGrowth}%
                 </span>
-              )
-            }}
-            loading={statsLoading}
-          />
-        </Col>
+              </div>
+            </Card>
+          </Col>
 
-        <Col xs={24} sm={12} lg={6}>
-          <StatisticCard
-            statistic={{
-              title: t('dashboard.stats.invoiceCount'),
-              value: stats?.invoiceCount || 0,
-              description: (
-                <span>
-                  {t('dashboard.stats.recentInvoices')}: {stats?.recentInvoices}
+          {/* Faturalar */}
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Toplam Fatura"
+                value={stats.totalInvoices}
+                prefix={<FileTextOutlined />}
+              />
+              <div style={{ marginTop: 8 }}>
+                <RiseOutlined style={{ color: '#3f8600' }} />
+                <span style={{ marginLeft: 4, color: '#3f8600' }}>
+                  {stats.invoiceGrowth}%
                 </span>
-              )
-            }}
-            loading={statsLoading}
-          />
-        </Col>
-      </Row>
-
-      {/* İkinci Satır - Ödeme Özeti ve Uyarılar */}
-      <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
-        <Col xs={24} sm={8}>
-          <ProCard
-            title={t('dashboard.cashFlow.title')}
-            headerBordered
-            loading={!paymentSummary}
-          >
-            <Row gutter={[16, 16]}>
-              <Col span={24}>
-                <StatisticCard.Group>
-                  <StatisticCard
-                    statistic={{
-                      title: t('dashboard.cashFlow.collections'),
-                      value: paymentSummary?.totalCollections || 0,
-                      precision: 2,
-                      prefix: '₺',
-                      valueStyle: { color: '#52c41a' }
-                    }}
-                  />
-                  <StatisticCard
-                    statistic={{
-                      title: t('dashboard.cashFlow.payments'),
-                      value: paymentSummary?.totalPayments || 0,
-                      precision: 2,
-                      prefix: '₺',
-                      valueStyle: { color: '#ff4d4f' }
-                    }}
-                  />
-                </StatisticCard.Group>
-              </Col>
-              <Col span={24}>
-                <StatisticCard
-                  statistic={{
-                    title: t('dashboard.cashFlow.net'),
-                    value: paymentSummary?.netCashFlow || 0,
-                    precision: 2,
-                    prefix: '₺',
-                    valueStyle: {
-                      color: (paymentSummary?.netCashFlow || 0) >= 0 ? '#52c41a' : '#ff4d4f'
-                    }
-                  }}
-                />
-              </Col>
-            </Row>
-          </ProCard>
-        </Col>
-
-        <Col xs={24} sm={8}>
-          <ProCard
-            title={t('dashboard.quickStats.title')}
-            headerBordered
-            loading={statsLoading}
-          >
-            <Space direction="vertical" style={{ width: '100%' }}>
-              <div className="quick-stat-item">
-                <TeamOutlined style={{ fontSize: 24, color: '#1890ff' }} />
-                <div>
-                  <div className="stat-value">{stats?.activePartners || 0}</div>
-                  <div className="stat-label">{t('dashboard.quickStats.activePartners')}</div>
-                </div>
               </div>
+            </Card>
+          </Col>
 
-              <div className="quick-stat-item">
-                <FileTextOutlined style={{ fontSize: 24, color: '#52c41a' }} />
-                <div>
-                  <div className="stat-value">{stats?.recentInvoices || 0}</div>
-                  <div className="stat-label">{t('dashboard.quickStats.recentInvoices')}</div>
+          {/* Ürünler */}
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Ürün Sayısı"
+                value={stats.totalProducts}
+                prefix={<ShoppingOutlined />}
+              />
+              {stats.lowStockCount > 0 && (
+                <div style={{ marginTop: 8, color: '#cf1322' }}>
+                  {stats.lowStockCount} ürün düşük stokta
                 </div>
+              )}
+            </Card>
+          </Col>
+
+          {/* Müşteriler */}
+          <Col xs={24} sm={12} lg={6}>
+            <Card>
+              <Statistic
+                title="Müşteri Sayısı"
+                value={stats.totalCustomers}
+                prefix={<UserOutlined />}
+              />
+              <div style={{ marginTop: 8 }}>
+                <RiseOutlined style={{ color: '#3f8600' }} />
+                <span style={{ marginLeft: 4, color: '#3f8600' }}>
+                  {stats.customerGrowth}%
+                </span>
               </div>
+            </Card>
+          </Col>
+        </Row>
 
-              <div className="quick-stat-item">
-                <WarningOutlined style={{ fontSize: 24, color: '#faad14' }} />
-                <div>
-                  <div className="stat-value">{lowStockAlerts?.length || 0}</div>
-                  <div className="stat-label">{t('dashboard.quickStats.lowStock')}</div>
-                </div>
-              </div>
-            </Space>
-          </ProCard>
-        </Col>
-
-        <Col xs={24} sm={8}>
-          <ProCard
-            title={t('dashboard.lowStockAlerts.title')}
-            headerBordered
-            extra={
-              <Button
-                type="link"
-                size="small"
-                onClick={() => window.location.href = '/stock/levels'}
-              >
-                {t('common.viewAll')}
-              </Button>
-            }
-          >
-            {lowStockAlerts && lowStockAlerts.length > 0 ? (
-              <Space direction="vertical" style={{ width: '100%' }}>
-                {lowStockAlerts.slice(0, 5).map(alert => (
-                  <div key={alert.productId} className="low-stock-item">
-                    <div>
-                      <strong>{alert.productCode}</strong>
-                      <div style={{ fontSize: 12, color: '#8c8c8c' }}>
-                        {alert.productName}
-                      </div>
-                    </div>
-                    <Tag color="warning">
-                      {alert.currentStock} / {alert.minStockLevel}
-                    </Tag>
-                  </div>
-                ))}
-              </Space>
-            ) : (
-              <div style={{ textAlign: 'center', padding: '20px 0', color: '#8c8c8c' }}>
-                {t('dashboard.lowStockAlerts.empty')}
-              </div>
-            )}
-          </ProCard>
-        </Col>
-      </Row>
-
-      {/* Satış Grafiği */}
-      <ProCard
-        title={t('dashboard.salesChart.title')}
-        headerBordered
-        style={{ marginTop: 16 }}
-      >
-        <Line {...salesChartConfig} data={chartData} height={300} />
-      </ProCard>
-
-      {/* Son Aktiviteler */}
-      <ProCard
-        title={t('dashboard.recentActivities.title')}
-        headerBordered
-        style={{ marginTop: 16 }}
-      >
-        <Table
-          dataSource={activities}
-          rowKey="id"
-          pagination={false}
-          columns={[
-            {
-              title: t('dashboard.recentActivities.columns.type'),
-              dataIndex: 'type',
-              key: 'type',
-              width: 60,
-              render: (type) => getActivityIcon(type)
-            },
-            {
-              title: t('dashboard.recentActivities.columns.activity'),
-              dataIndex: 'title',
-              key: 'title',
-              render: (title, record) => (
-                <div>
-                  <div><strong>{title}</strong></div>
-                  <div style={{ fontSize: 12, color: '#8c8c8c' }}>
-                    {record.description}
-                  </div>
-                </div>
-              )
-            },
-            {
-              title: t('dashboard.recentActivities.columns.amount'),
-              dataIndex: 'amount',
-              key: 'amount',
-              align: 'right',
-              render: (amount) => amount ? formatCurrency(amount) : '-'
-            },
-            {
-              title: t('dashboard.recentActivities.columns.date'),
-              dataIndex: 'createdAt',
-              key: 'createdAt',
-              align: 'right',
-              render: (date) => formatDate(date, 'time')
-            }
-          ]}
-        />
-      </ProCard>
-    </PageContainer>
+        {/* Hızlı Erişim Bilgilendirmesi */}
+        <Card title="Hoş Geldiniz!" style={{ marginTop: 16 }}>
+          <Typography.Paragraph>
+            AccountOS muhasebe sisteminize hoş geldiniz. Sol menüden tüm modüllere erişebilirsiniz.
+          </Typography.Paragraph>
+          <Typography.Paragraph>
+            <strong>Not:</strong> Dashboard istatistikleri şu an mock data göstermektedir. 
+            Backend API entegrasyonu tamamlandığında gerçek veriler görüntülenecektir.
+          </Typography.Paragraph>
+        </Card>
+      </Space>
+    </div>
   );
 };
+
+export default Dashboard;

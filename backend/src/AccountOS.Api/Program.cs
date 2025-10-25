@@ -164,7 +164,11 @@ if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
     });
 }
 
-app.UseHttpsRedirection();
+// HTTPS redirect - sadece production'da
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 // CORS - ÖNEMLİ: Diğer middleware'lerden ÖNCE!
 app.UseCors("AllowFrontend");

@@ -1,11 +1,45 @@
 import client from '../utils/client';
-import { buildQueryString } from '../utils/api-helpers';
-import type { PaginatedResponse, PaginationParams } from '../utils/api-helpers';
 
-/**
- * Stok hareketi servisi
- * FIFO hesaplama ve stok takibi
- */
+// Mock mode flag - Backend hazır olunca false yap
+const USE_MOCK_DATA = true;
+
+// ============================================
+// TYPE DEFINITIONS (INLINE - NO EXTERNAL IMPORTS)
+// ============================================
+
+interface PaginationParams {
+  pageNumber?: number;
+  pageSize?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+interface PaginatedResponse<T> {
+  items: T[];
+  totalCount: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+function buildQueryString(params: Record<string, any>): string {
+  const cleanParams = Object.entries(params)
+    .filter(([_, value]) => value !== undefined && value !== null && value !== '')
+    .map(([key, value]) => {
+      if (Array.isArray(value)) {
+        return value.map(v => `${key}=${encodeURIComponent(v)}`).join('&');
+      }
+      return `${key}=${encodeURIComponent(value)}`;
+    })
+    .join('&');
+  return cleanParams ? `?${cleanParams}` : '';
+}
+
+// ============================================
+// STOCK SERVICE
+// ============================================
 
 export type StockMovementType = 'in' | 'out' | 'adjustment';
 
@@ -16,8 +50,8 @@ export interface StockMovement {
   productName: string;
   type: StockMovementType;
   quantity: number;
-  unitCost: number; // Birim maliyet
-  totalCost: number; // Toplam maliyet
+  unitCost: number;
+  totalCost: number;
   referenceType?: 'invoice' | 'payment' | 'adjustment';
   referenceId?: string;
   referenceNumber?: string;
@@ -31,114 +65,76 @@ export interface StockLevel {
   productId: string;
   productCode: string;
   productName: string;
-  quantity: number;
-  averageCost: number; // Ortalama maliyet
-  fifoCost: number; // FIFO maliyeti
-  totalValue: number; // Stok değeri
-  lastMovementDate: string;
-}
-
-export interface FIFOCalculation {
-  productId: string;
   currentStock: number;
-  fifoCost: number;
-  layers: FIFOLayer[];
+  minStock: number;
+  maxStock: number;
+  averageCost: number;
+  totalValue: number;
+  warehouseId?: string;
+  lastMovementDate?: string;
 }
 
-export interface FIFOLayer {
-  date: string;
-  quantity: number;
-  unitCost: number;
-  remainingQuantity: number;
-}
-
-export interface StockAdjustment {
-  productId: string;
-  newQuantity: number;
-  reason: string;
-  notes?: string;
-}
-
-export interface LowStockAlert {
-  productId: string;
-  productCode: string;
-  productName: string;
-  currentStock: number;
-  minStockLevel: number;
-  difference: number;
-}
-
-export interface StockFilters extends PaginationParams {
-  productId?: string;
-  type?: StockMovementType;
-  startDate?: string;
-  endDate?: string;
-}
-
-export const stockService = {
-  /**
-   * Stok hareketlerini getir
-   */
-  getMovements: async (filters: StockFilters = {}): Promise<PaginatedResponse<StockMovement>> => {
-    const queryString = buildQueryString({
-      pageNumber: filters.pageNumber || 1,
-      pageSize: filters.pageSize || 10,
-      productId: filters.productId,
-      type: filters.type,
-      startDate: filters.startDate,
-      endDate: filters.endDate,
-      sortBy: filters.sortBy || 'createdAt',
-      sortOrder: filters.sortOrder || 'desc'
-    });
-
-    const response = await client.get(`/stock/movements${queryString}`);
-    return response.data;
-  },
-
-  /**
-   * Stok seviyelerini getir
-   */
-  getStockLevels: async (filters: PaginationParams = {}): Promise<PaginatedResponse<StockLevel>> => {
-    const queryString = buildQueryString({
-      pageNumber: filters.pageNumber || 1,
-      pageSize: filters.pageSize || 10,
-      sortBy: filters.sortBy || 'productCode',
-      sortOrder: filters.sortOrder || 'asc'
-    });
-
-    const response = await client.get(`/stock/levels${queryString}`);
-    return response.data;
-  },
-
-  /**
-   * Ürün için FIFO hesaplama
-   */
-  calculateFIFO: async (productId: string): Promise<FIFOCalculation> => {
-    const response = await client.get(`/stock/fifo/${productId}`);
-    return response.data;
-  },
-
-  /**
-   * Stok ayarlama (düzeltme)
-   */
-  adjustStock: async (adjustment: StockAdjustment): Promise<StockMovement> => {
-    const response = await client.post('/stock/adjust', adjustment);
-    return response.data;
-  },
-
-  /**
-   * Düşük stok uyarıları
-   */
-  getLowStockAlerts: async (): Promise<LowStockAlert[]> => {
-    const response = await client.get('/stock/low-stock-alerts');
-    return response.data;
-  },
-
-  /**
-   * Belirli bir ürünün stok durumu
-   */
-  getProductStock: async (productId: string): Promise<StockLevel> => {
-    const response = await client.get(`/stock/product/${productId}`);
-    return response.data;
+export const getStockMovements = async (
+  params: PaginationParams & {
+    productId?: string;
+    type?: StockMovementType;
+    startDate?: string;
+    endDate?: string;
   }
+): Promise<PaginatedResponse<StockMovement>> => {
+  if (USE_MOCK_DATA) {
+    console.log('📦 Using MOCK stock movements data');
+    return {
+      items: [],
+      totalCount: 0,
+      pageNumber: 1,
+      pageSize: 10,
+      totalPages: 0,
+      hasNextPage: false,
+      hasPreviousPage: false
+    };
+  }
+  
+  const queryString = buildQueryString(params);
+  const response = await client.get(`/stock/movements${queryString}`);
+  return response.data;
 };
+
+export const getStockLevels = async (
+  params: PaginationParams & {
+    lowStock?: boolean;
+    warehouseId?: string;
+  }
+): Promise<PaginatedResponse<StockLevel>> => {
+  if (USE_MOCK_DATA) {
+    console.log('📦 Using MOCK stock levels data');
+    return {
+      items: [],
+      totalCount: 0,
+      pageNumber: 1,
+      pageSize: 10,
+      totalPages: 0,
+      hasNextPage: false,
+      hasPreviousPage: false
+    };
+  }
+  
+  const queryString = buildQueryString(params);
+  const response = await client.get(`/stock/levels${queryString}`);
+  return response.data;
+};
+
+export const calculateFifoCost = async (
+  productId: string,
+  quantity: number
+): Promise<number> => {
+  if (USE_MOCK_DATA) {
+    console.log('📦 Using MOCK FIFO cost calculation');
+    return 100; // Mock cost
+  }
+  
+  const response = await client.get(`/stock/fifo-cost/${productId}`, {
+    params: { quantity }
+  });
+  return response.data.cost;
+};// Cache bust: Fri Oct 24 23:31:19 +03 2025

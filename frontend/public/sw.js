@@ -1,8 +1,12 @@
 /**
- * Service Worker - PWA özellikleri
- * Offline çalışma, cache yönetimi, background sync
+ * Service Worker - TEMPORARILY DISABLED FOR DEBUGGING
+ * Uncomment after cache issues are resolved
  */
 
+// ENTIRE FILE COMMENTED OUT TO PREVENT CACHING ISSUES
+console.log('SW: Disabled for debugging');
+
+/*
 const CACHE_NAME = 'accountos-v1';
 const RUNTIME_CACHE = 'accountos-runtime-v1';
 
@@ -11,195 +15,162 @@ const PRECACHE_URLS = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png'
+  '/offline.html',
+  '/icon.svg',
+  '/favicon.svg'
 ];
 
-// API endpoint'leri için cache stratejisi
-const API_CACHE_STRATEGY = 'network-first';
-const STATIC_CACHE_STRATEGY = 'cache-first';
-
-/**
- * Install event - Cache'i oluştur
- */
+// Service Worker kurulumu
 self.addEventListener('install', (event) => {
-  console.log('[SW] Installing...');
-  
+  console.log('SW: Installing...');
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log('[SW] Precaching static assets');
-      return cache.addAll(PRECACHE_URLS);
-    }).then(() => {
-      return self.skipWaiting();
-    })
+    caches.open(CACHE_NAME)
+      .then((cache) => {
+        console.log('SW: Caching static files');
+        return cache.addAll(PRECACHE_URLS);
+      })
+      .then(() => {
+        console.log('SW: Installation complete');
+        return self.skipWaiting();
+      })
   );
 });
 
-/**
- * Activate event - Eski cache'leri temizle
- */
+// Eski cache'leri temizle
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activating...');
-  
+  console.log('SW: Activating...');
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames
-          .filter((name) => name !== CACHE_NAME && name !== RUNTIME_CACHE)
-          .map((name) => {
-            console.log('[SW] Deleting old cache:', name);
-            return caches.delete(name);
-          })
-      );
-    }).then(() => {
-      return self.clients.claim();
-    })
+    caches.keys()
+      .then((cacheNames) => {
+        return Promise.all(
+          cacheNames.map((cacheName) => {
+            if (cacheName !== CACHE_NAME && cacheName !== RUNTIME_CACHE) {
+              console.log('SW: Deleting old cache:', cacheName);
+              return caches.delete(cacheName);
+            }
+          });
+          });
+        );
+      })
+      .then(() => {
+        console.log('SW: Activation complete');
+        return self.clients.claim();
+      })
   );
 });
 
-/**
- * Fetch event - Request'leri intercept et
- */
+// Network isteklerini yakala ve cache'le
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // API requests - Network first strategy
+  // API istekleri için network-first stratejisi
   if (url.pathname.startsWith('/api/')) {
-    event.respondWith(networkFirst(request));
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          // Başarılı API yanıtını cache'le
+          if (response.ok) {
+            const responseClone = response.clone();
+            caches.open(RUNTIME_CACHE)
+              .then((cache) => {
+                cache.put(request, responseClone);
+              });
+          }
+          return response;
+        })
+        .catch(() => {
+          // Network hatası durumunda cache'den döndür
+          return caches.match(request);
+        })
+    );
     return;
   }
 
-  // Static assets - Cache first strategy
-  event.respondWith(cacheFirst(request));
+  // Static dosyalar için cache-first stratejisi
+  event.respondWith(
+    caches.match(request)
+      .then((cachedResponse) => {
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+
+        return fetch(request)
+          .then((response) => {
+            // Geçerli yanıtı cache'le
+            if (response.ok) {
+              const responseClone = response.clone();
+              caches.open(CACHE_NAME)
+                .then((cache) => {
+                  cache.put(request, responseClone);
+                });
+            }
+            return response;
+          })
+          .catch(() => {
+            // Offline durumunda offline sayfasını göster
+            if (request.destination === 'document') {
+              return caches.match('/offline.html');
+            }
+          });
+      })
+  );
 });
 
-/**
- * Network first strategy
- * Önce network'ten getir, başarısız olursa cache'den al
- */
-async function networkFirst(request) {
-  const cache = await caches.open(RUNTIME_CACHE);
-
-  try {
-    const response = await fetch(request);
-    
-    // Cache successful responses
-    if (response.ok) {
-      cache.put(request, response.clone());
-    }
-    
-    return response;
-  } catch (error) {
-    console.log('[SW] Network request failed, trying cache:', request.url);
-    const cached = await cache.match(request);
-    
-    if (cached) {
-      return cached;
-    }
-    
-    // Return offline page for navigation requests
-    if (request.mode === 'navigate') {
-      return caches.match('/offline.html');
-    }
-    
-    throw error;
-  }
-}
-
-/**
- * Cache first strategy
- * Önce cache'den al, yoksa network'ten getir
- */
-async function cacheFirst(request) {
-  const cache = await caches.open(CACHE_NAME);
-  const cached = await cache.match(request);
-
-  if (cached) {
-    return cached;
-  }
-
-  try {
-    const response = await fetch(request);
-    
-    if (response.ok) {
-      cache.put(request, response.clone());
-    }
-    
-    return response;
-  } catch (error) {
-    console.log('[SW] Fetch failed:', request.url);
-    
-    // Return offline page for navigation requests
-    if (request.mode === 'navigate') {
-      return caches.match('/offline.html');
-    }
-    
-    throw error;
-  }
-}
-
-/**
- * Background sync event
- * Offline'da yapılan işlemleri online olunca gönder
- */
+// Background sync
 self.addEventListener('sync', (event) => {
-  console.log('[SW] Background sync:', event.tag);
+  console.log('SW: Background sync:', event.tag);
   
-  if (event.tag === 'sync-invoices') {
-    event.waitUntil(syncInvoices());
+  if (event.tag === 'background-sync') {
+    event.waitUntil(
+      // Background sync işlemleri burada yapılacak
+      console.log('SW: Background sync completed')
+    );
   }
 });
 
-/**
- * Push notification event
- */
+// Push notification
 self.addEventListener('push', (event) => {
-  console.log('[SW] Push notification received');
+  console.log('SW: Push notification received');
   
-  const data = event.data ? event.data.json() : {};
-  const title = data.title || 'AccountOS';
   const options = {
-    body: data.body || 'Yeni bildirim',
-    icon: '/icons/icon-192x192.png',
-    badge: '/icons/badge-72x72.png',
-    data: data.url || '/',
+    body: event.data ? event.data.text() : 'Yeni bildirim',
+    icon: '/icon.svg',
+    badge: '/icon.svg',
+    vibrate: [100, 50, 100],
+    data: {
+      dateOfArrival: Date.now(),
+      primaryKey: 1
+    },
     actions: [
       {
-        action: 'open',
-        title: 'Aç'
+        action: 'explore',
+        title: 'Görüntüle',
+        icon: '/icon.svg'
       },
       {
         action: 'close',
-        title: 'Kapat'
+        title: 'Kapat',
+        icon: '/icon.svg'
       }
     ]
   };
 
   event.waitUntil(
-    self.registration.showNotification(title, options)
+    self.registration.showNotification('AccountOS', options)
   );
 });
 
-/**
- * Notification click event
- */
+// Notification click
 self.addEventListener('notificationclick', (event) => {
+  console.log('SW: Notification clicked');
+  
   event.notification.close();
-
-  if (event.action === 'open' || !event.action) {
-    const url = event.notification.data || '/';
-    
+  
+  if (event.action === 'explore') {
     event.waitUntil(
-      clients.openWindow(url)
+      clients.openWindow('/')
     );
   }
 });
-
-/**
- * Sync invoices (example)
- */
-async function syncInvoices() {
-  // TODO: Offline'da kaydedilen faturaları sync et
-  console.log('[SW] Syncing invoices...');
-}
+*/

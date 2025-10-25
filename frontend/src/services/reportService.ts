@@ -1,5 +1,5 @@
-import client from '../utils/client';
-import { buildQueryString } from '../utils/api-helpers';
+import client from '@/utils/client';
+import { buildQueryString } from '@/utils/api-helpers';
 
 /**
  * Rapor servisi

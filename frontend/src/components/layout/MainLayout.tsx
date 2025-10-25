@@ -60,7 +60,7 @@ export const MainLayout = () => {
         icon: <FileTextOutlined />,
         routes: [
           {
-            path: '/invoices/list',
+            path: '/invoices',
             name: 'Fatura Listesi',
           },
           {
