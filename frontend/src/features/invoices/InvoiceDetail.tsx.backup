@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Card, Descriptions, Table, Tag, Button, Space, Spin, message, App } from 'antd';
+import { Card, Descriptions, Table, Tag, Button, Space, Spin, App } from 'antd';
 import {
   FilePdfOutlined,
   PrinterOutlined,
@@ -25,7 +25,7 @@ export const InvoiceDetail = () => {
   const navigate = useNavigate();
   const [invoice, setInvoice] = useState<Invoice | null>(null);
   const [loading, setLoading] = useState(true);
-  const { modal } = App.useApp();
+  const { modal, message } = App.useApp();
 
   useEffect(() => {
     if (id) {

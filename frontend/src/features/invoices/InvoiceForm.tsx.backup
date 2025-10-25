@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { PageContainer, ProForm, ProFormText, ProFormSelect, ProFormDatePicker, ProFormDigit, ProFormSwitch, ProFormList } from '@ant-design/pro-components';
-import { Card, Space, Button, App } from 'antd';
+import { Card, Space, App } from 'antd';
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
@@ -92,7 +92,7 @@ export const InvoiceForm: React.FC = () => {
               label={t('invoices.form.partner')}
               width="xl"
               showSearch
-              request={async ({ keyWords }) => {
+              request={async () => {
                 // Cari hesapları API'den çek
                 return [
                   { label: 'Müşteri 1', value: '1' },
@@ -149,7 +149,7 @@ export const InvoiceForm: React.FC = () => {
                 label={t('invoices.form.product')}
                 width="lg"
                 showSearch
-                request={async ({ keyWords }) => {
+                request={async () => {
                   // Ürünleri API'den çek
                   return [
                     { label: 'Ürün 1', value: '1' },

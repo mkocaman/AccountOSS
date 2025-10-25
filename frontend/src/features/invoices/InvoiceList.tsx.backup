@@ -297,7 +297,7 @@ export const InvoiceList: React.FC = () => {
         columns={columns}
         actionRef={actionRef}
         cardBordered
-        request={async (params, sort, filter) => {
+        request={async () => {
           // Backend API henüz hazır değil, boş data döndür
           return {
             data: [],
