@@ -62,7 +62,9 @@
     "createPartner": "New Partner",
     "categories": "Categories",
     "stock": "Stock",
+    "stockLevels": "Stock Levels",
     "stockMovements": "Stock Movements",
+    "stockAdjustments": "Stock Adjustments",
     "purchasing": "Purchasing",
     "purchaseOrders": "Purchase Orders",
     "goodsReceipts": "Goods Receipts",
@@ -1065,6 +1067,280 @@
     "actions": "Actions",
     "total": "Total",
     "items": "items"
+  },
+  "stock": {
+    "levels": {
+      "title": "Stock Levels",
+      "description": "Current stock status of all products",
+      "columns": {
+        "product": "Product",
+        "warehouse": "Warehouse",
+        "currentStock": "Current Stock",
+        "reserved": "Reserved",
+        "available": "Available",
+        "minMax": "Min/Max",
+        "status": "Status",
+        "unitCost": "Unit Cost",
+        "totalValue": "Total Value"
+      },
+      "status": {
+        "ok": "Normal",
+        "low": "Low",
+        "critical": "Critical",
+        "overstock": "Overstock"
+      },
+      "stats": {
+        "totalValue": "Total Stock Value",
+        "products": "products",
+        "critical": "Critical Products",
+        "needsImmediate": "Immediate order required",
+        "low": "Low Stock",
+        "needsAttention": "Needs attention",
+        "ok": "Healthy Stock",
+        "healthyStock": "Normal level"
+      },
+      "filters": {
+        "searchPlaceholder": "Search by product name or code...",
+        "statusPlaceholder": "Filter by status",
+        "warehousePlaceholder": "Filter by warehouse",
+        "reset": "Reset Filters"
+      },
+      "actions": {
+        "order": "Order Now"
+      },
+      "messages": {
+        "filtersReset": "Filters reset",
+        "refreshed": "Data updated"
+      }
+    },
+    "movements": {
+      "title": "Stock Movements",
+      "description": "All stock inbound and outbound transactions",
+      "columns": {
+        "movementNumber": "Movement No",
+        "type": "Type",
+        "product": "Product",
+        "warehouse": "Warehouse",
+        "quantity": "Quantity",
+        "unitCost": "Unit Cost",
+        "totalCost": "Total Cost",
+        "reference": "Reference",
+        "date": "Date",
+        "status": "Status",
+        "createdBy": "Created By",
+        "createdAt": "Created At",
+        "approvedBy": "Approved By",
+        "approvedAt": "Approved At"
+      },
+      "types": {
+        "purchase": "Purchase",
+        "sale": "Sale",
+        "adjustment": "Adjustment",
+        "return": "Return",
+        "transfer": "Transfer",
+        "production": "Production",
+        "damage": "Damage"
+      },
+      "directions": {
+        "in": "Inbound",
+        "out": "Outbound"
+      },
+      "status": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "cancelled": "Cancelled"
+      },
+      "stats": {
+        "totalMovements": "Total Movements",
+        "inbound": "Inbound",
+        "outbound": "Outbound",
+        "pending": "Pending Approval",
+        "needsApproval": "Needs approval"
+      },
+      "filters": {
+        "typePlaceholder": "Filter by movement type",
+        "directionPlaceholder": "Filter by direction",
+        "statusPlaceholder": "Filter by status",
+        "dateFrom": "Start Date",
+        "dateTo": "End Date",
+        "reset": "Reset Filters"
+      },
+      "detail": {
+        "title": "Movement Detail"
+      },
+      "messages": {
+        "filtersReset": "Filters reset",
+        "refreshed": "Data updated"
+      }
+    },
+    "adjustments": {
+      "title": "Stock Adjustments",
+      "description": "Manual stock correction operations",
+      "columns": {
+        "adjustmentNumber": "Adjustment No",
+        "product": "Product",
+        "warehouse": "Warehouse",
+        "currentStock": "Current Stock",
+        "adjustedStock": "Adjusted Stock",
+        "difference": "Difference",
+        "reasonCode": "Reason Code",
+        "reason": "Reason",
+        "notes": "Notes",
+        "status": "Status",
+        "createdBy": "Created By",
+        "createdAt": "Created At",
+        "approvedBy": "Approved By",
+        "approvedAt": "Approved At",
+        "rejectedBy": "Rejected By",
+        "rejectedAt": "Rejected At",
+        "rejectionReason": "Rejection Reason"
+      },
+      "status": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      },
+      "reasonCodes": {
+        "count": "Physical Count",
+        "damage": "Damage",
+        "theft": "Loss/Theft",
+        "correction": "Record Correction",
+        "expiry": "Expiry Date",
+        "other": "Other"
+      },
+      "stats": {
+        "total": "Total Adjustments",
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "needsApproval": "Needs approval"
+      },
+      "filters": {
+        "statusPlaceholder": "Filter by status",
+        "warehousePlaceholder": "Filter by warehouse",
+        "reset": "Reset Filters"
+      },
+      "actions": {
+        "approve": "Approve",
+        "reject": "Reject"
+      },
+      "create": {
+        "title": "New Stock Adjustment",
+        "description": "Create manual stock correction operation",
+        "save": "Save Adjustment"
+      },
+      "form": {
+        "product": "Product",
+        "warehouse": "Warehouse",
+        "currentStock": "Current Stock",
+        "unitCost": "Unit Cost",
+        "totalValue": "Total Value",
+        "adjustedStock": "New Stock Quantity",
+        "reasonCode": "Adjustment Reason",
+        "reason": "Description",
+        "notes": "Additional Notes",
+        "productPlaceholder": "Select product",
+        "warehousePlaceholder": "Select warehouse",
+        "adjustedStockPlaceholder": "Enter new stock quantity",
+        "reasonCodePlaceholder": "Select adjustment reason",
+        "reasonPlaceholder": "Describe the adjustment reason",
+        "notesPlaceholder": "Additional notes (optional)",
+        "productRequired": "Product selection is required",
+        "warehouseRequired": "Warehouse selection is required",
+        "adjustedStockRequired": "New stock quantity is required",
+        "adjustedStockMin": "Stock quantity cannot be less than 0",
+        "reasonCodeRequired": "Adjustment reason is required",
+        "reasonRequired": "Description is required",
+        "reasonMinLength": "Description must be at least 10 characters",
+        "productWarehouseRequired": "Product and warehouse selection is required"
+      },
+      "summary": {
+        "title": "Adjustment Summary",
+        "currentStock": "Current Stock",
+        "adjustedStock": "New Stock",
+        "difference": "Difference",
+        "unitCost": "Unit Cost",
+        "totalValue": "Total Value",
+        "selectProduct": "Select a product first"
+      },
+      "info": {
+        "title": "About Adjustment Process",
+        "description": "Stock adjustments go through an approval process and permanently change stock levels.",
+        "step1": "1. Select product and warehouse",
+        "step2": "2. Enter new stock quantity",
+        "step3": "3. Specify adjustment reason",
+        "step4": "4. Submit for approval"
+      },
+      "approve": {
+        "title": "Approve Adjustment",
+        "confirm": "Are you sure you want to approve this adjustment?"
+      },
+      "reject": {
+        "title": "Reject Adjustment",
+        "confirm": "Reject",
+        "confirmText": "Are you sure you want to reject the adjustment for {{product}}?",
+        "reasonLabel": "Rejection Reason",
+        "reasonPlaceholder": "Explain the rejection reason",
+        "reasonRequired": "Rejection reason is required"
+      },
+      "detail": {
+        "title": "Adjustment Detail"
+      },
+      "messages": {
+        "created": "Adjustment created successfully",
+        "approved": "Adjustment approved",
+        "rejected": "Adjustment rejected",
+        "createError": "Failed to create adjustment",
+        "approveError": "Failed to approve adjustment",
+        "rejectError": "Failed to reject adjustment",
+        "filtersReset": "Filters reset"
+      }
+    },
+    "fifo": {
+      "title": "FIFO Cost Layers",
+      "columns": {
+        "purchaseDate": "Purchase Date",
+        "batchNumber": "Batch No",
+        "quantity": "Quantity",
+        "remaining": "Remaining",
+        "unitCost": "Unit Cost",
+        "totalCost": "Total Cost",
+        "expiryDate": "Expiry Date",
+        "purchaseNumber": "Purchase No",
+        "status": "Status"
+      },
+      "status": {
+        "available": "Available",
+        "partial": "Partially Used",
+        "used": "Used",
+        "expired": "Expired",
+        "nearExpiry": "Near Expiry"
+      },
+      "stats": {
+        "totalQuantity": "Total Quantity",
+        "remainingQuantity": "Remaining Quantity",
+        "totalCost": "Total Cost",
+        "averageCost": "Average Cost"
+      },
+      "info": {
+        "title": "FIFO System",
+        "description": "FIFO (First-In, First-Out) system is used to calculate stock costs. First-in products are used first."
+      },
+      "notes": {
+        "title": "Important Notes",
+        "note1": "FIFO layers are sorted by purchase date",
+        "note2": "Layers with 0 remaining quantity are considered used",
+        "note3": "Expired products are prioritized for use",
+        "note4": "Cost calculations are based on FIFO layers"
+      },
+      "loading": "Loading FIFO layers...",
+      "empty": "No FIFO layers found for this product",
+      "error": {
+        "title": "Error",
+        "description": "Error occurred while loading FIFO layers"
+      }
+    }
   }
 }
 

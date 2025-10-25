@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useCompanyStore } from '@/stores/companyStore';
+import { useCompanyStore } from '@/store/companyStore';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/api/client';
 

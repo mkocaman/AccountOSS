@@ -31,6 +31,9 @@ const ForgotPassword = lazy(() => import('../features/auth/ForgotPassword').then
 const Dashboard = lazy(() => import('../pages/Dashboard'));
 const ComingSoon = lazy(() => import('../pages/common/ComingSoon'));
 const StockLevels = lazy(() => import('../pages/stock/StockLevels'));
+const StockMovements = lazy(() => import('../pages/stock/StockMovements'));
+const StockAdjustments = lazy(() => import('../pages/stock/StockAdjustments'));
+const CreateAdjustment = lazy(() => import('../pages/stock/CreateAdjustment'));
 const InvoiceList = lazy(() => import('../pages/invoices/InvoiceList'));
 const InvoiceForm = lazy(() => import('../pages/invoices/InvoiceForm'));
 const InvoiceDetail = lazy(() => import('../pages/invoices/InvoiceDetail'));
@@ -136,6 +139,18 @@ export const router = createBrowserRouter([
           {
             path: 'levels',
             element: LazyLoad(StockLevels),
+          },
+          {
+            path: 'movements',
+            element: LazyLoad(StockMovements),
+          },
+          {
+            path: 'adjustments',
+            element: LazyLoad(StockAdjustments),
+          },
+          {
+            path: 'adjustments/create',
+            element: LazyLoad(CreateAdjustment),
           },
         ],
       },

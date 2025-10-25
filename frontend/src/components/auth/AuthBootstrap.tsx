@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import { apiClient } from '@/api/client';
-import { useCompanyStore } from '@/stores/companyStore';
+import { useCompanyStore } from '@/store/companyStore';
 
 /**
  * AuthBootstrap - Auth hidrasyonu tamamlanmadan Router'ı render etme

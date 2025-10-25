@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, List, Avatar, Spin, message } from 'antd';
 import { BankOutlined, CheckOutlined } from '@ant-design/icons';
-import { useCompanyStore } from '@/stores/companyStore';
+import { useCompanyStore } from '@/store/companyStore';
 import { useNavigate } from 'react-router-dom';
 
 interface Company {

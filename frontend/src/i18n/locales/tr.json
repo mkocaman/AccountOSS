@@ -82,7 +82,9 @@
     "profile": "Profil",
     "categories": "Kategoriler",
     "stock": "Stok",
+    "stockLevels": "Stok Seviyeleri",
     "stockMovements": "Stok Hareketleri",
+    "stockAdjustments": "Stok Düzeltmeleri",
     "purchasing": "Satın Alma",
     "purchaseOrders": "Satın Alma Siparişleri",
     "goodsReceipts": "Mal Kabul",
@@ -1201,6 +1203,234 @@
       "messages": {
         "filtersReset": "Filtreler sıfırlandı",
         "refreshed": "Veriler güncellendi"
+      }
+    },
+    "movements": {
+      "title": "Stok Hareketleri",
+      "description": "Tüm stok giriş ve çıkış hareketleri",
+      "columns": {
+        "movementNumber": "Hareket No",
+        "type": "Tip",
+        "product": "Ürün",
+        "warehouse": "Depo",
+        "quantity": "Miktar",
+        "unitCost": "Birim Maliyet",
+        "totalCost": "Toplam Maliyet",
+        "reference": "Referans",
+        "date": "Tarih",
+        "status": "Durum",
+        "createdBy": "Oluşturan",
+        "createdAt": "Oluşturma Tarihi",
+        "approvedBy": "Onaylayan",
+        "approvedAt": "Onay Tarihi"
+      },
+      "types": {
+        "purchase": "Satın Alma",
+        "sale": "Satış",
+        "adjustment": "Düzeltme",
+        "return": "İade",
+        "transfer": "Transfer",
+        "production": "Üretim",
+        "damage": "Hasar"
+      },
+      "directions": {
+        "in": "Giriş",
+        "out": "Çıkış"
+      },
+      "status": {
+        "pending": "Beklemede",
+        "approved": "Onaylandı",
+        "rejected": "Reddedildi",
+        "cancelled": "İptal Edildi"
+      },
+      "stats": {
+        "totalMovements": "Toplam Hareket",
+        "inbound": "Giriş",
+        "outbound": "Çıkış",
+        "pending": "Onay Bekleyen",
+        "needsApproval": "Onay gerekli"
+      },
+      "filters": {
+        "typePlaceholder": "Hareket tipine göre filtrele",
+        "directionPlaceholder": "Yöne göre filtrele",
+        "statusPlaceholder": "Duruma göre filtrele",
+        "dateFrom": "Başlangıç Tarihi",
+        "dateTo": "Bitiş Tarihi",
+        "reset": "Filtreleri Sıfırla"
+      },
+      "detail": {
+        "title": "Hareket Detayı"
+      },
+      "messages": {
+        "filtersReset": "Filtreler sıfırlandı",
+        "refreshed": "Veriler güncellendi"
+      }
+    },
+    "adjustments": {
+      "title": "Stok Düzeltmeleri",
+      "description": "Manuel stok düzeltme işlemleri",
+      "columns": {
+        "adjustmentNumber": "Düzeltme No",
+        "product": "Ürün",
+        "warehouse": "Depo",
+        "currentStock": "Mevcut Stok",
+        "adjustedStock": "Düzeltilmiş Stok",
+        "difference": "Fark",
+        "reasonCode": "Neden Kodu",
+        "reason": "Neden",
+        "notes": "Notlar",
+        "status": "Durum",
+        "createdBy": "Oluşturan",
+        "createdAt": "Oluşturma Tarihi",
+        "approvedBy": "Onaylayan",
+        "approvedAt": "Onay Tarihi",
+        "rejectedBy": "Reddeden",
+        "rejectedAt": "Red Tarihi",
+        "rejectionReason": "Red Nedeni"
+      },
+      "status": {
+        "pending": "Beklemede",
+        "approved": "Onaylandı",
+        "rejected": "Reddedildi"
+      },
+      "reasonCodes": {
+        "count": "Fiziksel Sayım",
+        "damage": "Hasar",
+        "theft": "Kayıp/Çalınma",
+        "correction": "Kayıt Düzeltmesi",
+        "expiry": "Son Kullanma Tarihi",
+        "other": "Diğer"
+      },
+      "stats": {
+        "total": "Toplam Düzeltme",
+        "pending": "Beklemede",
+        "approved": "Onaylandı",
+        "rejected": "Reddedildi",
+        "needsApproval": "Onay gerekli"
+      },
+      "filters": {
+        "statusPlaceholder": "Duruma göre filtrele",
+        "warehousePlaceholder": "Depoya göre filtrele",
+        "reset": "Filtreleri Sıfırla"
+      },
+      "actions": {
+        "approve": "Onayla",
+        "reject": "Reddet"
+      },
+      "create": {
+        "title": "Yeni Stok Düzeltmesi",
+        "description": "Manuel stok düzeltme işlemi oluşturun",
+        "save": "Düzeltmeyi Kaydet"
+      },
+      "form": {
+        "product": "Ürün",
+        "warehouse": "Depo",
+        "currentStock": "Mevcut Stok",
+        "unitCost": "Birim Maliyet",
+        "totalValue": "Toplam Değer",
+        "adjustedStock": "Yeni Stok Miktarı",
+        "reasonCode": "Düzeltme Nedeni",
+        "reason": "Açıklama",
+        "notes": "Ek Notlar",
+        "productPlaceholder": "Ürün seçin",
+        "warehousePlaceholder": "Depo seçin",
+        "adjustedStockPlaceholder": "Yeni stok miktarını girin",
+        "reasonCodePlaceholder": "Düzeltme nedenini seçin",
+        "reasonPlaceholder": "Düzeltme nedenini açıklayın",
+        "notesPlaceholder": "Ek notlar (opsiyonel)",
+        "productRequired": "Ürün seçimi zorunludur",
+        "warehouseRequired": "Depo seçimi zorunludur",
+        "adjustedStockRequired": "Yeni stok miktarı zorunludur",
+        "adjustedStockMin": "Stok miktarı 0'dan küçük olamaz",
+        "reasonCodeRequired": "Düzeltme nedeni zorunludur",
+        "reasonRequired": "Açıklama zorunludur",
+        "reasonMinLength": "Açıklama en az 10 karakter olmalıdır",
+        "productWarehouseRequired": "Ürün ve depo seçimi zorunludur"
+      },
+      "summary": {
+        "title": "Düzeltme Özeti",
+        "currentStock": "Mevcut Stok",
+        "adjustedStock": "Yeni Stok",
+        "difference": "Fark",
+        "unitCost": "Birim Maliyet",
+        "totalValue": "Toplam Değer",
+        "selectProduct": "Önce ürün seçin"
+      },
+      "info": {
+        "title": "Düzeltme İşlemi Hakkında",
+        "description": "Stok düzeltmeleri onay sürecinden geçer ve stok seviyelerini kalıcı olarak değiştirir.",
+        "step1": "1. Ürün ve depo seçin",
+        "step2": "2. Yeni stok miktarını girin",
+        "step3": "3. Düzeltme nedenini belirtin",
+        "step4": "4. Onay için gönderin"
+      },
+      "approve": {
+        "title": "Düzeltmeyi Onayla",
+        "confirm": "Bu düzeltmeyi onaylamak istediğinizden emin misiniz?"
+      },
+      "reject": {
+        "title": "Düzeltmeyi Reddet",
+        "confirm": "Reddet",
+        "confirmText": "{{product}} ürünü için düzeltmeyi reddetmek istediğinizden emin misiniz?",
+        "reasonLabel": "Red Nedeni",
+        "reasonPlaceholder": "Red nedenini açıklayın",
+        "reasonRequired": "Red nedeni zorunludur"
+      },
+      "detail": {
+        "title": "Düzeltme Detayı"
+      },
+      "messages": {
+        "created": "Düzeltme başarıyla oluşturuldu",
+        "approved": "Düzeltme onaylandı",
+        "rejected": "Düzeltme reddedildi",
+        "createError": "Düzeltme oluşturulamadı",
+        "approveError": "Düzeltme onaylanamadı",
+        "rejectError": "Düzeltme reddedilemedi",
+        "filtersReset": "Filtreler sıfırlandı"
+      }
+    },
+    "fifo": {
+      "title": "FIFO Maliyet Katmanları",
+      "columns": {
+        "purchaseDate": "Satın Alma Tarihi",
+        "batchNumber": "Parti No",
+        "quantity": "Miktar",
+        "remaining": "Kalan",
+        "unitCost": "Birim Maliyet",
+        "totalCost": "Toplam Maliyet",
+        "expiryDate": "Son Kullanma",
+        "purchaseNumber": "Satın Alma No",
+        "status": "Durum"
+      },
+      "status": {
+        "available": "Mevcut",
+        "partial": "Kısmen Kullanılmış",
+        "used": "Kullanılmış",
+        "expired": "Süresi Dolmuş",
+        "nearExpiry": "Süresi Yakın"
+      },
+      "stats": {
+        "totalQuantity": "Toplam Miktar",
+        "remainingQuantity": "Kalan Miktar",
+        "totalCost": "Toplam Maliyet",
+        "averageCost": "Ortalama Maliyet"
+      },
+      "info": {
+        "title": "FIFO Sistemi",
+        "description": "FIFO (First-In, First-Out) sistemi, stok maliyetlerini hesaplamak için kullanılır. İlk giren ürünler önce çıkarılır."
+      },
+      "notes": {
+        "title": "Önemli Notlar",
+        "note1": "FIFO katmanları satın alma tarihine göre sıralanır",
+        "note2": "Kalan miktar 0 olan katmanlar kullanılmış sayılır",
+        "note3": "Süresi dolmuş ürünler öncelikli olarak kullanılır",
+        "note4": "Maliyet hesaplamaları FIFO katmanlarına göre yapılır"
+      },
+      "loading": "FIFO katmanları yükleniyor...",
+      "empty": "Bu ürün için FIFO katmanı bulunamadı",
+      "error": {
+        "title": "Hata",
+        "description": "FIFO katmanları yüklenirken hata oluştu"
       }
     }
   },

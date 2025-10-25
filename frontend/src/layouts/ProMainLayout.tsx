@@ -20,7 +20,10 @@ import {
   CrownOutlined,
   BankOutlined as BankOutlinedIcon,
   QuestionCircleOutlined,
-  ThunderboltOutlined
+  ThunderboltOutlined,
+  InboxOutlined,
+  SwapOutlined,
+  EditOutlined
 } from '@ant-design/icons';
 import { Dropdown, Modal } from 'antd';
 import { useAuth } from '../hooks/useAuth';
@@ -147,6 +150,28 @@ export const ProMainLayout: React.FC = () => {
         {
           path: '/stock-movements',
           name: t('menu.stockMovements')
+        }
+      ]
+    },
+    {
+      path: '/stock',
+      name: t('menu.stock'),
+      icon: <InboxOutlined />,
+      routes: [
+        {
+          path: '/stock/levels',
+          name: t('menu.stockLevels'),
+          icon: <InboxOutlined />
+        },
+        {
+          path: '/stock/movements',
+          name: t('menu.stockMovements'),
+          icon: <SwapOutlined />
+        },
+        {
+          path: '/stock/adjustments',
+          name: t('menu.stockAdjustments'),
+          icon: <EditOutlined />
         }
       ]
     },

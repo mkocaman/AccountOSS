@@ -96,3 +96,101 @@ export interface StockStatistics {
   overstockItems: number;       // Fazla stoklu ürün sayısı
   warehouseCount: number;      // Toplam depo sayısı
 }
+
+// Stok düzeltme nedeni kodları - Düzeltme nedenlerini kategorize etmek için
+export type AdjustmentReasonCode = 
+  | 'count'           // Fiziksel sayım
+  | 'damage'          // Hasar
+  | 'theft'           // Kayıp/Çalınma
+  | 'correction'      // Kayıt düzeltmesi
+  | 'expiry'          // Son kullanma tarihi
+  | 'other';          // Diğer
+
+// Stok düzeltme - Manuel stok düzeltme işlemleri için
+export interface StockAdjustment {
+  id: string;                    // Benzersiz ID
+  adjustmentNumber: string;       // Düzeltme numarası (ADJ-2024-0001)
+  productId: string;             // Ürün ID'si
+  productCode: string;           // Ürün kodu
+  productName: string;           // Ürün adı
+  warehouseId: string;           // Depo ID'si
+  warehouseName: string;         // Depo adı
+  currentStock: number;           // Mevcut stok (düzeltme öncesi)
+  adjustedStock: number;          // Düzeltilmiş stok (düzeltme sonrası)
+  difference: number;             // Fark (adjustedStock - currentStock)
+  reason: string;                 // Düzeltme nedeni (metin)
+  reasonCode: AdjustmentReasonCode;  // Düzeltme nedeni (kod)
+  notes?: string;                 // Ek notlar (opsiyonel)
+  attachments?: string[];         // Ek dosyalar (URLs) (opsiyonel)
+  createdBy: string;              // Oluşturan kullanıcı
+  createdAt: string;              // Oluşturma tarihi
+  approvedBy?: string;            // Onaylayan kullanıcı (opsiyonel)
+  approvedAt?: string;            // Onay tarihi (opsiyonel)
+  rejectedBy?: string;            // Reddeden kullanıcı (opsiyonel)
+  rejectedAt?: string;            // Red tarihi (opsiyonel)
+  rejectionReason?: string;       // Red nedeni (opsiyonel)
+  status: 'pending' | 'approved' | 'rejected'; // Düzeltme durumu
+}
+
+// Stok düzeltme oluşturma request - Yeni düzeltme oluştururken gönderilen veri
+export interface CreateStockAdjustmentRequest {
+  productId: string;             // Ürün ID'si
+  warehouseId: string;           // Depo ID'si
+  adjustedStock: number;          // Yeni stok miktarı
+  reasonCode: AdjustmentReasonCode; // Düzeltme nedeni kodu
+  reason: string;                 // Açıklama
+  notes?: string;                 // Ek notlar (opsiyonel)
+}
+
+// Stok düzeltme onay/red request - Onaylama/reddetme işlemleri için
+export interface AdjustmentActionRequest {
+  notes?: string;                 // Ek notlar (opsiyonel)
+}
+
+// FIFO katmanı (maliyet katmanı) - FIFO maliyet hesaplaması için katman bilgileri
+export interface FIFOLayer {
+  id: string;                    // Benzersiz ID
+  productId: string;             // Ürün ID'si
+  productCode: string;           // Ürün kodu
+  productName: string;           // Ürün adı
+  warehouseId: string;           // Depo ID'si
+  warehouseName: string;         // Depo adı
+  quantity: number;               // Toplam miktar
+  remainingQuantity: number;      // Kalan miktar
+  unitCost: number;               // Birim maliyet
+  totalCost: number;              // Toplam maliyet
+  purchaseDate: string;           // Satın alma tarihi
+  purchaseId?: string;            // Satın alma belgesi ID (opsiyonel)
+  purchaseNumber?: string;        // Satın alma belgesi numarası (opsiyonel)
+  expiryDate?: string;            // Son kullanma tarihi (varsa)
+  batchNumber?: string;           // Parti numarası (varsa)
+}
+
+// Stok hareket detayı (genişletilmiş) - Hareket detay sayfası için genişletilmiş bilgiler
+export interface StockMovementDetail extends StockMovement {
+  productCategory?: string;        // Ürün kategorisi (opsiyonel)
+  warehouseAddress?: string;      // Depo adresi (opsiyonel)
+  approvalHistory?: {             // Onay geçmişi (opsiyonel)
+    action: 'created' | 'approved' | 'rejected' | 'cancelled';
+    by: string;
+    at: string;
+    notes?: string;
+  }[];
+  fifoLayers?: FIFOLayer[];       // Bu hareketten etkilenen FIFO katmanları (opsiyonel)
+}
+
+// Stok hareket istatistikleri - Hareket özet bilgileri
+export interface MovementStatistics {
+  totalMovements: number;         // Toplam hareket sayısı
+  totalInbound: number;          // Toplam giriş sayısı
+  totalOutbound: number;         // Toplam çıkış sayısı
+  totalInboundValue: number;     // Toplam giriş değeri
+  totalOutboundValue: number;    // Toplam çıkış değeri
+  pendingApprovals: number;      // Onay bekleyen hareket sayısı
+  byType: {                      // Tipe göre istatistikler
+    type: StockMovementType;
+    count: number;
+    totalQuantity: number;
+    totalValue: number;
+  }[];
+}
