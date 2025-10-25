@@ -14,6 +14,7 @@ import {
   ReloadOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { formatCurrency } from '@/utils/formatters';
 import type { Invoice, InvoiceStatus } from '@/types/invoice';
 import { getInvoices, deleteInvoice } from '@/services/invoiceService';
@@ -53,6 +54,7 @@ interface InvoiceQueryParams {
  * Sayfalama, sıralama, filtreleme, arama ve CRUD işlemleri
  */
 export const InvoiceList: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const actionRef = useRef<ActionType>();
   
@@ -110,7 +112,7 @@ export const InvoiceList: React.FC = () => {
       setLoading(false);
     } catch (error: any) {
       setLoading(false);
-      message.error(error.message || 'Faturalar yüklenirken hata oluştu');
+      message.error(error.message || t('invoice.errors.loadFailed'));
       console.error('❌ Fatura listesi hatası:', error);
     }
   };
@@ -135,10 +137,10 @@ export const InvoiceList: React.FC = () => {
   const handleDelete = async (id: string) => {
     try {
       await deleteInvoice(id);
-      message.success('Fatura başarıyla silindi');
+      message.success(t('invoice.messages.deleteSuccess'));
       fetchInvoices(); // Listeyi yenile
     } catch (error: any) {
-      message.error(error.message || 'Fatura silinirken hata oluştu');
+      message.error(error.message || t('invoice.errors.deleteFailed'));
     }
   };
 
@@ -147,11 +149,11 @@ export const InvoiceList: React.FC = () => {
    */
   const confirmDelete = (invoice: Invoice) => {
     Modal.confirm({
-      title: 'Faturayı Sil',
-      content: 'Bu faturayı silmek istediğinizden emin misiniz?',
-      okText: 'Evet',
+      title: t('invoice.messages.deleteConfirmTitle'),
+      content: t('invoice.messages.deleteConfirmContent'),
+      okText: t('invoice.confirmModal.okText'),
       okType: 'danger',
-      cancelText: 'İptal',
+      cancelText: t('invoice.confirmModal.cancelText'),
       onOk: () => handleDelete(invoice.id),
     });
   };
@@ -225,7 +227,7 @@ export const InvoiceList: React.FC = () => {
    */
   const columns: ProColumns<Invoice>[] = [
     {
-      title: 'Fatura No',
+      title: t('invoice.labels.invoiceNumber'),
       dataIndex: 'invoiceNumber',
       key: 'invoiceNumber',
       width: 140,
@@ -241,7 +243,7 @@ export const InvoiceList: React.FC = () => {
       )
     },
     {
-      title: 'Tarih',
+      title: t('invoice.labels.invoiceDate'),
       dataIndex: 'invoiceDate',
       key: 'invoiceDate',
       width: 120,
@@ -250,7 +252,7 @@ export const InvoiceList: React.FC = () => {
       render: (_, record) => dayjs(record.invoiceDate).format('DD.MM.YYYY')
     },
     {
-      title: 'Müşteri',
+      title: t('invoice.labels.customer'),
       dataIndex: 'partnerName',
       key: 'partnerName',
       width: 200,
@@ -258,36 +260,36 @@ export const InvoiceList: React.FC = () => {
       copyable: true
     },
     {
-      title: 'Tip',
+      title: t('invoice.labels.invoiceType'),
       dataIndex: 'invoiceType',
       key: 'invoiceType',
       width: 120,
       valueType: 'select',
       valueEnum: {
-        SALES: { text: 'Satış', status: 'Success' },
-        PURCHASE: { text: 'Alış', status: 'Processing' }
+        SALES: { text: t('invoice.type.sales'), status: 'Success' },
+        PURCHASE: { text: t('invoice.type.purchase'), status: 'Processing' }
       },
       filters: true
     },
     {
-      title: 'Resmi',
+      title: t('invoice.labels.official'),
       dataIndex: 'isOfficial',
       key: 'isOfficial',
       width: 120,
       align: 'center',
       valueType: 'select',
       valueEnum: {
-        true: { text: 'Resmi', status: 'Success' },
-        false: { text: 'Gayri Resmi', status: 'Default' }
+        true: { text: t('invoice.labels.official'), status: 'Success' },
+        false: { text: t('invoice.labels.unofficial'), status: 'Default' }
       },
       render: (_, record) => (
         <Tag color="default">
-          {record.invoiceType === 'sales' ? 'Satış' : 'Alış'}
+          {record.invoiceType === 'sales' ? t('invoice.type.sales') : t('invoice.type.purchase')}
         </Tag>
       )
     },
     {
-      title: 'Ara Toplam',
+      title: t('invoice.labels.subtotal'),
       dataIndex: 'subtotal',
       key: 'subtotal',
       width: 130,
@@ -297,7 +299,7 @@ export const InvoiceList: React.FC = () => {
       render: (_, record) => formatCurrency(record.subtotal)
     },
     {
-      title: 'KDV',
+      title: t('invoice.labels.taxRate'),
       dataIndex: 'taxAmount',
       key: 'taxAmount',
       width: 120,
@@ -306,7 +308,7 @@ export const InvoiceList: React.FC = () => {
       render: (_, record) => formatCurrency(record.taxAmount)
     },
     {
-      title: 'Toplam',
+      title: t('invoice.labels.grandTotal'),
       dataIndex: 'totalAmount',
       key: 'totalAmount',
       width: 140,
@@ -320,49 +322,49 @@ export const InvoiceList: React.FC = () => {
       )
     },
     {
-      title: 'Durum',
+      title: t('invoice.labels.status'),
       dataIndex: 'status',
       key: 'status',
       width: 120,
       align: 'center',
       valueType: 'select',
       valueEnum: {
-        draft: { text: 'Taslak', status: 'Default' },
-        sent: { text: 'Gönderildi', status: 'Processing' },
-        paid: { text: 'Ödendi', status: 'Success' },
-        overdue: { text: 'Vadesi Geçti', status: 'Error' },
-        cancelled: { text: 'İptal', status: 'Default' }
+        draft: { text: t('invoice.status.draft'), status: 'Default' },
+        sent: { text: t('invoice.status.pending'), status: 'Processing' },
+        paid: { text: t('invoice.status.paid'), status: 'Success' },
+        overdue: { text: t('invoice.status.overdue'), status: 'Error' },
+        cancelled: { text: t('invoice.status.cancelled'), status: 'Default' }
       },
       filters: true,
       render: (_, record) => (
         <Tag color={getStatusColor(record.status)}>
-          {record.status}
+          {t(`invoice.status.${record.status}`)}
         </Tag>
       )
     },
     {
-      title: 'İşlemler',
+      title: t('invoice.table.actions'),
       key: 'actions',
       width: 150,
       fixed: 'right',
       align: 'center',
       valueType: 'option',
       render: (_, record) => [
-        <Tooltip key="view" title="Görüntüle">
+        <Tooltip key="view" title={t('invoice.buttons.edit')}>
           <Button
             type="text"
             icon={<EyeOutlined />}
             onClick={() => navigate(`/invoices/${record.id}`)}
           />
         </Tooltip>,
-        <Tooltip key="edit" title="Düzenle">
+        <Tooltip key="edit" title={t('invoice.buttons.edit')}>
           <Button
             type="text"
             icon={<EditOutlined />}
             onClick={() => navigate(`/invoices/${record.id}/edit`)}
           />
         </Tooltip>,
-        <Tooltip key="delete" title="Sil">
+        <Tooltip key="delete" title={t('invoice.buttons.delete')}>
           <Button
             type="text"
             danger
@@ -384,14 +386,14 @@ export const InvoiceList: React.FC = () => {
       icon={<PlusOutlined />}
       onClick={() => navigate('/invoices/create')}
     >
-      Yeni Fatura
+      {t('invoice.buttons.new')}
     </Button>,
     <Button
       key="refresh"
       icon={<ReloadOutlined />}
       onClick={fetchInvoices}
     >
-      Yenile
+      {t('invoice.buttons.reload')}
     </Button>
   ];
 
@@ -412,13 +414,13 @@ export const InvoiceList: React.FC = () => {
   return (
     <PageContainer
       header={{
-        title: 'Fatura Listesi',
-        subTitle: 'Tüm faturaları görüntüleyin ve yönetin',
+        title: t('invoice.title'),
+        subTitle: t('invoice.subtitle'),
         breadcrumb: {
           items: [
-            { title: 'Ana Sayfa' },
-            { title: 'Faturalar' },
-            { title: 'Fatura Listesi' }
+            { title: t('menu.dashboard') },
+            { title: t('menu.invoices') },
+            { title: t('menu.invoiceList') }
           ]
         }
       }}
@@ -436,7 +438,7 @@ export const InvoiceList: React.FC = () => {
         <Col span={6}>
           <ProCard>
             <Statistic
-              title="Toplam Fatura"
+              title={t('invoice.statistics.total')}
               value={pagination.total}
               prefix={<FileTextOutlined />}
             />
@@ -445,7 +447,7 @@ export const InvoiceList: React.FC = () => {
         <Col span={6}>
           <ProCard>
             <Statistic
-              title="Toplam Tutar"
+              title={t('invoice.statistics.totalAmount')}
               value={invoices.reduce((sum, invoice) => sum + (invoice.totalAmount || 0), 0)}
               precision={2}
               prefix="₺"
@@ -456,7 +458,7 @@ export const InvoiceList: React.FC = () => {
         <Col span={6}>
           <ProCard>
             <Statistic
-              title="Bekleyen"
+              title={t('invoice.statistics.pending')}
               value={invoices.filter(inv => inv.status === 'sent').length}
               prefix={<ClockCircleOutlined />}
               valueStyle={{ color: '#faad14' }}
@@ -465,13 +467,13 @@ export const InvoiceList: React.FC = () => {
         </Col>
         <Col span={6}>
           <ProCard>
-            <Statistic
-              title="Onaylanan"
-              value={invoices.filter(inv => inv.status === 'paid').length}
-              prefix={<CheckCircleOutlined />}
-              valueStyle={{ color: '#52c41a' }}
-            />
-          </ProCard>
+          <Statistic
+            title={t('invoice.statistics.paid')}
+            value={invoices.filter(inv => inv.status === 'paid').length}
+            prefix={<CheckCircleOutlined />}
+            valueStyle={{ color: '#52c41a' }}
+          />
+        </ProCard>
         </Col>
       </Row>
 
@@ -480,7 +482,7 @@ export const InvoiceList: React.FC = () => {
         <Row gutter={16}>
           <Col span={6}>
             <Input
-              placeholder="Fatura no veya müşteri ara..."
+              placeholder={t('invoice.placeholders.search')}
               value={filters.searchTerm}
               onChange={(e) => handleFilterChange('searchTerm', e.target.value)}
               prefix={<SearchOutlined />}
@@ -489,34 +491,34 @@ export const InvoiceList: React.FC = () => {
           </Col>
           <Col span={4}>
             <Select
-              placeholder="Durum"
+              placeholder={t('invoice.labels.status')}
               value={filters.status}
               onChange={(value) => handleFilterChange('status', value)}
               allowClear
               style={{ width: '100%' }}
             >
-              <Select.Option value="draft">Taslak</Select.Option>
-              <Select.Option value="sent">Gönderildi</Select.Option>
-              <Select.Option value="paid">Ödendi</Select.Option>
-              <Select.Option value="overdue">Vadesi Geçti</Select.Option>
-              <Select.Option value="cancelled">İptal</Select.Option>
+              <Select.Option value="draft">{t('invoice.status.draft')}</Select.Option>
+              <Select.Option value="sent">{t('invoice.status.pending')}</Select.Option>
+              <Select.Option value="paid">{t('invoice.status.paid')}</Select.Option>
+              <Select.Option value="overdue">{t('invoice.status.overdue')}</Select.Option>
+              <Select.Option value="cancelled">{t('invoice.status.cancelled')}</Select.Option>
             </Select>
           </Col>
           <Col span={4}>
             <Select
-              placeholder="Tip"
+              placeholder={t('invoice.labels.invoiceType')}
               value={filters.isOfficial}
               onChange={(value) => handleFilterChange('isOfficial', value)}
               allowClear
               style={{ width: '100%' }}
             >
-              <Select.Option value={true}>Resmi</Select.Option>
-              <Select.Option value={false}>Gayri Resmi</Select.Option>
+              <Select.Option value={true}>{t('invoice.labels.official')}</Select.Option>
+              <Select.Option value={false}>{t('invoice.labels.unofficial')}</Select.Option>
             </Select>
           </Col>
           <Col span={5}>
             <DatePicker.RangePicker
-              placeholder={['Başlangıç', 'Bitiş']}
+              placeholder={[t('invoice.filters.startDate'), t('invoice.filters.endDate')]}
               onChange={(dates) => {
                 if (dates) {
                   handleFilterChange('startDate', dates[0]?.format('YYYY-MM-DD'));
@@ -532,10 +534,10 @@ export const InvoiceList: React.FC = () => {
           <Col span={5}>
             <Space>
               <Button onClick={handleResetFilters}>
-                Temizle
+                {t('invoice.buttons.reset')}
               </Button>
               <Button type="primary" onClick={fetchInvoices}>
-                Ara
+                {t('invoice.buttons.search')}
               </Button>
             </Space>
           </Col>
@@ -556,7 +558,7 @@ export const InvoiceList: React.FC = () => {
           total: pagination.total,
           showSizeChanger: true,
           showQuickJumper: true,
-          showTotal: (total) => `Toplam ${total} fatura`,
+          showTotal: (total) => t('invoice.table.showTotal', { total }),
         }}
         onChange={handleTableChange}
         rowSelection={{
@@ -580,7 +582,7 @@ export const InvoiceList: React.FC = () => {
           setting: true
         }}
         dateFormatter="string"
-        headerTitle="Fatura Listesi"
+        headerTitle={t('invoice.title')}
       />
     </PageContainer>
   );

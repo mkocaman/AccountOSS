@@ -57,12 +57,160 @@
     "sales": "Sales",
     "quotations": "Quotations",
     "salesOrders": "Sales Orders",
-    "invoices": "Invoices",
-    "invoiceList": "Invoice List",
-    "newInvoice": "New Invoice",
-    "createInvoice": "New Invoice",
-    "editInvoice": "Edit Invoice",
-    "invoiceDetail": "Invoice Detail",
+    "invoice": {
+      "title": "Invoices",
+      "subtitle": "Invoice list and management",
+      "titleSingle": "Invoice",
+      "detail": "Invoice Detail",
+      "createTitle": "New Invoice",
+      "editTitle": "Edit Invoice",
+      
+      "buttons": {
+        "new": "New Invoice",
+        "create": "Create Invoice",
+        "edit": "Edit",
+        "delete": "Delete",
+        "save": "Save",
+        "cancel": "Cancel",
+        "back": "Back",
+        "print": "Print",
+        "downloadPdf": "Download PDF",
+        "generatePdf": "Generate PDF",
+        "addItem": "Add Item",
+        "removeItem": "Remove",
+        "search": "Search",
+        "reset": "Reset",
+        "filter": "Filter",
+        "reload": "Reload"
+      },
+      
+      "labels": {
+        "invoiceNumber": "Invoice No",
+        "invoiceDate": "Invoice Date",
+        "dueDate": "Due Date",
+        "customer": "Customer",
+        "customerName": "Customer Name",
+        "invoiceType": "Invoice Type",
+        "official": "Official",
+        "unofficial": "Unofficial",
+        "status": "Status",
+        "currency": "Currency",
+        "notes": "Notes",
+        "items": "Invoice Items",
+        "product": "Product",
+        "quantity": "Quantity",
+        "unitPrice": "Unit Price",
+        "discount": "Discount",
+        "discountPercent": "Discount %",
+        "taxRate": "Tax %",
+        "amount": "Amount",
+        "subtotal": "Subtotal",
+        "totalDiscount": "Total Discount",
+        "totalTax": "Total Tax",
+        "grandTotal": "Grand Total",
+        "createdAt": "Created At",
+        "updatedAt": "Updated At"
+      },
+      
+      "status": {
+        "draft": "Draft",
+        "pending": "Pending",
+        "paid": "Paid",
+        "overdue": "Overdue",
+        "cancelled": "Cancelled",
+        "all": "All"
+      },
+      
+      "type": {
+        "sales": "Sales",
+        "purchase": "Purchase",
+        "all": "All"
+      },
+      
+      "placeholders": {
+        "search": "Search invoice no, customer...",
+        "selectCustomer": "Select customer",
+        "selectProduct": "Select product",
+        "selectCurrency": "Select currency",
+        "enterNotes": "Enter notes",
+        "selectDate": "Select date",
+        "enterQuantity": "Quantity",
+        "enterPrice": "Price"
+      },
+      
+      "filters": {
+        "title": "Filters",
+        "dateRange": "Date Range",
+        "startDate": "Start Date",
+        "endDate": "End Date",
+        "customerFilter": "Customer Filter",
+        "statusFilter": "Status Filter",
+        "typeFilter": "Type Filter"
+      },
+      
+      "messages": {
+        "createSuccess": "Invoice created successfully",
+        "updateSuccess": "Invoice updated successfully",
+        "deleteSuccess": "Invoice deleted successfully",
+        "deleteConfirmTitle": "Delete Invoice",
+        "deleteConfirmContent": "Are you sure you want to delete this invoice? This action cannot be undone.",
+        "pdfGenerating": "Generating PDF...",
+        "pdfSuccess": "PDF generated successfully",
+        "loading": "Loading...",
+        "loadingInvoice": "Loading invoice...",
+        "noData": "No invoices found",
+        "selectCustomerFirst": "Please select customer first",
+        "addAtLeastOneItem": "Please add at least one item",
+        "fillAllFields": "Please fill all fields",
+        "invalidQuantity": "Quantity must be greater than 0",
+        "invalidPrice": "Price must be greater than 0"
+      },
+      
+      "errors": {
+        "loadFailed": "Failed to load invoices",
+        "loadDetailFailed": "Failed to load invoice detail",
+        "createFailed": "Failed to create invoice",
+        "updateFailed": "Failed to update invoice",
+        "deleteFailed": "Failed to delete invoice",
+        "pdfFailed": "Failed to generate PDF",
+        "loadCustomersFailed": "Failed to load customers",
+        "loadProductsFailed": "Failed to load products",
+        "notFound": "Invoice not found",
+        "notFoundDescription": "The invoice you are looking for was not found or may have been deleted.",
+        "serverError": "Server error occurred"
+      },
+      
+      "validation": {
+        "customerRequired": "Customer selection is required",
+        "invoiceDateRequired": "Invoice date is required",
+        "dueDateRequired": "Due date is required",
+        "typeRequired": "Invoice type selection is required",
+        "currencyRequired": "Currency selection is required",
+        "itemsRequired": "At least one item must be added",
+        "productRequired": "Product selection is required",
+        "quantityRequired": "Quantity is required",
+        "quantityMin": "Quantity must be at least 1",
+        "priceRequired": "Price is required",
+        "priceMin": "Price must be greater than 0"
+      },
+      
+      "statistics": {
+        "total": "Total Invoices",
+        "totalAmount": "Total Amount",
+        "pending": "Pending",
+        "paid": "Paid"
+      },
+      
+      "table": {
+        "actions": "Actions",
+        "showTotal": "Total {{total}} invoices"
+      },
+      
+      "confirmModal": {
+        "okText": "Yes",
+        "cancelText": "Cancel"
+      }
+    },
     "payments": "Payments",
     "paymentsReceivables": "Payments/Receivables",
     "bankAccounts": "Bank Accounts",

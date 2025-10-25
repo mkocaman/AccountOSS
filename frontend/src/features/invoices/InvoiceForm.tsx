@@ -24,6 +24,7 @@ import {
   DollarOutlined
 } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { 
   createInvoice, 
@@ -75,6 +76,7 @@ const formatCurrency = (amount: number): string => {
  * Create ve Edit mode'ları destekler, real-time calculation ve validation
  */
 export const InvoiceForm: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   
@@ -96,7 +98,7 @@ export const InvoiceForm: React.FC = () => {
       setCustomers(response.items);
       console.log('✅ Müşteriler yüklendi:', response.items.length);
     } catch (error: any) {
-      message.error('Müşteriler yüklenemedi');
+      message.error(t('invoice.errors.loadCustomersFailed'));
       console.error('❌ Müşteri yükleme hatası:', error);
     }
   };
@@ -110,7 +112,7 @@ export const InvoiceForm: React.FC = () => {
       setProducts(response.items);
       console.log('✅ Ürünler yüklendi:', response.items.length);
     } catch (error: any) {
-      message.error('Ürünler yüklenemedi');
+      message.error(t('invoice.errors.loadProductsFailed'));
       console.error('❌ Ürün yükleme hatası:', error);
     }
   };
@@ -154,7 +156,7 @@ export const InvoiceForm: React.FC = () => {
       setLoading(false);
     } catch (error: any) {
       setLoading(false);
-      message.error(error.message || 'Fatura yüklenirken hata oluştu');
+      message.error(error.message || t('invoice.errors.loadDetailFailed'));
       console.error('❌ Fatura yükleme hatası:', error);
       navigate('/invoices');
     }
@@ -294,7 +296,7 @@ export const InvoiceForm: React.FC = () => {
       // API çağrısı
       await createInvoice(createDto);
       
-      message.success('Fatura başarıyla oluşturuldu');
+      message.success(t('invoice.messages.createSuccess'));
       console.log('✅ Fatura oluşturuldu');
       setSubmitting(false);
       
@@ -302,7 +304,7 @@ export const InvoiceForm: React.FC = () => {
       navigate('/invoices');
     } catch (error: any) {
       setSubmitting(false);
-      message.error(error.message || 'Fatura oluşturulurken hata oluştu');
+      message.error(error.message || t('invoice.errors.createFailed'));
       console.error('❌ Fatura oluşturma hatası:', error);
     }
   };
@@ -334,14 +336,14 @@ export const InvoiceForm: React.FC = () => {
       
       await updateInvoice(updateDto);
       
-      message.success('Fatura başarıyla güncellendi');
+      message.success(t('invoice.messages.updateSuccess'));
       console.log('✅ Fatura güncellendi');
       setSubmitting(false);
       
       navigate('/invoices');
     } catch (error: any) {
       setSubmitting(false);
-      message.error(error.message || 'Fatura güncellenirken hata oluştu');
+      message.error(error.message || t('invoice.errors.updateFailed'));
       console.error('❌ Fatura güncelleme hatası:', error);
     }
   };
@@ -352,21 +354,21 @@ export const InvoiceForm: React.FC = () => {
   const handleSubmit = async (values: any) => {
     // Items kontrolü
     if (items.length === 0) {
-      message.error('En az bir ürün eklemelisiniz');
+      message.error(t('invoice.messages.addAtLeastOneItem'));
       return;
     }
     
     // Her item'ın productId'si olmalı
     const hasInvalidItems = items.some(item => !item.productId);
     if (hasInvalidItems) {
-      message.error('Tüm satırlarda ürün seçili olmalıdır');
+      message.error(t('invoice.validation.productRequired'));
       return;
     }
     
     // Her item'ın quantity'si > 0 olmalı
     const hasZeroQuantity = items.some(item => item.quantity <= 0);
     if (hasZeroQuantity) {
-      message.error('Miktar 0\'dan büyük olmalıdır');
+      message.error(t('invoice.validation.quantityMin'));
       return;
     }
     
@@ -382,7 +384,7 @@ export const InvoiceForm: React.FC = () => {
   if (loading) {
     return (
       <div style={{ textAlign: 'center', padding: '50px' }}>
-        <Spin size="large" tip="Fatura yükleniyor..." />
+        <Spin size="large" tip={t('invoice.messages.loadingInvoice')} />
       </div>
     );
   }
@@ -392,7 +394,7 @@ export const InvoiceForm: React.FC = () => {
   return (
     <PageContainer
       header={{
-        title: isEditMode ? 'Fatura Düzenle' : 'Yeni Fatura',
+        title: isEditMode ? t('invoice.editTitle') : t('invoice.createTitle'),
         onBack: () => navigate('/invoices')
       }}
     >
@@ -408,16 +410,16 @@ export const InvoiceForm: React.FC = () => {
         }}
       >
         {/* Temel Bilgiler */}
-        <Card title="Fatura Bilgileri" style={{ marginBottom: 16 }}>
+        <Card title={`${t('invoice.titleSingle')} Bilgileri`} style={{ marginBottom: 16 }}>
           <Row gutter={16}>
             <Col span={8}>
               <Form.Item
                 name="customerId"
-                label="Müşteri"
-                rules={[{ required: true, message: 'Müşteri seçimi zorunludur' }]}
+                label={t('invoice.labels.customer')}
+                rules={[{ required: true, message: t('invoice.validation.customerRequired') }]}
               >
                 <Select
-                  placeholder="Müşteri seçiniz"
+                  placeholder={t('invoice.placeholders.selectCustomer')}
                   showSearch
                   filterOption={(input, option) =>
                     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
@@ -432,8 +434,8 @@ export const InvoiceForm: React.FC = () => {
             <Col span={8}>
               <Form.Item
                 name="invoiceDate"
-                label="Fatura Tarihi"
-                rules={[{ required: true, message: 'Fatura tarihi zorunludur' }]}
+                label={t('invoice.labels.invoiceDate')}
+                rules={[{ required: true, message: t('invoice.validation.invoiceDateRequired') }]}
               >
                 <Input type="date" />
               </Form.Item>
@@ -441,8 +443,8 @@ export const InvoiceForm: React.FC = () => {
             <Col span={8}>
               <Form.Item
                 name="dueDate"
-                label="Vade Tarihi"
-                rules={[{ required: true, message: 'Vade tarihi zorunludur' }]}
+                label={t('invoice.labels.dueDate')}
+                rules={[{ required: true, message: t('invoice.validation.dueDateRequired') }]}
               >
                 <Input type="date" />
               </Form.Item>
@@ -453,20 +455,20 @@ export const InvoiceForm: React.FC = () => {
             <Col span={8}>
               <Form.Item
                 name="isOfficial"
-                label="Fatura Tipi"
-                rules={[{ required: true, message: 'Fatura tipi seçimi zorunludur' }]}
+                label={t('invoice.labels.invoiceType')}
+                rules={[{ required: true, message: t('invoice.validation.typeRequired') }]}
               >
                 <Select>
-                  <Select.Option value={true}>Resmi</Select.Option>
-                  <Select.Option value={false}>Gayri Resmi</Select.Option>
+                  <Select.Option value={true}>{t('invoice.labels.official')}</Select.Option>
+                  <Select.Option value={false}>{t('invoice.labels.unofficial')}</Select.Option>
                 </Select>
               </Form.Item>
             </Col>
             <Col span={8}>
               <Form.Item
                 name="currencyCode"
-                label="Para Birimi"
-                rules={[{ required: true, message: 'Para birimi seçimi zorunludur' }]}
+                label={t('invoice.labels.currency')}
+                rules={[{ required: true, message: t('invoice.validation.currencyRequired') }]}
               >
                 <Select>
                   <Select.Option value="TRY">Türk Lirası</Select.Option>
@@ -476,8 +478,8 @@ export const InvoiceForm: React.FC = () => {
               </Form.Item>
             </Col>
             <Col span={8}>
-              <Form.Item name="notes" label="Notlar">
-                <Input.TextArea rows={2} placeholder="Fatura notları..." />
+              <Form.Item name="notes" label={t('invoice.labels.notes')}>
+                <Input.TextArea rows={2} placeholder={t('invoice.placeholders.enterNotes')} />
               </Form.Item>
             </Col>
           </Row>
@@ -488,14 +490,14 @@ export const InvoiceForm: React.FC = () => {
           title={
             <Space>
               <CalculatorOutlined />
-              Fatura Kalemleri
+              {t('invoice.labels.items')}
               <Button 
                 type="primary" 
                 icon={<PlusOutlined />} 
                 onClick={handleAddItem}
                 size="small"
               >
-                Kalem Ekle
+                {t('invoice.buttons.addItem')}
               </Button>
             </Space>
           }
@@ -508,14 +510,14 @@ export const InvoiceForm: React.FC = () => {
             size="small"
             columns={[
               {
-                title: 'Ürün',
+                title: t('invoice.labels.product'),
                 dataIndex: 'productId',
                 key: 'productId',
                 width: 200,
                 render: (_, record, index) => (
                   <Select
                     value={record.productId}
-                    placeholder="Ürün seçiniz"
+                    placeholder={t('invoice.placeholders.selectProduct')}
                     showSearch
                     style={{ width: '100%' }}
                     onChange={(value) => handleUpdateItem(index, 'productId', value)}
@@ -527,7 +529,7 @@ export const InvoiceForm: React.FC = () => {
                 ),
               },
               {
-                title: 'Miktar',
+                title: t('invoice.labels.quantity'),
                 dataIndex: 'quantity',
                 key: 'quantity',
                 width: 100,
@@ -542,7 +544,7 @@ export const InvoiceForm: React.FC = () => {
                 ),
               },
               {
-                title: 'Birim Fiyat',
+                title: t('invoice.labels.unitPrice'),
                 dataIndex: 'unitPrice',
                 key: 'unitPrice',
                 width: 120,
@@ -558,7 +560,7 @@ export const InvoiceForm: React.FC = () => {
                 ),
               },
               {
-                title: 'İndirim %',
+                title: t('invoice.labels.discountPercent'),
                 dataIndex: 'discountPercentage',
                 key: 'discountPercentage',
                 width: 100,
@@ -575,7 +577,7 @@ export const InvoiceForm: React.FC = () => {
                 ),
               },
               {
-                title: 'KDV %',
+                title: t('invoice.labels.taxRate'),
                 dataIndex: 'taxRate',
                 key: 'taxRate',
                 width: 100,
@@ -592,7 +594,7 @@ export const InvoiceForm: React.FC = () => {
                 ),
               },
               {
-                title: 'Tutar',
+                title: t('invoice.labels.amount'),
                 dataIndex: 'amount',
                 key: 'amount',
                 width: 120,
@@ -602,7 +604,7 @@ export const InvoiceForm: React.FC = () => {
                 ),
               },
               {
-                title: 'İşlemler',
+                title: t('invoice.table.actions'),
                 key: 'actions',
                 width: 80,
                 render: (_, __, index) => (
@@ -623,7 +625,7 @@ export const InvoiceForm: React.FC = () => {
           title={
             <Space>
               <DollarOutlined />
-              Fatura Toplamları
+              {t('invoice.titleSingle')} Toplamları
             </Space>
           }
           style={{ marginBottom: 16 }}
@@ -631,7 +633,7 @@ export const InvoiceForm: React.FC = () => {
           <Row gutter={16}>
             <Col span={6}>
               <Statistic
-                title="Ara Toplam"
+                title={t('invoice.labels.subtotal')}
                 value={totals.subtotal}
                 precision={2}
                 prefix="₺"
@@ -639,7 +641,7 @@ export const InvoiceForm: React.FC = () => {
             </Col>
             <Col span={6}>
               <Statistic
-                title="İndirim"
+                title={t('invoice.labels.discount')}
                 value={totals.discountAmount}
                 precision={2}
                 prefix="₺"
@@ -648,7 +650,7 @@ export const InvoiceForm: React.FC = () => {
             </Col>
             <Col span={6}>
               <Statistic
-                title="KDV"
+                title={t('invoice.labels.taxRate')}
                 value={totals.taxAmount}
                 precision={2}
                 prefix="₺"
@@ -656,7 +658,7 @@ export const InvoiceForm: React.FC = () => {
             </Col>
             <Col span={6}>
               <Statistic
-                title="Genel Toplam"
+                title={t('invoice.labels.grandTotal')}
                 value={totals.total}
                 precision={2}
                 prefix="₺"
@@ -670,7 +672,7 @@ export const InvoiceForm: React.FC = () => {
         <Card>
           <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
             <Button onClick={() => navigate('/invoices')}>
-              İptal
+              {t('invoice.buttons.cancel')}
             </Button>
             <Button 
               type="primary" 
@@ -678,7 +680,7 @@ export const InvoiceForm: React.FC = () => {
               icon={<SaveOutlined />}
               loading={submitting}
             >
-              {isEditMode ? 'Güncelle' : 'Kaydet'}
+              {isEditMode ? t('invoice.buttons.save') : t('invoice.buttons.create')}
             </Button>
           </Space>
         </Card>

@@ -27,6 +27,7 @@ import {
   DollarOutlined
 } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { getInvoice, deleteInvoice, updateInvoiceStatus, generateInvoicePDF } from '@/services/invoiceService';
 import type { Invoice, InvoiceStatus } from '@/types/invoice';
@@ -56,6 +57,7 @@ const formatDate = (date: string): string => {
  * Fatura bilgilerini görüntüleme, düzenleme, silme ve PDF oluşturma
  */
 export const InvoiceDetail = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [invoice, setInvoice] = useState<Invoice | null>(null);
@@ -66,7 +68,7 @@ export const InvoiceDetail = () => {
    */
   const fetchInvoiceDetail = async () => {
     if (!id) {
-      message.error('Fatura ID bulunamadı');
+      message.error(t('invoice.errors.notFound'));
       navigate('/invoices');
       return;
     }
@@ -83,7 +85,7 @@ export const InvoiceDetail = () => {
       setLoading(false);
     } catch (error: any) {
       setLoading(false);
-      message.error(error.message || 'Fatura detayı yüklenirken hata oluştu');
+      message.error(error.message || t('invoice.errors.loadDetailFailed'));
       console.error('❌ Fatura detayı hatası:', error);
       // 404 ise listeye yönlendir
       if (error.response?.status === 404) {
@@ -111,18 +113,18 @@ export const InvoiceDetail = () => {
    */
   const handleDelete = () => {
     Modal.confirm({
-      title: 'Faturayı Sil',
-      content: 'Bu faturayı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.',
-      okText: 'Evet, Sil',
+      title: t('invoice.messages.deleteConfirmTitle'),
+      content: t('invoice.messages.deleteConfirmContent'),
+      okText: t('invoice.confirmModal.okText'),
       okType: 'danger',
-      cancelText: 'İptal',
+      cancelText: t('invoice.confirmModal.cancelText'),
       onOk: async () => {
         try {
           await deleteInvoice(invoice!.id);
-          message.success('Fatura başarıyla silindi');
+          message.success(t('invoice.messages.deleteSuccess'));
           navigate('/invoices');
         } catch (error: any) {
-          message.error(error.message || 'Fatura silinirken hata oluştu');
+          message.error(error.message || t('invoice.errors.deleteFailed'));
         }
       },
     });
@@ -133,13 +135,13 @@ export const InvoiceDetail = () => {
    */
   const handleGeneratePDF = async () => {
     try {
-      message.loading('PDF oluşturuluyor...', 0);
+      message.loading(t('invoice.messages.pdfGenerating'), 0);
       await generateInvoicePDF(invoice!.id);
       message.destroy();
-      message.success('PDF başarıyla oluşturuldu');
+      message.success(t('invoice.messages.pdfSuccess'));
     } catch (error: any) {
       message.destroy();
-      message.error(error.message || 'PDF oluşturulurken hata oluştu');
+      message.error(error.message || t('invoice.errors.pdfFailed'));
     }
   };
 
@@ -156,11 +158,11 @@ export const InvoiceDetail = () => {
   const handleStatusChange = async (newStatus: string) => {
     try {
       await updateInvoiceStatus(invoice!.id, newStatus);
-      message.success('Fatura durumu güncellendi');
+      message.success(t('invoice.messages.updateSuccess'));
       // Detayı yeniden yükle
       fetchInvoiceDetail();
     } catch (error: any) {
-      message.error(error.message || 'Durum güncellenirken hata oluştu');
+      message.error(error.message || t('invoice.errors.updateFailed'));
     }
   };
 
@@ -169,11 +171,11 @@ export const InvoiceDetail = () => {
    */
   const getStatusConfig = (status: string) => {
     const configs: Record<string, { color: string; text: string }> = {
-      'draft': { color: 'default', text: 'Taslak' },
-      'sent': { color: 'processing', text: 'Gönderildi' },
-      'paid': { color: 'success', text: 'Ödendi' },
-      'overdue': { color: 'error', text: 'Vadesi Geçti' },
-      'cancelled': { color: 'default', text: 'İptal Edildi' },
+      'draft': { color: 'default', text: t('invoice.status.draft') },
+      'sent': { color: 'processing', text: t('invoice.status.pending') },
+      'paid': { color: 'success', text: t('invoice.status.paid') },
+      'overdue': { color: 'error', text: t('invoice.status.overdue') },
+      'cancelled': { color: 'default', text: t('invoice.status.cancelled') },
     };
     return configs[status] || { color: 'default', text: status };
   };
@@ -182,7 +184,7 @@ export const InvoiceDetail = () => {
   if (loading) {
     return (
       <div style={{ textAlign: 'center', padding: '50px' }}>
-        <Spin size="large" tip="Fatura yükleniyor..." />
+        <Spin size="large" tip={t('invoice.messages.loadingInvoice')} />
       </div>
     );
   }
@@ -192,11 +194,11 @@ export const InvoiceDetail = () => {
     return (
       <Result
         status="404"
-        title="Fatura Bulunamadı"
-        subTitle="Aradığınız fatura bulunamadı veya silinmiş olabilir."
+        title={t('invoice.errors.notFound')}
+        subTitle={t('invoice.errors.notFoundDescription')}
         extra={
           <Button type="primary" onClick={() => navigate('/invoices')}>
-            Fatura Listesine Dön
+            {t('invoice.buttons.back')}
           </Button>
         }
       />
@@ -212,7 +214,7 @@ export const InvoiceDetail = () => {
       width: 50,
     },
     {
-      title: 'Ürün',
+      title: t('invoice.labels.product'),
       key: 'product',
       render: (_, record) => (
         <div>
@@ -227,20 +229,20 @@ export const InvoiceDetail = () => {
       key: 'description',
     },
     {
-      title: 'Miktar',
+      title: t('invoice.labels.quantity'),
       key: 'quantity',
       align: 'right' as const,
       render: (_, record) => `${record.quantity} ${record.unit || 'adet'}`,
     },
     {
-      title: 'Birim Fiyat',
+      title: t('invoice.labels.unitPrice'),
       dataIndex: 'unitPrice',
       key: 'unitPrice',
       align: 'right' as const,
       render: (price) => formatCurrency(price, invoice.currency),
     },
     {
-      title: 'İndirim',
+      title: t('invoice.labels.discount'),
       key: 'discount',
       align: 'right' as const,
       render: (_, record) =>
@@ -249,13 +251,13 @@ export const InvoiceDetail = () => {
           : '-',
     },
     {
-      title: 'KDV',
+      title: t('invoice.labels.taxRate'),
       key: 'tax',
       align: 'right' as const,
       render: (_, record) => `%${record.taxRate} (${formatCurrency(record.taxAmount, invoice.currency)})`,
     },
     {
-      title: 'Tutar',
+      title: t('invoice.labels.amount'),
       dataIndex: 'amount',
       key: 'amount',
       align: 'right' as const,
@@ -292,9 +294,9 @@ export const InvoiceDetail = () => {
             onClick={() => navigate('/invoices')}
             className="mr-4"
           >
-            Geri Dön
+            {t('invoice.buttons.back')}
           </Button>
-          <h1 className="text-2xl font-bold inline">Fatura Detayı</h1>
+          <h1 className="text-2xl font-bold inline">{t('invoice.detail')}</h1>
           <p className="text-gray-500">{invoice.invoiceNumber}</p>
         </div>
         <Space>
@@ -302,26 +304,26 @@ export const InvoiceDetail = () => {
             icon={<FilePdfOutlined />} 
             onClick={handleGeneratePDF}
           >
-            PDF İndir
+            {t('invoice.buttons.downloadPdf')}
           </Button>
           <Button 
             icon={<PrinterOutlined />} 
             onClick={handlePrint}
           >
-            Yazdır
+            {t('invoice.buttons.print')}
           </Button>
           <Button
             icon={<EditOutlined />}
             onClick={handleEdit}
           >
-            Düzenle
+            {t('invoice.buttons.edit')}
           </Button>
           <Button
             danger
             icon={<DeleteOutlined />}
             onClick={handleDelete}
           >
-            Sil
+            {t('invoice.buttons.delete')}
           </Button>
         </Space>
       </div>
@@ -331,29 +333,29 @@ export const InvoiceDetail = () => {
         title={
           <Space>
             <FileTextOutlined />
-            Fatura Bilgileri
+            {t('invoice.titleSingle')} Bilgileri
           </Space>
         } 
         className="mb-4"
       >
         <Descriptions column={3} bordered>
-          <Descriptions.Item label="Fatura No">
+          <Descriptions.Item label={t('invoice.labels.invoiceNumber')}>
             <span className="font-mono font-medium text-lg">
               {invoice.invoiceNumber}
             </span>
           </Descriptions.Item>
-          <Descriptions.Item label="Tür">
+          <Descriptions.Item label={t('invoice.labels.invoiceType')}>
             <Tag color={invoice.invoiceType === 'sales' ? 'green' : 'blue'}>
-              {invoice.invoiceType === 'sales' ? 'Satış' : 'Alış'}
+              {invoice.invoiceType === 'sales' ? t('invoice.type.sales') : t('invoice.type.purchase')}
             </Tag>
           </Descriptions.Item>
-          <Descriptions.Item label="Tarih">
+          <Descriptions.Item label={t('invoice.labels.invoiceDate')}>
             <Space>
               <CalendarOutlined />
               {formatDate(invoice.invoiceDate)}
             </Space>
           </Descriptions.Item>
-          <Descriptions.Item label="Müşteri">
+          <Descriptions.Item label={t('invoice.labels.customer')}>
             <div>
               <div className="font-medium flex items-center">
                 <UserOutlined className="mr-2" />
@@ -364,13 +366,13 @@ export const InvoiceDetail = () => {
               </div>
             </div>
           </Descriptions.Item>
-          <Descriptions.Item label="Vade Tarihi">
+          <Descriptions.Item label={t('invoice.labels.dueDate')}>
             {invoice.dueDate ? formatDate(invoice.dueDate) : '-'}
           </Descriptions.Item>
-          <Descriptions.Item label="Para Birimi">
+          <Descriptions.Item label={t('invoice.labels.currency')}>
             <Tag>{invoice.currency}</Tag>
           </Descriptions.Item>
-          <Descriptions.Item label="Durum">
+          <Descriptions.Item label={t('invoice.labels.status')}>
             <Badge 
               status={getStatusConfig(invoice.status).color as any} 
               text={getStatusConfig(invoice.status).text}
@@ -379,7 +381,7 @@ export const InvoiceDetail = () => {
           <Descriptions.Item label="Kur">
             {invoice.exchangeRate}
           </Descriptions.Item>
-          <Descriptions.Item label="Oluşturulma">
+          <Descriptions.Item label={t('invoice.labels.createdAt')}>
             {formatDate(invoice.createdAt)}
           </Descriptions.Item>
           {invoice.description && (
@@ -388,7 +390,7 @@ export const InvoiceDetail = () => {
             </Descriptions.Item>
           )}
           {invoice.notes && (
-            <Descriptions.Item label="Notlar" span={3}>
+            <Descriptions.Item label={t('invoice.labels.notes')} span={3}>
               {invoice.notes}
             </Descriptions.Item>
           )}
@@ -400,7 +402,7 @@ export const InvoiceDetail = () => {
         title={
           <Space>
             <FileTextOutlined />
-            Fatura Kalemleri
+            {t('invoice.labels.items')}
           </Space>
         } 
         className="mb-4"
@@ -419,28 +421,28 @@ export const InvoiceDetail = () => {
         title={
           <Space>
             <DollarOutlined />
-            Fatura Özeti
+            {t('invoice.titleSingle')} Özeti
           </Space>
         }
         className="mb-4"
       >
         <div className="max-w-md ml-auto">
           <Descriptions bordered column={1}>
-            <Descriptions.Item label="Ara Toplam">
+            <Descriptions.Item label={t('invoice.labels.subtotal')}>
               <strong>{formatCurrency(invoice.subtotal, invoice.currency)}</strong>
             </Descriptions.Item>
             {invoice.discountAmount > 0 && (
-              <Descriptions.Item label="İndirim">
+              <Descriptions.Item label={t('invoice.labels.discount')}>
                 <strong style={{ color: '#ff4d4f' }}>
                   -{formatCurrency(invoice.discountAmount, invoice.currency)}
                 </strong>
               </Descriptions.Item>
             )}
-            <Descriptions.Item label="KDV">
+            <Descriptions.Item label={t('invoice.labels.taxRate')}>
               <strong>{formatCurrency(invoice.taxAmount, invoice.currency)}</strong>
             </Descriptions.Item>
             <Divider />
-            <Descriptions.Item label="Genel Toplam">
+            <Descriptions.Item label={t('invoice.labels.grandTotal')}>
               <strong style={{ fontSize: '18px', color: '#1890ff' }}>
                 {formatCurrency(invoice.totalAmount, invoice.currency)}
               </strong>
