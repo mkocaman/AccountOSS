@@ -1,5 +1,4 @@
 import axios, { type AxiosInstance, type AxiosRequestConfig } from 'axios';
-import { message } from 'antd';
 
 // Debug mode - Development ortamında console log
 const DEBUG = import.meta.env.DEV;
@@ -156,11 +155,11 @@ class ApiClient {
           console.error('❌ Network Error:', error.message);
         }
 
-        // Diğer hatalar için mesaj göster
+        // Diğer hatalar için console log
         const errorMessage = error.response?.data?.message || 
                            error.message || 
                            'Bir hata oluştu';
-        message.error(errorMessage);
+        console.error('❌ API Error:', errorMessage);
 
         return Promise.reject(error);
       }

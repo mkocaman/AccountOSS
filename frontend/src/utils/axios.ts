@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { message } from 'antd';
 
 /**
  * Axios instance konfigürasyonu
@@ -74,23 +73,23 @@ axiosInstance.interceptors.response.use(
 
     // 403 - Forbidden: Yetkisiz erişim
     if (error.response?.status === 403) {
-      message.error('Bu işlem için yetkiniz yok');
+      console.error('❌ Yetkisiz erişim:', error);
       window.location.href = '/403';
     }
 
     // 404 - Not Found
     if (error.response?.status === 404) {
-      message.error('İstek yapılan kaynak bulunamadı');
+      console.error('❌ Kaynak bulunamadı:', error);
     }
 
     // 500 - Internal Server Error
     if (error.response?.status === 500) {
-      message.error('Sunucu hatası oluştu. Lütfen daha sonra tekrar deneyin.');
+      console.error('❌ Sunucu hatası:', error);
     }
 
     // Network error
     if (!error.response) {
-      message.error('Bağlantı hatası. İnternet bağlantınızı kontrol edin.');
+      console.error('❌ Bağlantı hatası:', error);
     }
 
     return Promise.reject(error);

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { message } from 'antd';
+import { App } from 'antd';
 import {
   getInvoices,
   getInvoice,
@@ -42,6 +42,7 @@ export const useInvoice = (id: string) => {
  */
 export const useCreateInvoice = () => {
   const queryClient = useQueryClient();
+  const { message } = App.useApp();
 
   return useMutation({
     mutationFn: (data: CreateInvoiceRequest) => createInvoice(data),
@@ -60,6 +61,7 @@ export const useCreateInvoice = () => {
  */
 export const useUpdateInvoice = () => {
   const queryClient = useQueryClient();
+  const { message } = App.useApp();
 
   return useMutation({
     mutationFn: (data: UpdateInvoiceRequest) => updateInvoice(data),
@@ -79,6 +81,7 @@ export const useUpdateInvoice = () => {
  */
 export const useDeleteInvoice = () => {
   const queryClient = useQueryClient();
+  const { message } = App.useApp();
 
   return useMutation({
     mutationFn: (id: string) => deleteInvoice(id),
@@ -97,6 +100,7 @@ export const useDeleteInvoice = () => {
  */
 export const useUpdateInvoiceStatus = () => {
   const queryClient = useQueryClient();
+  const { message } = App.useApp();
 
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: string }) => 
