@@ -54,10 +54,15 @@ interface InvoiceQueryParams {
  * Sayfalama, sıralama, filtreleme, arama ve CRUD işlemleri
  */
 export const InvoiceList: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const actionRef = useRef<ActionType>();
   const { message } = App.useApp();
+  
+  // Debug logging
+  console.log('🌐 Current language:', i18n.language);
+  console.log('🔑 Translation test:', t('invoice.title'));
+  console.log('📚 Available languages:', i18n.languages);
   
   // State yönetimi
   const [invoices, setInvoices] = useState<Invoice[]>([]);
