@@ -54,16 +54,26 @@ export const formatNumber = (value: number, locale: string = 'tr-TR'): string =>
 };
 
 // Chart renk paleti
-export const chartColors = [
-  '#1890ff', // Mavi
-  '#52c41a', // Yeşil
-  '#fa8c16', // Turuncu
-  '#722ed1', // Mor
-  '#eb2f96', // Pembe
-  '#13c2c2', // Cyan
-  '#faad14', // Sarı
-  '#f5222d', // Kırmızı
-];
+export const chartColors = {
+  primary: '#1890ff',
+  success: '#52c41a', 
+  warning: '#faad14',
+  error: '#f5222d',
+  info: '#13c2c2',
+  purple: '#722ed1',
+  pink: '#eb2f96',
+  orange: '#fa8c16',
+  palette: [
+    '#1890ff', // Mavi
+    '#52c41a', // Yeşil
+    '#fa8c16', // Turuncu
+    '#722ed1', // Mor
+    '#eb2f96', // Pembe
+    '#13c2c2', // Cyan
+    '#faad14', // Sarı
+    '#f5222d', // Kırmızı
+  ]
+};
 
 // Responsive chart height calculator
 export const getResponsiveChartHeight = (baseHeight: number = 350): number => {

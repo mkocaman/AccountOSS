@@ -127,7 +127,7 @@ export const RevenueByCustomerChart: React.FC<RevenueByCustomerChartProps> = ({
         </Pie>
 
         {/* Tooltip */}
-        <Tooltip content={<CustomTooltip />} />
+        <Tooltip content={CustomTooltip} />
 
         {/* Legend */}
         <Legend
