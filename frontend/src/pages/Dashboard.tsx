@@ -22,11 +22,14 @@ import {
 } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { StatisticsCard } from './dashboard/StatisticsCard';
 import { SalesChart } from './dashboard/SalesChart';
 import { TopProductsChart } from './dashboard/TopProductsChart';
 import { RevenueByCustomerChart } from './dashboard/RevenueByCustomerChart';
 import { CashFlowChart } from './dashboard/CashFlowChart';
+import { RecentActivities } from './dashboard/RecentActivities';
+import { LowStockAlerts } from './dashboard/LowStockAlerts';
 import { dashboardService } from '@/services/dashboardService';
 import type { DashboardData, DashboardFilter } from '@/types/dashboard';
 
@@ -40,6 +43,9 @@ export const Dashboard: React.FC = () => {
   console.log('🔴 Dashboard component started rendering');
   console.log('🔴 Dashboard component is being executed');
 
+  // Navigation hook
+  const navigate = useNavigate();
+  
   // Filtre state
   const [filter, setFilter] = useState<DashboardFilter>({
     period: 'thisMonth',
@@ -466,10 +472,14 @@ export const Dashboard: React.FC = () => {
             loading={isLoading}
             bordered={false}
           >
-            {/* RecentActivities component buraya gelecek */}
-            <div style={{ textAlign: 'center', padding: '50px 0', color: '#8c8c8c' }}>
-              📋 {t('dashboard.recentActivities.title')} - Coming in Task 7
-            </div>
+            <RecentActivities
+              data={dashboardData?.recentActivities || []}
+              loading={isLoading}
+              onViewAll={() => {
+                // TODO: Navigate to full activities page
+                message.info('Son aktiviteler sayfası yapım aşamasında');
+              }}
+            />
           </Card>
         </Col>
 
@@ -479,10 +489,11 @@ export const Dashboard: React.FC = () => {
             loading={isLoading}
             bordered={false}
           >
-            {/* LowStockAlerts component buraya gelecek */}
-            <div style={{ textAlign: 'center', padding: '50px 0', color: '#8c8c8c' }}>
-              ⚠️ {t('dashboard.lowStockAlerts.title')} - Coming in Task 8
-            </div>
+            <LowStockAlerts
+              data={dashboardData?.lowStockAlerts || []}
+              loading={isLoading}
+              onViewAll={() => navigate('/stock/alerts')}
+            />
           </Card>
         </Col>
       </Row>

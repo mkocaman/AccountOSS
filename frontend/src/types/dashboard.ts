@@ -1,3 +1,26 @@
+// Son aktiviteler için tip
+export interface RecentActivity {
+  id: string;
+  type: 'invoice' | 'payment' | 'customer' | 'product' | 'stock';
+  action: 'created' | 'updated' | 'deleted' | 'paid';
+  description: string;
+  referenceId?: string;
+  amount?: number;
+  date: string;
+  user?: string;
+}
+
+// Düşük stok uyarıları için tip
+export interface LowStockAlert {
+  productId: string;
+  productName: string;
+  currentStock: number;
+  minStock: number;
+  unit: string;
+  status: 'critical' | 'low' | 'warning';
+  lastOrderDate?: string;
+}
+
 // Dashboard İstatistik Türleri
 export interface DashboardStatistics {
   totalSales: number;
