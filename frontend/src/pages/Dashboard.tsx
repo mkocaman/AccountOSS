@@ -1,4 +1,4 @@
-// CACHE BUST: 2025-10-25-16-30 - Force reload
+// CACHE BUST: 2025-10-25-17-11 - Force reload after chart debug logs
 import React, { useState, useEffect } from 'react';
 import {
   Row,
