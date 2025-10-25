@@ -106,6 +106,12 @@ export const Dashboard: React.FC = () => {
     cashFlow: !!dashboardData?.cashFlow,
   });
 
+  // Return öncesi debug
+  console.log('🟣🟣🟣 About to return Dashboard JSX');
+  console.log('🟣 Dashboard data exists:', !!dashboardData);
+  console.log('🟣 Loading state:', isLoading);
+  console.log('🟣 Error state:', !!error);
+
   // Hata durumu
   useEffect(() => {
     if (error) {
