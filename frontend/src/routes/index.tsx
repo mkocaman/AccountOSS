@@ -90,7 +90,7 @@ const JournalEntryDetail = lazy(() => import('@/features/journalEntries/JournalE
 const LedgerView = lazy(() => import('@/features/journalEntries/LedgerView'));
 const ReportsDashboard = lazy(() => import('@/features/reports/ReportsDashboard'));
 const IncomeStatementReport = lazy(() => import('@/features/reports/IncomeStatementReport'));
-const SalesReport = lazy(() => import('@/features/reports/SalesReport'));
+const SalesReport = lazy(() => import('@/pages/reports/SalesReport'));
 const InventoryReport = lazy(() => import('@/features/reports/InventoryReport'));
 const AgingReport = lazy(() => import('@/features/reports/AgingReport'));
 
