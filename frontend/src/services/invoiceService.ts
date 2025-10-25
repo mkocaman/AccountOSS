@@ -410,15 +410,22 @@ export const suggestInvoiceNumber = async (
   try {
     console.log('🔍 Suggesting invoice number for type:', invoiceType);
     
-    // API isteği gönder
-    const response = await client.get<ApiResponse<{ invoiceNumber: string }>>(`/invoices/suggest-number?type=${invoiceType}`);
+    // Backend endpoint hazır olana kadar mock data dön
+    console.log('ℹ️ Mock invoice number kullanılıyor (backend endpoint hazır değil)');
     
-    // Başarılı yanıtı döndür
-    console.log('✅ Invoice number suggested successfully:', response.data);
-    return response.data.data.invoiceNumber;
+    // Simulated API delay
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Mock invoice number generate et
+    const timestamp = new Date().getTime();
+    const randomSuffix = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+    const mockNumber = `${invoiceType.toUpperCase()}-${timestamp.toString().slice(-6)}-${randomSuffix}`;
+    
+    console.log('✅ Mock invoice number generated:', mockNumber);
+    return mockNumber;
   } catch (error) {
-    // Hata yönetimi
-    handleApiError(error);
-    throw error; // TypeScript için return statement
+    console.error('❌ Invoice number suggestion error:', error);
+    // Fallback - basit number dön
+    return `${invoiceType.toUpperCase()}-${Date.now()}`;
   }
 };

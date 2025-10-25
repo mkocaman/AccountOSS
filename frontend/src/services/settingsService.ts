@@ -1,4 +1,3 @@
-import { apiClient } from '@/api/client';
 import type { Language } from '@/types/language';
 
 /**
@@ -43,12 +42,23 @@ export const settingsService = {
 
   /**
    * Kullanıcının dil tercihini günceller
+   * Backend endpoint hazır olana kadar mock data kullan
    */
   updateLanguage: async (languageCode: string): Promise<void> => {
     try {
-      await apiClient.post('/settings/language', { languageCode });
+      // Backend endpoint hazır olana kadar mock data kullan
+      console.log('ℹ️ Mock language update kullanılıyor (backend endpoint hazır değil)');
+      
+      // Simulated API delay
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      // Local storage'a kaydet
+      localStorage.setItem('language', languageCode);
+      localStorage.setItem('i18nextLng', languageCode);
+      
+      console.log('✅ Language updated to:', languageCode);
     } catch (error) {
-      console.error('Language update failed:', error);
+      console.error('❌ Language update failed:', error);
       // Sessizce başarısız ol, kullanıcıyı rahatsız etme
     }
   }

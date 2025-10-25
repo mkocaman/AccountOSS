@@ -59,10 +59,12 @@ export const InvoiceList: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const { message } = App.useApp();
   
-  // Debug logging
-  console.log('🌐 Current language:', i18n.language);
-  console.log('🔑 Translation test:', t('invoice.title'));
-  console.log('📚 Available languages:', i18n.languages);
+  // Debug logging (production'da kaldırılabilir)
+  if (import.meta.env.DEV) {
+    console.log('🌐 Current language:', i18n.language);
+    console.log('🔑 Translation test:', t('invoice.title'));
+    console.log('📚 Available languages:', i18n.languages);
+  }
   
   // State yönetimi
   const [invoices, setInvoices] = useState<Invoice[]>([]);
