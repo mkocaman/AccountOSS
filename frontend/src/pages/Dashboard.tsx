@@ -77,18 +77,26 @@ export const Dashboard: React.FC = () => {
 
   // Dashboard verilerini console'a yazdır (debug için)
   useEffect(() => {
+    console.log('📊📊📊 Dashboard Data Changed!');
     if (dashboardData) {
-      console.log('📊 Dashboard Data Loaded:', {
-        statistics: dashboardData.statistics,
-        salesChartLength: dashboardData.salesChart?.length,
-        topProductsLength: dashboardData.topProducts?.length,
-        customerRevenueLength: dashboardData.customerRevenue?.length,
-        cashFlowLength: dashboardData.cashFlow?.length,
+      console.log('✅ Dashboard Data Loaded:', {
+        hasStatistics: !!dashboardData.statistics,
+        salesChartLength: dashboardData.salesChart?.length || 0,
+        topProductsLength: dashboardData.topProducts?.length || 0,
+        customerRevenueLength: dashboardData.customerRevenue?.length || 0,
+        cashFlowLength: dashboardData.cashFlow?.length || 0,
       });
-      console.log('📈 Sales Chart Data Sample:', dashboardData.salesChart?.[0]);
+      console.log('📈 Sales Chart Sample:', dashboardData.salesChart?.[0]);
       console.log('🏆 Top Products Sample:', dashboardData.topProducts?.[0]);
+    } else {
+      console.log('⚠️ Dashboard data is NULL/UNDEFINED');
     }
   }, [dashboardData]);
+
+  // Loading state'i logla
+  useEffect(() => {
+    console.log('🔄 Loading state changed:', isLoading);
+  }, [isLoading]);
 
   // Hata durumu
   useEffect(() => {
