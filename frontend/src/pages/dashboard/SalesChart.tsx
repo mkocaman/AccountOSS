@@ -16,7 +16,6 @@ import {
   formatCurrencyShort,
   formatMonth,
   chartColors,
-  CustomTooltipWrapper,
   formatCurrency,
 } from '@/utils/chartUtils';
 
@@ -93,12 +92,8 @@ export const SalesChart: React.FC<SalesChartProps> = ({
 
         {/* Tooltip */}
         <Tooltip
-          content={(props) => (
-            <CustomTooltipWrapper
-              {...props}
-              formatter={(value) => formatCurrency(value, i18n.language)}
-            />
-          )}
+          formatter={(value) => [formatCurrency(value, i18n.language), '']}
+          labelFormatter={(label) => formatMonth(label, i18n.language)}
         />
 
         {/* Legend */}

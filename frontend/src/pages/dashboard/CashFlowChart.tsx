@@ -17,7 +17,6 @@ import {
   formatCurrencyShort,
   formatDate,
   chartColors,
-  CustomTooltipWrapper,
   formatCurrency,
 } from '@/utils/chartUtils';
 
@@ -86,12 +85,8 @@ export const CashFlowChart: React.FC<CashFlowChartProps> = ({
 
         {/* Tooltip */}
         <Tooltip
-          content={(props) => (
-            <CustomTooltipWrapper
-              {...props}
-              formatter={(value) => formatCurrency(value, i18n.language)}
-            />
-          )}
+          formatter={(value) => [formatCurrency(value, i18n.language), '']}
+          labelFormatter={(label) => formatDate(label, i18n.language)}
         />
 
         {/* Legend */}

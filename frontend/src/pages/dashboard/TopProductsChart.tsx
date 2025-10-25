@@ -16,7 +16,6 @@ import type { TopProduct } from '@/types/dashboard';
 import {
   formatCurrencyShort,
   chartColors,
-  CustomTooltipWrapper,
   formatCurrency,
 } from '@/utils/chartUtils';
 
@@ -86,17 +85,12 @@ export const TopProductsChart: React.FC<TopProductsChartProps> = ({
 
         {/* Tooltip */}
         <Tooltip
-          content={(props) => (
-            <CustomTooltipWrapper
-              {...props}
-              formatter={(value, name) => {
-                if (name === t('dashboard.charts.revenue')) {
-                  return formatCurrency(value, i18n.language);
-                }
-                return `${value} ${t('dashboard.charts.quantity')}`;
-              }}
-            />
-          )}
+          formatter={(value, name) => {
+            if (name === t('dashboard.charts.revenue')) {
+              return [formatCurrency(value, i18n.language), name];
+            }
+            return [`${value} ${t('dashboard.charts.quantity')}`, name];
+          }}
         />
 
         {/* Legend */}
