@@ -149,7 +149,7 @@ export const GlobalSearch: React.FC = () => {
     <Dropdown
       open={open}
       onOpenChange={setOpen}
-      dropdownRender={() => dropdownContent}
+      popupRender={() => dropdownContent}
       placement="bottom"
       trigger={['click']}
       overlayClassName="global-search-dropdown-overlay"

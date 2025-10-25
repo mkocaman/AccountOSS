@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { login, logout, LoginRequest, LoginResponse } from '../services/authService';
-import { message } from 'antd';
+import { App } from 'antd';
 
 /**
  * Auth hook - Login/logout işlemleri
@@ -10,6 +10,7 @@ import { message } from 'antd';
 export const useAuth = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { message } = App.useApp();
 
   // Login mutation
   const loginMutation = useMutation({

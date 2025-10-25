@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { PageContainer, ProTable, ProCard } from '@ant-design/pro-components';
 import type { ProColumns, ActionType } from '@ant-design/pro-components';
-import { Button, Space, Modal, message, Tooltip, Statistic, Row, Col, Tag, DatePicker, Select, Input } from 'antd';
+import { Button, Space, Modal, Tooltip, Statistic, Row, Col, Tag, DatePicker, Select, Input, App } from 'antd';
 import {
   PlusOutlined,
   EditOutlined,
@@ -57,6 +57,7 @@ export const InvoiceList: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const actionRef = useRef<ActionType>();
+  const { message } = App.useApp();
   
   // State yönetimi
   const [invoices, setInvoices] = useState<Invoice[]>([]);

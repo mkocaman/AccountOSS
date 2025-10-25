@@ -82,20 +82,24 @@ export const ProMainLayout: React.FC = () => {
       routes: [
         {
           path: '/invoices',
-          name: t('menu.invoiceList')
+          name: t('menu.invoiceList'),
+          key: 'invoices-list'
         },
         {
           path: '/invoices/create',
-          name: t('menu.createInvoice')
+          name: t('menu.createInvoice'),
+          key: 'invoices-create'
         },
         {
           path: '/invoices/edit/:id',
           name: t('menu.editInvoice'),
+          key: 'invoices-edit',
           hideInMenu: true
         },
         {
           path: '/invoices/:id',
           name: t('menu.invoiceDetail'),
+          key: 'invoices-detail',
           hideInMenu: true
         }
       ]

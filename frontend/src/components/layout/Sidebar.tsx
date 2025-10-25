@@ -43,10 +43,10 @@ export const Sidebar = ({ collapsed, onCollapse }: SidebarProps) => {
       icon: <FileTextOutlined />,
       label: t('menu.invoices'),
       children: [
-        { key: '/invoices', label: t('menu.invoiceList') },
-        { key: '/invoices/create', label: t('menu.newInvoice') },
-        { key: '/invoices/edit/:id', label: t('menu.editInvoice'), hideInMenu: true },
-        { key: '/invoices/:id', label: t('menu.invoiceDetail'), hideInMenu: true },
+        { key: 'invoices-list', label: t('menu.invoiceList') },
+        { key: 'invoices-create', label: t('menu.newInvoice') },
+        { key: 'invoices-edit', label: t('menu.editInvoice'), hideInMenu: true },
+        { key: 'invoices-detail', label: t('menu.invoiceDetail'), hideInMenu: true },
       ],
     },
     {

@@ -7,14 +7,33 @@ import type { Language } from '@/types/language';
 export const settingsService = {
   /**
    * Mevcut dilleri getirir
+   * Backend endpoint hazır olana kadar mock data döner
    */
   getAvailableLanguages: async (): Promise<Language[]> => {
     try {
-      const response = await apiClient.get<Language[]>('/settings/languages');
-      return response;
+      // Backend'de /settings/languages endpoint'i yok, mock data dön
+      console.log('ℹ️ Mock dil listesi kullanılıyor (backend endpoint hazır değil)');
+      
+      // Simulated API delay
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      return [
+        { 
+          code: 'tr', 
+          name: 'Türkçe', 
+          flag: '🇹🇷', 
+          isDefault: true 
+        },
+        { 
+          code: 'en', 
+          name: 'English', 
+          flag: '🇬🇧', 
+          isDefault: false 
+        }
+      ];
     } catch (error) {
+      console.error('❌ Dil listesi yüklenirken hata:', error);
       // Fallback - API yoksa default diller
-      console.warn('Language API not available, using fallback');
       return [
         { code: 'tr', name: 'Türkçe', flag: '🇹🇷', isDefault: true },
         { code: 'en', name: 'English', flag: '🇬🇧', isDefault: false }
