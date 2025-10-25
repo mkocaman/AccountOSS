@@ -903,3 +903,15 @@ class StockService {
 }
 
 export const stockService = new StockService();
+
+// Export individual functions for useStock.ts
+export const getStockLevels = (filter?: StockLevelFilter) => stockService.getStockLevels(filter);
+export const getStockMovements = (filter?: StockMovementFilter) => stockService.getStockMovements(filter);
+export const getStockAdjustments = (filter?: any) => stockService.getStockAdjustments(filter);
+export const getStockAdjustmentById = (id: string) => stockService.getStockAdjustmentById(id);
+export const createStockAdjustment = (data: CreateStockAdjustmentRequest) => stockService.createStockAdjustment(data);
+export const approveStockAdjustment = (id: string, data: AdjustmentActionRequest) => stockService.approveStockAdjustment(id, data);
+export const rejectStockAdjustment = (id: string, data: AdjustmentActionRequest) => stockService.rejectStockAdjustment(id, data);
+export const getStockMovementDetail = (id: string) => stockService.getStockMovementDetail(id);
+export const getMovementStatistics = () => stockService.getMovementStatistics();
+export const getFIFOLayers = (productId: string, warehouseId?: string) => stockService.getFIFOLayers(productId, warehouseId);
