@@ -52,9 +52,25 @@ export const Dashboard: React.FC = () => {
     retry: 1,
   });
 
+  // Dashboard verilerini console'a yazdır (debug için)
+  useEffect(() => {
+    if (dashboardData) {
+      console.log('📊 Dashboard Data Loaded:', {
+        statistics: dashboardData.statistics,
+        salesChartLength: dashboardData.salesChart?.length,
+        topProductsLength: dashboardData.topProducts?.length,
+        customerRevenueLength: dashboardData.customerRevenue?.length,
+        cashFlowLength: dashboardData.cashFlow?.length,
+      });
+      console.log('📈 Sales Chart Data Sample:', dashboardData.salesChart?.[0]);
+      console.log('🏆 Top Products Sample:', dashboardData.topProducts?.[0]);
+    }
+  }, [dashboardData]);
+
   // Hata durumu
   useEffect(() => {
     if (error) {
+      console.error('❌ Dashboard Load Error:', error);
       message.error(t('dashboard.messages.loadError'));
     }
   }, [error, t]);
