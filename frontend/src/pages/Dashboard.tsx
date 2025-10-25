@@ -36,6 +36,8 @@ export const Dashboard: React.FC = () => {
 
   // CRITICAL: Render log
   console.log('🔴🔴🔴 Dashboard component rendering NOW!');
+  console.log('🔴 Dashboard component started rendering');
+  console.log('🔴 Dashboard component is being executed');
 
   // Filtre state
   const [filter, setFilter] = useState<DashboardFilter>({
